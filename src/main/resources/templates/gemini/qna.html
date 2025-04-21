@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini</title>
+</head>
+<body>
+<h1>Gemini</h1>
+<input type="text" id="questionInput" placeholder="Nhập câu hỏi" />
+<button onclick="askQuestion()">Hỏi</button>
+
+<div id="answerText" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></div>
+
+<script>
+    // Hàm để gọi API và hiển thị câu trả lời
+    function askQuestion() {
+        const question = document.getElementById("questionInput").value;
+
+        // Gọi API backend
+        fetch("/api/qna/ask", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ question })
+        })
+            .then(response => response.text())
+            .then(data => {
+                // Hiển thị câu trả lời trả về từ backend
+                document.getElementById("answerText").innerText = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById("answerText").innerText = "Đã xảy ra lỗi. Vui lòng thử lại!";
+            });
+    }
+</script>
+</body>
+</html>
