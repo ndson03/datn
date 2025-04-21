@@ -47,7 +47,9 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
+		http.csrf().disable()
+			.authorizeRequests()
+			.antMatchers("/api/qna/**").permitAll()
 			.antMatchers("/").authenticated()
 			.antMatchers("/admin/**").hasRole("ADMIN") //user with student or teacher role cannot access url starting with admin
 			.antMatchers("/student/**").hasRole("STUDENT")
