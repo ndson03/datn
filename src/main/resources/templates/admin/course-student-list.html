@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>Danh sach sinh vien</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+		 
+	<link rel="stylesheet" th:href="@{/css/navbar.css}">
+	
+	<link rel="stylesheet" th:href="@{/css/table.css}">
+	
+	<link rel="stylesheet" th:href="@{/css/button.css}">
+	
+	<link rel="stylesheet" th:href="@{/css/admin/course-student-list.css}">
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+	<nav>
+		<i class="fa fa-mortar-board"></i>
+		<h1>Trường SICT - HaUI</h1>
+		<ul>
+			<li>								
+				<a><i class="fa fa-user-circle"></i>Admin</a>
+				<ul class="dropdown">
+					<li>										
+						<form action="#" th:action="@{/logout}" method="POST">	
+							<input type="submit" value="Đăng xuất"></input>
+						</form>						
+					</li>
+				</ul>
+			</li>
+		</ul>		
+	</nav>
+	
+	<div class="vertical-navbar">
+		<ul>
+			<li><a th:href="@{/admin/adminPanel}"><i class="fa fa-home fa-navbar"></i><span>Trang chủ</span></a></li>
+			<li><a th:href="@{/admin/courses}"><i class="fa fa-pencil fa-navbar"></i><span>Khóa học</span></a></li>
+			<li><a th:href="@{/admin/students}"><i class="fa fa-user fa-navbar"></i><span>Sinh viên</span></a></li>
+			<li><a th:href="@{/admin/teachers}"><i class="fa fa-user-secret fa-navbar"></i><span>Giảng viên</span></a></li>
+			<li><a th:href="@{/admin/adminPanel}"><i class="fa fa-calendar fa-navbar"></i><span>Lịch</span></a></li>
+			<li><a th:href="@{/admin/adminPanel}"><i class="fa fa-bullhorn fa-navbar"></i><span>Thông báo</span></a></li>
+			<li><a th:href="@{/admin/adminInfo}"><i class="fa fa-info-circle fa-navbar"></i><span>Thông tin</span></a></li>
+		</ul>
+	</div>
+	
+	<div class="content">
+	
+	<h3 th:text="${course.name}"></h3>
+	
+	<div class="container">
+	
+	<p th:text="${'Giảng viên: ' + teacher.firstName + ' ' + teacher.lastName}"></p>
+	
+	<div th:if="${students.size() == 0}">Không có sinh viên.</div>
+	
+	<div th:if="${students.size() != 0}">
+	
+	<table>
+		<thead>
+			<tr>
+				<th id="table-top-left" class="short-col">Id</th>
+				<th>Họ đệm</th>
+				<th>Tên</th>
+				<th id="table-top-right" class="short-col"></th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			<tr th:each="student : ${students}">
+				<td class="short-col" th:text="${student.id}">
+				<td th:text="${student.firstName}">
+				<td th:text="${student.lastName}">
+				<td class="short-col">
+					<a class="button delete-button" th:href="@{/admin/courses/{courseId}/students/delete(courseId=${course.id}, studentId=${student.id})}"
+					onclick="if (!(confirm('Are you sure you want to delete?'))) return false">
+					<i class="fa fa-trash"></i><span>Xóa</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	</div>
+	
+	<a class="button" id="add-button" th:href="@{/admin/courses/{courseId}/students/addStudent(courseId=${course.id})}">Thêm sinh viên</a>
+	
+	</div>
+	
+	</div>
+</body>
+
+</html>

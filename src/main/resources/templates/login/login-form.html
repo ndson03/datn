@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Đăng nhập</title>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">	
+	
+	<link rel="stylesheet" th:href="@{/css/login/login-form.css}">
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+	
+	<div class="top">
+		<i class="fa fa-mortar-board"></i>
+		<h2>Trường SICT - HaUI</h2>
+	</div>
+	
+	
+	<div class="container">
+	
+		<h3>Đăng nhập</h3>
+		
+		<form action="#" th:action="@{/authenticateTheUser}" method="POST">
+			
+			 
+			<div class="error" th:if="${param.error}">Tài khoản hoặc mật khẩu không hợp lệ</div>
+
+			
+			<div class="form-input-item">
+				<div>Tên người dùng: </div> <input type="text" name="username">
+			</div>
+			
+			<div class="form-input-item">
+				<div>Mật khẩu: </div> <input type="password" name="password">
+			</div>
+			
+			<button type="submit">Đăng nhập</button>
+		
+		</form>
+		
+		<hr>
+		
+		
+		<span>Bạn chưa có tài khoản?</span>
+		<a th:href="@{/register/showRegistrationForm}">Đăng ký</a>
+	</div>
+	
+	<div class="bottom">
+	</div>
+</body>
+
+</html>

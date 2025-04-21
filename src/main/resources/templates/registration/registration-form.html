@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Registration Form</title>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">	
+	
+	<link rel="stylesheet" th:href="@{/css/registration/registration-form.css}">
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+	<div class="top">
+		<i class="fa fa-mortar-board"></i>
+		<h2>Trường SICT - HaUI</h2>
+	</div>
+	
+	<div class="container">
+	
+	<h3>Đăng ký</h3>
+	 
+	<form th:action="@{/register/processRegistrationForm}" th:object="${userDto}" method="POST">
+	
+	<div th:if="${registrationError}" th:text="${registrationError}"></div>
+	
+	
+	<div class="form-input-item">
+		<span>Tên người dùng: </span><input type="text" th:field="*{userName}">
+		<p th:if="${#fields.hasErrors('userName')}" class="error">Invalid user name!</p>
+	</div>
+	
+	
+	<div class="form-input-item">
+		<span>Mật khẩu: </span><input type="password" th:field="*{password}">
+		<p th:if="${#fields.hasErrors('password')}" class="error">Invalid password!</p>
+	</div>
+	
+	<div class="form-input-item">
+		<span>Họ đệm: </span><input type="text" th:field="*{firstName}">
+		<p th:if="${#fields.hasErrors('firstName')}" class="error">Invalid first name!</p>
+	</div>
+	
+	<div class="form-input-item">
+		<span>Tên: </span><input type="text" th:field="*{lastName}">
+		<p th:if="${#fields.hasErrors('lastName')}" class="error">Invalid last name!</p>
+	</div>
+	
+	<div class="form-input-item">
+		<span>Email: </span><input type="text" th:field="*{email}"> 
+		<p th:if="${#fields.hasErrors('email')}" class="error">Invalid email!</p>
+	</div>
+	
+	<div class="form-input-item">
+		Vai trò:
+		<select th:name="role">
+			<option th:value="'ROLE_STUDENT'" th:text="Sinhvien"></option>
+    		<option th:value="'ROLE_TEACHER'" th:text="Giangvien"></option>
+		</select> 
+		
+	</div>
+	
+	 
+	
+	<button type="submit">Đăng ký</button>
+		
+	</form>
+	
+	<hr>
+	
+	<span id="login">Bạn đã có tài khoản?</span>
+	<a th:href="@{/showLoginPage}">Đăng nhập</a>
+	
+	
+	</div>
+	
+	<div class="bottom"> </div>
+
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>Course Details</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<link rel="stylesheet" th:href="@{/css/student/student-navbar.css}">
+	
+	<link rel="stylesheet" th:href="@{/css/table.css}">
+	
+	<link rel="stylesheet" th:href="@{/css/button.css}">
+	
+	<link rel="stylesheet" th:href="@{/css/teacher/teacher-course-details.css}">
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+	<nav>
+		<i class="fa fa-mortar-board"></i>
+		<h1>Trường SICT - HaUI</h1>
+		<ul>
+			<li>								
+				<a><i class="fa fa-user-circle"></i><span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span></a>
+				<ul class="dropdown">
+					<li>										
+						<form action="#" th:action="@{/logout}" method="POST">	
+							<input type="submit" value="Logout"></input>						
+						</form>						
+					</li>
+				</ul>
+			</li>
+		</ul>		
+	</nav>
+	
+	<div class="vertical-navbar">
+		<ul th:each="course : ${courses}">
+			<li><a th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"><i class="fa fa-tag fa-navbar"></i><span th:text="${course.code}"></span></a></li>
+		</ul>
+	</div>
+	
+	<div class="content">
+	
+	<h2 th:text="${course.name}"></h2>
+ 
+	
+	<div th:if="${students.size() == 0}">There are no students in this course. At least 1 student needed to view course detail.</div>
+	
+	
+	<div th:if="${students.size() != 0}">
+	
+	<h3>Danh sách sinh viên</h3>
+	
+	<div th:text="${'Số lượng: ' + course.studentListSize()}"></div>
+	<table id="table-one">
+		<thead>
+			<tr>
+				<th id="table-top-left" class="short-cell">Id</th>
+				<th>Họ đệm</th>
+				<th>Tên</th>
+				<th id="table-top-right">Email</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="student : ${students}">
+				<td class="short-cell" th:text="${student.id}"></td>
+				<td th:text="${student.firstName}"></td>
+				<td th:text="${student.lastName}"></td>
+				<td th:text="${student.email}"></td>
+		</tbody>
+	</table>
+	
+	<h3>Danh sách bài tập</h3>
+	<div th:if="${assignments == null}">Không có bài tập</div>
+	<table id="table-two" th:if="${assignments != null}">
+		<thead>
+			<tr>
+				<th id="table-top-left">Tên</th>
+				<th class="longer-cell">Mô tả</th>
+				<th>Hạn nộp</th>
+				<th>Số ngày còn lại</th>
+				<th id="table-top-right"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="assignment : ${assignments}">
+				<td th:text="${assignment.name}"></td>
+				<td class="longer-cell" th:text="${assignment.description}"></td>
+				<td th:text="${assignment.dueDate}"></td>
+				<td th:if="${assignment.daysRemaining >= 0}" th:text="${assignment.daysRemaining}"></td>
+				<td th:if="${assignment.daysRemaining < 0}">Overdue</td>		
+				<td >
+					<a class="button courses-button" th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}
+					(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}">Xem</a>
+					
+					<a class="button delete-button" th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}/delete
+					(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
+					onclick="if (!(confirm('Are you sure you want to delete?'))) return false">Xóa</a>
+				</td>
+		</tbody>
+	</table>
+	
+	<a class="button new-button" th:href="@{/teacher/{teacherId}/courses/{courseId}/addNewAssignment
+					(teacherId=${teacher.id}, courseId=${course.id})}">Thêm bài tập</a>
+	
+	
+	
+	<h3>Kết quả</h3>
+			
+	<table id="table-three">
+		<tr th:each="element : ${studentGradeList}" >
+			<td class="no-padding">
+				<table>
+					<thead>
+						<tr>
+							<th id="table-top-left">Student</th>						
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="student : ${element.key}">
+							<td th:text="${student.firstName + ' ' + student.lastName}"></td>
+						</tr>
+					</tbody>	
+				</table>
+			</td>
+			  	
+			<td class="no-padding">
+				<table>
+					<thead>
+						<tr>
+							<th>Điểm TX1</th>
+							<th>Điểm TX2</th>
+							<th id="table-top-right">Điểm GK</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="gradeDetails : ${element.value}">  
+							<td th:if="${gradeDetails.getGradeOne() == -1}">-</td>
+							<td th:if="${gradeDetails.getGradeOne() != -1}" th:text=${gradeDetails.gradeOne}></td>					
+							<td th:if="${gradeDetails.getGradeTwo() == -1}">-</td>
+							<td th:if="${gradeDetails.getGradeTwo() != -1}" th:text=${gradeDetails.gradeTwo}></td>
+							<td th:if="${gradeDetails.getGradeThree() == -1}">-</td>
+							<td th:if="${gradeDetails.getGradeThree() != -1}" th:text=${gradeDetails.gradeThree}></td>							
+						</tr>
+					</tbody>
+				</table>
+			</td>
+			
+		</tr>	  
+	</table>
+	
+	<a class="button edit-button" th:href="@{/teacher/{teacherId}/courses/{courseId}/editGrades(teacherId=${teacher.id}, courseId=${course.id})}">Nhập điểm</a>
+	
+	</div>
+	
+	</div> 
+</body>
+
+</html>
+
+
