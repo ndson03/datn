@@ -3,12 +3,8 @@ html {
 }
 
 body {
-	flex: 2;	
-}
-
-body {
+	flex: 2;
 	margin: 0;
-	background-color: #f7f8fa;
 }
 
 h3 {
@@ -127,7 +123,7 @@ nav ul:hover li input:hover{
 .vertical-navbar {
 	display: inline-block;
     width: 15vw;
-    height: 91.5%;
+    height: 90%;
     min-height: 89vh;
     background-color: #333;
     float: left;

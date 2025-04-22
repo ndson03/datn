@@ -1,40 +1,380 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini</title>
+    <title>Chatbot</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+
+    <link rel="stylesheet" th:href="@{/css/admin/admin-panel.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Main container */
+        .main-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Fixed vertical navbar */
+        .navbar {
+            width: 250px;
+            background-color: #333;
+            position: fixed; /* Fix navbar on the left */
+            top: 0;
+            left: 0;
+            bottom: 0;
+            color: white;
+            padding: 20px;
+            z-index: 20; /* Ensures navbar stays on top */
+            overflow-y: auto; /* Allow vertical scroll inside navbar if content exceeds viewport height */
+        }
+
+        .navbar ul {
+            list-style: none;
+        }
+
+        .navbar ul li {
+            margin: 10px 0;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Main content area */
+        .content {
+            margin-left: 250px; /* Adjust content area to the right to make space for navbar */
+            width: calc(100% - 250px); /* Take full width minus navbar width */
+            display: flex;
+            flex-direction: column;
+            height: 86vh;
+        }
+
+        /* Chat container */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            background-color: #fff;
+            border-radius: 10px;
+            width: 65%;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Chatbox content (the scrollable area inside chat-container) */
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Input container fixed at the bottom */
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            bottom: 0;
+            background-color: #fff;
+            z-index: 10;
+        }
+
+        /* Textarea style */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            resize: none;
+            min-height: 40px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: Arial, sans-serif;
+            outline: none;
+        }
+
+        .chat-input-container i {
+            font-size: 20px;
+            cursor: pointer;
+            color: #4CAF50;
+            margin-left: 10px;
+        }
+
+        /* Message styles */
+        .user-message {
+            max-width: 70%;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: #d1e7ff;
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            max-width: 95%;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: #fafafa;
+            align-self: flex-start;
+        }
+
+        /* Loading spinner */
+        .loading {
+            font-size: 20px;
+            color: #f39c12;
+            margin: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animation for loading spinner */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Scrollbar customization */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
+        .chat-box, .user-message, .bot-message {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Inline code */
+        /* Inline code */
+        .bot-message code {
+            background-color: rgba(27,31,35,0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Menlo, Consolas, monospace;
+            font-size: 0.95em;
+        }
+
+        /* Code block */
+        .bot-message pre {
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: Menlo, Consolas, monospace;
+            font-size: 0.93em;
+            line-height: 1.4;
+            margin: 1em 0;
+        }
+
+        /* Giãn dòng và ký tự */
+        .chat-box,
+        .user-message,
+        .bot-message {
+            /* Khoảng dòng: càng lớn thì các dòng càng nới rộng */
+            line-height: 1.6;
+
+            /* Khoảng cách giữa các ký tự (tuỳ chỉnh nếu muốn) */
+            letter-spacing: 0.5px;
+        }
+
+        /* Giãn khoảng cách giữa 2 bubble */
+        .user-message,
+        .bot-message {
+            /* Khoảng cách dọc giữa các tin nhắn */
+            margin: 12px 0;
+
+            /* Padding bên trong bubble cũng tăng thêm cho thoáng */
+            padding: 18px 20px;
+        }
+
+        /* Thụt lề cho danh sách trong bot-message */
+        .bot-message ul {
+            list-style-type: disc;           /* dấu chấm đen */
+            list-style-position: outside;    /* bullet ở ngoài vùng text */
+            margin: 0;                       /* bỏ margin mặc định */
+            padding-left: 1.5em;             /* thụt vào 1.5em */
+        }
+        .bot-message ul li {
+            margin: 0.5em 0;                 /* cách dòng giữa các item */
+        }
+        /* Thụt lề cho numbered list trong bot-message */
+        .bot-message ol {
+            list-style-type: decimal;       /* 1., 2., 3.… */
+            list-style-position: outside;   /* số ở ngoài vùng text */
+            margin: 0;                      /* bỏ margin mặc định */
+            padding-left: 1.5em;            /* thụt vào 1.5em giống bullet list */
+        }
+        .bot-message ol li {
+            margin: 0.5em 0;                /* cách dòng giữa các item */
+        }
+
+
+
+
+    </style>
+
+
+
+
 </head>
+
 <body>
-<h1>Gemini</h1>
-<input type="text" id="questionInput" placeholder="Nhập câu hỏi" />
-<button onclick="askQuestion()">Hỏi</button>
 
-<div id="answerText" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></div>
+<nav>
+    <i class="fa fa-mortar-board"></i>
+    <h1>Trường SICT - HaUI</h1>
+    <ul>
+        <li>
+            <a><i class="fa fa-user-circle"></i>Admin</a>
+            <ul class="dropdown">
+                <li>
+                    <form action="#" th:action="@{/logout}" method="POST">
+                        <input type="submit" value="Đăng xuất"></input>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>
 
+<div class="vertical-navbar">
+    <ul>
+        <li><a th:href="@{/admin/adminPanel}"><i class="fa fa-home fa-navbar"></i><span>Trang chủ</span></a></li>
+        <li><a th:href="@{/admin/courses}"><i class="fa fa-pencil fa-navbar"></i><span>Khóa học</span></a></li>
+        <li><a th:href="@{/admin/students}"><i class="fa fa-user fa-navbar"></i><span>Sinh viên</span></a></li>
+        <li><a th:href="@{/admin/teachers}"><i class="fa fa-user-secret fa-navbar"></i><span>Giảng viên</span></a></li>
+        <li><a th:href="@{/admin/adminInfo}"><i class="fa fa-info-circle fa-navbar"></i><span>Thông tin</span></a></li>
+        <li><a th:href="@{/gemini/qna}"><i class="fa fa-info-circle fa-navbar"></i><span>Chatbot</span></a></li>
+    </ul>
+</div>
+
+
+
+<div class="content">
+
+    <div class="chat-container">
+        <div class="chat-box" id="chatBox">
+            <!-- Các tin nhắn sẽ được thêm vào đây -->
+        </div>
+
+        <div class="chat-input-container">
+            <textarea id="questionInput" placeholder="Nhập câu hỏi" oninput="autoResize(this)" onkeydown="checkEnter(event)"></textarea>
+            <i class="fas fa-arrow-up" id="sendIcon" onclick="askQuestion()"></i>
+            <i class="fa fa-spinner fa-spin loading" id="loadingIcon" style="display: none;"></i>
+        </div>
+    </div>
+
+</div>
+
+<!-- Thư viện Markdown-it & DOMPurify -->
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
 <script>
-    // Hàm để gọi API và hiển thị câu trả lời
-    function askQuestion() {
-        const question = document.getElementById("questionInput").value;
+    // Khởi tạo Markdown-it parser
+    const md = window.markdownit({ html: false, linkify: true, typographer: true });
 
-        // Gọi API backend
-        fetch("/api/qna/ask", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+    function autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    function askQuestion() {
+        const input = document.getElementById('questionInput');
+        const question = input.value.trim();
+        if (!question) return;
+
+        displayUserMessage(question);
+        input.value = '';
+        autoResize(input);
+        toggleLoading(true);
+
+        fetch('/gemini/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question })
         })
-            .then(response => response.text())
+            .then(res => res.text())
             .then(data => {
-                // Hiển thị câu trả lời trả về từ backend
-                document.getElementById("answerText").innerText = data;
+                displayBotMessage(data);
+
             })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById("answerText").innerText = "Đã xảy ra lỗi. Vui lòng thử lại!";
-            });
+            .catch(() => displayBotMessage('Đã xảy ra lỗi. Vui lòng thử lại!'))
+            .finally(() => toggleLoading(false));
+    }
+
+    function toggleLoading(isLoading) {
+        document.getElementById('sendIcon').style.display = isLoading ? 'none' : 'inline-block';
+        document.getElementById('loadingIcon').style.display = isLoading ? 'inline-block' : 'none';
+    }
+
+    function displayUserMessage(text) {
+        const el = document.createElement('div');
+        el.className = 'user-message';
+        el.textContent = text;
+        appendMessage(el);
+    }
+
+    function displayBotMessage(mdText) {
+        const el = document.createElement('div');
+        el.className = 'bot-message';
+        // chuyển Markdown → HTML và sanitize
+        const html = md.render(mdText);
+        el.innerHTML = DOMPurify.sanitize(html);
+        // sau el.innerHTML = DOMPurify.sanitize(html);
+        el.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+
+        appendMessage(el);
+    }
+
+    function appendMessage(el) {
+        const box = document.getElementById('chatBox');
+        box.appendChild(el);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function checkEnter(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            askQuestion();
+        }
     }
 </script>
 </body>
+
 </html>

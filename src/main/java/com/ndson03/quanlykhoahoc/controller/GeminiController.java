@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/api/qna")
+@RequestMapping("/gemini")
 public class GeminiController {
 
-    @GetMapping("/showqna")
+    @GetMapping("/qna")
     public String qnaPage() {
         return "gemini/qna";
     }
