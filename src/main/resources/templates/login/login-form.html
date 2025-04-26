@@ -8,8 +8,12 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome 6 -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- Material Design Icons -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
 	<!-- Google Fonts -->
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" th:href="@{/css/layout.css}">
 
 	<style>
 		body {
@@ -18,12 +22,6 @@
 			height: 100vh;
 			display: flex;
 			flex-direction: column;
-		}
-
-		.top-header {
-			background-color: #0d6efd;
-			color: white;
-			padding: 15px 0;
 		}
 
 		.login-container {
@@ -87,19 +85,29 @@
 </head>
 
 <body>
-<!-- Top Header -->
-<div class="top-header">
-	<div class="container">
-		<div class="d-flex align-items-center">
-			<i class="fas fa-graduation-cap fs-3 me-3"></i>
-			<h2 class="fs-4 mb-0">Trường SICT - HaUI</h2>
+<!-- Top Navbar - cập nhật giống như trang khóa học -->
+<nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
+	<div class="container-fluid">
+		<a class="navbar-brand d-flex align-items-center" href="#">
+			<i class="fas fa-graduation-cap me-2"></i>
+			<span>Trường SICT - HaUI</span>
+		</a>
+
+		<button class="navbar-toggler" type="button" id="mobileToggle">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav ms-auto">
+				<!-- Không hiển thị thông tin người dùng vì đây là trang đăng nhập -->
+			</ul>
 		</div>
 	</div>
-</div>
+</nav>
 
 <!-- Login Container -->
 <div class="container my-5">
-	<div class="login-container">
+	<div class="login-container" style="margin-top: 80px;">
 		<div class="login-header">
 			<h3>Đăng nhập</h3>
 			<p class="text-muted">Nhập thông tin đăng nhập của bạn</p>
@@ -116,9 +124,9 @@
 			<div class="mb-3">
 				<label for="username" class="form-label">Tên người dùng</label>
 				<div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-user"></i>
-                        </span>
+					<span class="input-group-text">
+						<i class="fas fa-user"></i>
+					</span>
 					<input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên người dùng">
 				</div>
 			</div>
@@ -127,9 +135,9 @@
 			<div class="mb-4">
 				<label for="password" class="form-label">Mật khẩu</label>
 				<div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-lock"></i>
-                        </span>
+					<span class="input-group-text">
+						<i class="fas fa-lock"></i>
+					</span>
 					<input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu">
 				</div>
 			</div>
@@ -167,5 +175,23 @@
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Thêm script giống trang khóa học -->
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		// Mobile toggle
+		const mobileToggle = document.getElementById('mobileToggle');
+
+		if (mobileToggle) {
+			mobileToggle.addEventListener('click', function() {
+				const navbarContent = document.getElementById('navbarSupportedContent');
+				if (navbarContent) {
+					navbarContent.classList.toggle('show');
+				}
+			});
+		}
+	});
+</script>
 </body>
 </html>
