@@ -114,7 +114,7 @@
 				</div>
 
 				<div class="list-group" th:if="${lessons != null && not #lists.isEmpty(lessons)}">
-					<a th:href="@{/student/lesson/{id}/{studentId}(id=${lesson.id}, studentId=${student.id})}"
+					<a th:href="@{/student/{studentId}/lesson/{id}(id=${lesson.id}, studentId=${student.id})}"
 					   class="list-group-item list-group-item-action lesson-item p-3 mb-2"
 					   th:each="lesson : ${lessons}">
 						<div class="d-flex justify-content-between align-items-center">

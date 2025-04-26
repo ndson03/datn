@@ -126,7 +126,7 @@ public class StudentController {
 		return -1;
 	}
 
-	@GetMapping("/lesson/{lessonId}/{studentId}")
+	@GetMapping("{studentId}/lesson/{lessonId}")
 	public String listContentsByLesson(@PathVariable("lessonId") int lessonId, @PathVariable("studentId") int studentId, Model model) {
 
 		Student student = studentService.findByStudentId(studentId);
