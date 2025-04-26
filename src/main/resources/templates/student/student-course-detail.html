@@ -8,6 +8,8 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome 6 -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- Material Design Icons -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
 	<!-- Google Fonts -->
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 	<!-- Custom CSS -->
@@ -18,12 +20,12 @@
 <!-- Top Navbar -->
 <nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
 	<div class="container-fluid">
-		<a class="navbar-brand d-flex align-items-center" th:href="@{/student/{studentId}/courses(studentId=${student.id})}" style="padding-left: 20px">
+		<a class="navbar-brand d-flex align-items-center" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
 			<i class="fas fa-graduation-cap me-2"></i>
 			<span>Trường SICT - HaUI</span>
 		</a>
 
-		<button class="navbar-toggler" type="button" id="sidebarToggle">
+		<button class="navbar-toggler" type="button" id="mobileToggle">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -38,14 +40,12 @@
 						<span th:text="${student.firstName + ' ' + student.lastName}"></span>
 					</a>
 					<ul class="dropdown-menu dropdown-menu-end">
-						<li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Hồ sơ</a></li>
-						<li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Cài đặt</a></li>
-						<li>
-							<hr class="dropdown-divider">
-						</li>
+						<li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+						<li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
+						<li><hr class="dropdown-divider"></li>
 						<li>
 							<form action="#" th:action="@{/logout}" method="POST">
-								<button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+								<button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
 							</form>
 						</li>
 					</ul>
@@ -55,21 +55,28 @@
 	</div>
 </nav>
 
-<!-- Side Navbar - FIXED WIDTH -->
-<nav class="side-navbar">
+<!-- Sidebar Toggle Button -->
+<button class="sidebar-toggle" id="sidebarToggle">
+	<i class="fas fa-chevron-left"></i>
+</button>
+
+<!-- Side Navbar -->
+<nav class="side-navbar" id="sideNav">
 	<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
 		<a class="nav-link" th:href="@{/student/{studentId}/courses(studentId=${student.id})}" title="Dashboard">
 			<i class="fas fa-tachometer-alt"></i>
 			<span>Dashboard</span>
 		</a>
-		<a class="nav-link" href="/gemini/qna" title="Chatbot">
+		<a class="nav-link" th:href="@{/student/{studentId}/chatbot(studentId=${student.id})}" title="Chatbot">
 			<i class="fas fa-robot"></i>
 			<span>Chatbot</span>
 		</a>
-		<div class="mt-3 text-center">
-			<div class="small text-muted px-2">KHÓA HỌC</div>
+
+		<div class="mt-3 px-3">
+			<div class="small text-muted text-uppercase">Khóa học</div>
 			<hr class="my-2">
 		</div>
+
 		<div th:each="course : ${courses}">
 			<a class="nav-link"
 			   th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}"
@@ -83,14 +90,14 @@
 </nav>
 
 <!-- Main Content -->
-<div class="main-content mt-5 pt-3">
+<div class="main-content" id="mainContent">
 	<div class="container-fluid">
 		<!-- Course Header -->
-		<div class="d-flex justify-content-between align-items-center mb-4" style="padding-top: 30px">
-			<h1 class="h2 mb-0" th:text="${course.name}"></h1>
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2 class="fw-bold" th:text="${course.name}"></h2>
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb mb-0">
-					<li class="breadcrumb-item"><a href="#">Home</a></li>
+					<li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses(studentId=${student.id})}">Home</a></li>
 					<li class="breadcrumb-item"><a href="#">Khóa học</a></li>
 					<li class="breadcrumb-item active" aria-current="page" th:text="${course.name}"></li>
 				</ol>
@@ -99,8 +106,8 @@
 
 		<!-- Lessons Section -->
 		<div class="card mb-4">
-			<div class="card-header">
-				<h5 class="mb-0">
+			<div class="card-header bg-light">
+				<h5 class="mb-0 fw-bold">
 					<i class="fas fa-book-open me-2"></i>
 					Danh sách bài học
 				</h5>
@@ -114,7 +121,7 @@
 				</div>
 
 				<div class="list-group" th:if="${lessons != null && not #lists.isEmpty(lessons)}">
-					<a th:href="@{/student/{studentId}/lesson/{id}(id=${lesson.id}, studentId=${student.id})}"
+					<a th:href="@{/student/{studentId}/course/{courseId}/lesson/{id}(id=${lesson.id}, studentId=${student.id}, courseId=${course.id})}"
 					   class="list-group-item list-group-item-action lesson-item p-3 mb-2"
 					   th:each="lesson : ${lessons}">
 						<div class="d-flex justify-content-between align-items-center">
@@ -129,8 +136,8 @@
 
 		<!-- Assignments Section -->
 		<div class="card mb-4">
-			<div class="card-header">
-				<h5 class="mb-0">
+			<div class="card-header bg-light">
+				<h5 class="mb-0 fw-bold">
 					<i class="fas fa-tasks me-2"></i>
 					Bài tập
 				</h5>
@@ -171,8 +178,8 @@
 
 		<!-- Grades Section -->
 		<div class="card mb-4">
-			<div class="card-header">
-				<h5 class="mb-0">
+			<div class="card-header bg-light">
+				<h5 class="mb-0 fw-bold">
 					<i class="fas fa-chart-line me-2"></i>
 					Kết quả học tập
 				</h5>
@@ -215,15 +222,65 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 
 <script>
-	// Modified for fixed sidebar
 	document.addEventListener('DOMContentLoaded', function() {
+		// Sidebar toggle functionality
 		const sidebarToggle = document.getElementById('sidebarToggle');
-		const sideNavbar = document.querySelector('.side-navbar');
-		const mainContent = document.querySelector('.main-content');
+		const mobileToggle = document.getElementById('mobileToggle');
+		const sideNav = document.getElementById('sideNav');
+		const mainContent = document.getElementById('mainContent');
 
-		// Only for mobile view
+		// Desktop toggle
 		sidebarToggle.addEventListener('click', function() {
-			sideNavbar.classList.toggle('show');
+			sideNav.classList.toggle('collapsed');
+			mainContent.classList.toggle('expanded');
+			sidebarToggle.classList.toggle('collapsed');
+
+			// Change icon direction
+			const icon = sidebarToggle.querySelector('i');
+			if (icon.classList.contains('fa-chevron-left')) {
+				icon.classList.remove('fa-chevron-left');
+				icon.classList.add('fa-chevron-right');
+			} else {
+				icon.classList.remove('fa-chevron-right');
+				icon.classList.add('fa-chevron-left');
+			}
+		});
+
+		// Mobile toggle
+		mobileToggle.addEventListener('click', function() {
+			sideNav.classList.toggle('show');
+		});
+
+		// Close sidebar when clicking outside on mobile
+		document.addEventListener('click', function(event) {
+			const isClickInsideSidebar = sideNav.contains(event.target);
+			const isClickOnToggle = mobileToggle.contains(event.target);
+
+			if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
+				sideNav.classList.remove('show');
+			}
+		});
+
+		// Handle window resize
+		window.addEventListener('resize', function() {
+			if (window.innerWidth >= 992) {
+				sideNav.classList.remove('show');
+			}
+		});
+
+		// Add hover effect to assignment cards
+		const assignmentCards = document.querySelectorAll('.assignment-card');
+		assignmentCards.forEach(card => {
+			card.addEventListener('mouseenter', function() {
+				this.style.transform = 'translateY(-5px)';
+				this.style.transition = 'transform 0.3s ease';
+				this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+			});
+
+			card.addEventListener('mouseleave', function() {
+				this.style.transform = 'translateY(0)';
+				this.style.boxShadow = '';
+			});
 		});
 	});
 </script>

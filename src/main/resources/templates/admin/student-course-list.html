@@ -1,95 +1,269 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<title>Danh sach khoa hoc</title>
-	
+	<title>Danh sách khóa học của sinh viên</title>
+	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
-	 
-	<link rel="stylesheet" th:href="@{/css/navbar.css}">
-	
-	<link rel="stylesheet" th:href="@{/css/table.css}">
-	
-	<link rel="stylesheet" th:href="@{/css/button.css}">
-	
-	<link rel="stylesheet" th:href="@{/css/admin/student-course-list.css}">
-	
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<!-- Bootstrap 5 CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Font Awesome 6 -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- Material Design Icons -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/layout.css}">
 </head>
 
 <body>
+<!-- Top Navbar -->
+<nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
+	<div class="container-fluid">
+		<a class="navbar-brand d-flex align-items-center" th:href="@{/admin/adminPanel}">
+			<i class="fas fa-graduation-cap me-2"></i>
+			<span>Trường SICT - HaUI</span>
+		</a>
 
-	<nav>
-		<i class="fa fa-mortar-board"></i>
-		<h1>Trường SICT - HaUI</h1>
-		<ul>
-			<li>								
-				<a><i class="fa fa-user-circle"></i>Admin</a>
-				<ul class="dropdown">
-					<li>										
-						<form action="#" th:action="@{/logout}" method="POST">	
-							<input type="submit" value="Đăng xuất"></input>
-						</form>						
-					</li>
-				</ul>
-			</li>
-		</ul>		
-	</nav>
-	
-	<div class="vertical-navbar">
-		<ul>
-			<li><a th:href="@{/admin/adminPanel}"><i class="fa fa-home fa-navbar"></i><span>Trang chủ</span></a></li>
-			<li><a th:href="@{/admin/courses}"><i class="fa fa-pencil fa-navbar"></i><span>Khóa học</span></a></li>
-			<li><a th:href="@{/admin/students}"><i class="fa fa-user fa-navbar"></i><span>Sinh viên</span></a></li>
-			<li><a th:href="@{/admin/teachers}"><i class="fa fa-user-secret fa-navbar"></i><span>Giảng viên</span></a></li>
-			<li><a th:href="@{/admin/adminInfo}"><i class="fa fa-info-circle fa-navbar"></i><span>Thông tin</span></a></li>
-			<li><a th:href="@{/gemini/qna}"><i class="fa fa-info-circle fa-navbar"></i><span>Chatbot</span></a></li>
-		</ul>
+		<button class="navbar-toggler" type="button" id="mobileToggle">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav ms-auto">
+				<li class="nav-item dropdown user-dropdown">
+					<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+						<div class="avatar me-2">
+							<span>A</span>
+						</div>
+						<span>Admin</span>
+					</a>
+					<ul class="dropdown-menu dropdown-menu-end">
+						<li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+						<li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
+						<li><hr class="dropdown-divider"></li>
+						<li>
+							<form action="#" th:action="@{/logout}" method="POST">
+								<button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
+							</form>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
 	</div>
-	
-	
-	<h3 th:text="${student.firstName + ' ' + student.lastName}"></h3>
-	
-	<div class="content">
-	
-	<div th:if="${courses.size() == 0}">There are no courses. Please add new courses clicking on the button below.</div>
-	
-	<div th:if="${courses.size() != 0}">
-	
-	<table>
-		<thead>
-			<tr>
-				<th id="table-top-left">Mã khóa học</th>
-				<th>Tên khóa học</th>
-				<th>Giảng viên</th>
-				<th id="table-top-right" class="short-col"></th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			<tr th:each="course : ${courses}">
-				<td th:text="${course.code}">
-				<td th:text="${course.name}">
-				<td th:text="${course.teacher.firstName + ' ' + course.teacher.lastName}">
-				<td class="short-col">
-					<a class="button delete-button" th:href="@{/admin/students/{studentId}/courses/delete/{courseId}(studentId=${student.id}, courseId=${course.id})}"
-							onclick="if (!(confirm('Are you sure you want to unroll the student from this course?'))) return false">
-					<i class="fa fa-trash"></i><span>Xóa</span></a>
-				</td>
-			</tr>	
-		</tbody>
-	
-	</table>
-	
+</nav>
+
+<!-- Sidebar Toggle Button -->
+<button class="sidebar-toggle" id="sidebarToggle">
+	<i class="fas fa-chevron-left"></i>
+</button>
+
+<!-- Side Navbar -->
+<nav class="side-navbar" id="sideNav">
+	<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+		<a class="nav-link" th:href="@{/admin/adminPanel}" title="Trang chủ">
+			<i class="fas fa-home"></i>
+			<span>Trang chủ</span>
+		</a>
+		<a class="nav-link" th:href="@{/admin/courses}" title="Khóa học">
+			<i class="fas fa-book"></i>
+			<span>Khóa học</span>
+		</a>
+		<a class="nav-link active" th:href="@{/admin/students}" title="Sinh viên">
+			<i class="fas fa-user-graduate"></i>
+			<span>Sinh viên</span>
+		</a>
+		<a class="nav-link" th:href="@{/admin/teachers}" title="Giảng viên">
+			<i class="fas fa-chalkboard-teacher"></i>
+			<span>Giảng viên</span>
+		</a>
+		<a class="nav-link" th:href="@{/admin/adminInfo}" title="Thông tin">
+			<i class="fas fa-info-circle"></i>
+			<span>Thông tin</span>
+		</a>
+		<a class="nav-link" th:href="@{/gemini/qna}" title="Chatbot">
+			<i class="fas fa-robot"></i>
+			<span>Chatbot</span>
+		</a>
 	</div>
-	
-	
-	<a class="button add-button" th:href="@{/admin/students/{studentId}/addCourse(studentId=${student.id})}">Thêm khóa học cho sinh viên</a>
-	
-	
+</nav>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+	<div class="container-fluid">
+		<!-- Header -->
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2 class="fw-bold">Khóa học của sinh viên</h2>
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb mb-0">
+					<li class="breadcrumb-item"><a th:href="@{/admin/adminPanel}">Home</a></li>
+					<li class="breadcrumb-item"><a th:href="@{/admin/students}">Sinh viên</a></li>
+					<li class="breadcrumb-item active" aria-current="page">Khóa học của sinh viên</li>
+				</ol>
+			</nav>
+		</div>
+
+		<!-- Student Info Card -->
+		<div class="card mb-4">
+			<div class="card-header bg-primary text-white">
+				<h5 class="mb-0">
+					<i class="fas fa-user-graduate me-2"></i>
+					Thông tin sinh viên
+				</h5>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-3 mb-3 mb-md-0">
+						<div class="text-center">
+							<div class="student-avatar mb-3">
+								<i class="fas fa-user-graduate fa-5x text-primary"></i>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-9">
+						<div class="row mb-2">
+							<div class="col-md-3 fw-bold">Họ tên:</div>
+							<div class="col-md-9" th:text="${student.firstName + ' ' + student.lastName}">Nguyễn Văn A</div>
+						</div>
+						<div class="row mb-2">
+							<div class="col-md-3 fw-bold">Email:</div>
+							<div class="col-md-9" th:text="${student.email}">nguyenvana@example.com</div>
+						</div>
+						<div class="row mb-2">
+							<div class="col-md-3 fw-bold">Tổng số khóa học:</div>
+							<div class="col-md-9">
+								<span class="badge bg-primary" th:text="${courses.size()}">3</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Student's Courses -->
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h5 class="mb-0 fw-bold">
+					<i class="fas fa-book me-2"></i>
+					Danh sách khóa học đã đăng ký
+				</h5>
+				<a th:href="@{/admin/students/{studentId}/addCourse(studentId=${student.id})}" class="btn btn-primary btn-sm">
+					<i class="fas fa-plus-circle me-1"></i> Thêm khóa học
+				</a>
+			</div>
+			<div class="card-body p-0">
+				<div class="alert alert-info m-3" th:if="${courses.size() == 0}">
+					<i class="fas fa-info-circle me-2"></i>
+					Sinh viên này chưa đăng ký khóa học nào.
+				</div>
+
+				<div class="row p-3" th:if="${courses.size() != 0}">
+					<div class="col-md-6 col-lg-4 mb-4" th:each="course : ${courses}">
+						<div class="card h-100 course-card">
+							<div class="card-header bg-light">
+								<h5 class="card-title mb-0" th:text="${course.name}">Tên khóa học</h5>
+							</div>
+							<div class="card-body">
+								<div class="mb-2">
+									<span class="fw-bold">Mã khóa học:</span>
+									<span th:text="${course.code}">CS101</span>
+								</div>
+								<div class="mb-2">
+									<span class="fw-bold">Giảng viên:</span>
+									<span th:text="${course.teacher.firstName + ' ' + course.teacher.lastName}">Giảng viên</span>
+								</div>
+							</div>
+							<div class="card-footer bg-light d-flex justify-content-between align-items-center">
+								<a th:href="@{/admin/courses/{courseId}/students(courseId=${course.id})}" class="btn btn-sm btn-info">
+									<i class="fas fa-eye me-1"></i> Chi tiết
+								</a>
+								<a th:href="@{/admin/students/{studentId}/courses/delete/{courseId}(studentId=${student.id}, courseId=${course.id})}"
+								   class="btn btn-sm btn-danger"
+								   onclick="if (!(confirm('Bạn có chắc chắn muốn hủy đăng ký khóa học này cho sinh viên?'))) return false">
+									<i class="fas fa-trash-alt me-1"></i> Hủy đăng ký
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Back Button -->
+		<div class="mb-4">
+			<a th:href="@{/admin/students}" class="btn btn-secondary">
+				<i class="fas fa-arrow-left me-1"></i> Quay lại danh sách sinh viên
+			</a>
+		</div>
 	</div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		// Sidebar toggle functionality
+		const sidebarToggle = document.getElementById('sidebarToggle');
+		const mobileToggle = document.getElementById('mobileToggle');
+		const sideNav = document.getElementById('sideNav');
+		const mainContent = document.getElementById('mainContent');
+
+		// Desktop toggle
+		sidebarToggle.addEventListener('click', function() {
+			sideNav.classList.toggle('collapsed');
+			mainContent.classList.toggle('expanded');
+			sidebarToggle.classList.toggle('collapsed');
+
+			// Change icon direction
+			const icon = sidebarToggle.querySelector('i');
+			if (icon.classList.contains('fa-chevron-left')) {
+				icon.classList.remove('fa-chevron-left');
+				icon.classList.add('fa-chevron-right');
+			} else {
+				icon.classList.remove('fa-chevron-right');
+				icon.classList.add('fa-chevron-left');
+			}
+		});
+
+		// Mobile toggle
+		mobileToggle.addEventListener('click', function() {
+			sideNav.classList.toggle('show');
+		});
+
+		// Close sidebar when clicking outside on mobile
+		document.addEventListener('click', function(event) {
+			const isClickInsideSidebar = sideNav.contains(event.target);
+			const isClickOnToggle = mobileToggle.contains(event.target);
+
+			if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
+				sideNav.classList.remove('show');
+			}
+		});
+
+		// Handle window resize
+		window.addEventListener('resize', function() {
+			if (window.innerWidth >= 992) {
+				sideNav.classList.remove('show');
+			}
+		});
+
+		// Add hover effect to course cards
+		const courseCards = document.querySelectorAll('.course-card');
+		courseCards.forEach(card => {
+			card.addEventListener('mouseenter', function() {
+				this.style.transform = 'translateY(-5px)';
+				this.style.transition = 'transform 0.3s ease';
+				this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+			});
+
+			card.addEventListener('mouseleave', function() {
+				this.style.transform = 'translateY(0)';
+				this.style.boxShadow = '';
+			});
+		});
+	});
+</script>
 </body>
-
 </html>

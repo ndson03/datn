@@ -11,39 +11,15 @@
 }
 
 /* Fixed vertical navbar */
-.navbar {
-    width: 250px;
-    background-color: #333;
-    position: fixed; /* Fix navbar on the left */
-    top: 0;
-    left: 0;
-    bottom: 0;
-    color: white;
-    padding: 20px;
-    z-index: 20; /* Ensures navbar stays on top */
-    overflow-y: auto; /* Allow vertical scroll inside navbar if content exceeds viewport height */
-}
 
-.navbar ul {
-    list-style: none;
-}
-
-.navbar ul li {
-    margin: 10px 0;
-}
-
-.navbar a {
-    color: white;
-    text-decoration: none;
-}
 
 /* Main content area */
 .content {
-    margin-left: 250px; /* Adjust content area to the right to make space for navbar */
-    width: calc(100% - 250px); /* Take full width minus navbar width */
+    margin-left: 100px; /* Adjust content area to the right to make space for navbar */
+    width: calc(100% - 200px); /* Take full width minus navbar width */
     display: flex;
     flex-direction: column;
-    height: 86vh;
+    height: 74.1vh;
 }
 
 /* Chat container */
@@ -53,7 +29,7 @@
     flex: 1;
     background-color: #fff;
     border-radius: 10px;
-    width: 65%;
+    width: 90%;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
@@ -118,7 +94,7 @@ textarea {
     padding: 8px 12px;
     border-radius: 30px;
     margin: 6px 0;
-    max-width: 70%;
+    max-width: 80%;
     position: relative;
     align-self: flex-start;
 }

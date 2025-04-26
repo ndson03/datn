@@ -51,8 +51,13 @@ public class AdminController {
 	private int teacherDeleteErrorValue; //used for deleting teacher, 0 means the teacher has not any assigned courses, 1 means it has
 	
 	@GetMapping("/adminPanel")
-	public String showAdminPanel() {
-		
+	public String showAdminPanel(Model theModel) {
+		int courseSize = courseService.findAllCourses().size();
+		theModel.addAttribute("courseSize", courseSize);
+		int studentSize = studentService.findAllStudents().size();
+		theModel.addAttribute("studentSize", studentSize);
+		int teacherSize = teacherService.findAllTeachers().size();
+		theModel.addAttribute("teacherSize", teacherSize);
 		return "admin/admin-panel";
 	}
 	
@@ -97,7 +102,18 @@ public class AdminController {
 		
 		return "admin/student-course-list";
 	}
-	
+
+	@GetMapping("/teacher/{teacherId}/courses")
+	public String listCoursesForTeacher(@PathVariable("teacherId") int teacherId, Model theModel) {
+		Teacher teacher = teacherService.findByTeacherId(teacherId);
+		List<Course> courses = teacher.getCourses();
+
+		theModel.addAttribute("teacher", teacher);
+		theModel.addAttribute("courses", courses);
+
+		return "admin/teacher-course-list";
+	}
+
 	@GetMapping("/students/{studentId}/addCourse")
 	public String addCourseToStudent(@PathVariable("studentId") int studentId, Model theModel) {
 		Student student = studentService.findByStudentId(studentId);

@@ -126,15 +126,16 @@ public class StudentController {
 		return -1;
 	}
 
-	@GetMapping("{studentId}/lesson/{lessonId}")
-	public String listContentsByLesson(@PathVariable("lessonId") int lessonId, @PathVariable("studentId") int studentId, Model model) {
+	@GetMapping("{studentId}/course/{courseId}/lesson/{lessonId}")
+	public String listContentsByLesson(@PathVariable("lessonId") int lessonId, @PathVariable("courseId") int courseId, @PathVariable("studentId") int studentId, Model model) {
 
 		Student student = studentService.findByStudentId(studentId);
+		Course course = courseService.findCourseById(courseId);
 		List<Course> courses = student.getCourses();
 		// Lấy thông tin bài học
 		Lesson lesson = lessonService.findById(lessonId);
 		model.addAttribute("lesson", lesson);
-		model.addAttribute("course", lesson.getCourse());
+		model.addAttribute("course", course);
 		model.addAttribute("student", student);
 		model.addAttribute("courses", courses);
 
@@ -142,21 +143,34 @@ public class StudentController {
 		List<Content> contents = contentService.findByLessonId(lessonId);
 		model.addAttribute("contents", contents);
 
-		return "student/student-list-content";
+		return "student/student-lesson-list-content";
 	}
 
-	@GetMapping("/{studentId}/content/{contentId}/view")
-	public String viewContent(@PathVariable int contentId,  @PathVariable("studentId") int studentId, Model model) {
+	@GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/content/{contentId}")
+	public String viewContent(@PathVariable int contentId,  @PathVariable("studentId") int studentId, @PathVariable("courseId") int courseId,
+							  @PathVariable("lessonId") int lessonId, Model model) {
 		Content content = contentService.findById(contentId);
 		Student student = studentService.findByStudentId(studentId);
+		Course course = courseService.findCourseById(courseId);
+		Lesson lesson = lessonService.findById(lessonId);
 		List<Course> courses = student.getCourses();
 		model.addAttribute("content", content);
-		model.addAttribute("lesson", content.getLesson());
-		model.addAttribute("course", content.getLesson().getCourse());
+		model.addAttribute("lesson", lesson);
+		model.addAttribute("course", course);
 		model.addAttribute("student", student);
 		model.addAttribute("courses", courses);
 
 		return "student/student-view-content";
+	}
+
+	@GetMapping("/{studentId}/chatbot")
+	public String showChatbot(@PathVariable("studentId") int studentId, Model theModel) {
+		Student student = studentService.findByStudentId(studentId); //accessing student logged in
+		List<Course> courses = student.getCourses();
+
+		theModel.addAttribute("student", student);
+		theModel.addAttribute("courses", courses);
+		return "student/student-chatbot";
 	}
 
 }
