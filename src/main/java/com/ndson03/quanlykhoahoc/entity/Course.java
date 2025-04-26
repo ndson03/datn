@@ -3,18 +3,7 @@ package com.ndson03.quanlykhoahoc.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -48,10 +37,37 @@ public class Course {
 				joinColumns = @JoinColumn(name="course_id"),
 				inverseJoinColumns = @JoinColumn(name="student_id"))			
 	private List<Student> students;
-	
-	
-	
-	
+
+
+	@OneToMany(cascade = CascadeType.ALL,
+			mappedBy = "course",
+			fetch = FetchType.LAZY)
+	private List<Lesson> lessons;
+
+	public List<Lesson> getLessons() {
+		return lessons;
+	}
+
+	public void setLessons(List<Lesson> lessons) {
+		this.lessons = lessons;
+	}
+
+	// Thêm bài học vào khóa học
+	public void addLesson(Lesson lesson) {
+		if (lessons == null) {
+			lessons = new ArrayList<>();
+		}
+		lessons.add(lesson);
+		lesson.setCourse(this);
+	}
+
+	// Xóa bài học khỏi khóa học
+	public void removeLesson(Lesson lesson) {
+		if (lessons != null && lessons.contains(lesson)) {
+			lessons.remove(lesson);
+			lesson.setCourse(null);
+		}
+	}
 
 	public Course() {
 		

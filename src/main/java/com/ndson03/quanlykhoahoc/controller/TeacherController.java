@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.validation.Valid;
+
+import com.ndson03.quanlykhoahoc.entity.*;
+import com.ndson03.quanlykhoahoc.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,19 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.ndson03.quanlykhoahoc.entity.Assignment;
-import com.ndson03.quanlykhoahoc.entity.AssignmentDetails;
-import com.ndson03.quanlykhoahoc.entity.Course;
-import com.ndson03.quanlykhoahoc.entity.GradeDetails;
-import com.ndson03.quanlykhoahoc.entity.Student;
-import com.ndson03.quanlykhoahoc.entity.StudentCourseDetails;
-import com.ndson03.quanlykhoahoc.entity.Teacher;
-import com.ndson03.quanlykhoahoc.service.AssignmentDetailsService;
-import com.ndson03.quanlykhoahoc.service.AssignmentService;
-import com.ndson03.quanlykhoahoc.service.CourseService;
-import com.ndson03.quanlykhoahoc.service.GradeDetailsService;
-import com.ndson03.quanlykhoahoc.service.StudentCourseDetailsService;
-import com.ndson03.quanlykhoahoc.service.TeacherService;
 
 
 @Controller
@@ -40,6 +30,9 @@ public class TeacherController {
 	
 	@Autowired
 	private TeacherService teacherService;
+
+	@Autowired
+	private LessonService lessonService;
 	
 	@Autowired
 	private StudentCourseDetailsService studentCourseDetailsService;
@@ -67,8 +60,11 @@ public class TeacherController {
 	public String showTeacherCourseDetails(@PathVariable("teacherId") int teacherId, @PathVariable("courseId") int courseId, Model theModel) {
 		Teacher teacher = teacherService.findByTeacherId(teacherId);
 		Course course = courseService.findCourseById(courseId);
+
 		List<Course> courses = teacher.getCourses();
 		List<Student> students = course.getStudents();
+		List<Lesson> lessons = lessonService.findByCourseId(courseId);
+		theModel.addAttribute("lessons", lessons);
 		
 		if(students.size() != 0) {
 			List<Assignment> assignments = studentCourseDetailsService.findByStudentAndCourseId(students.get(0).getId(), courseId).getAssignments();

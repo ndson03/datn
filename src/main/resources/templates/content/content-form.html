@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${content.id == 0 ? 'Thêm nội dung mới' : 'Cập nhật nội dung'}"></title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <!-- Summernote CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-4 mb-4" th:text="${content.id == 0 ? 'Thêm nội dung mới' : 'Cập nhật nội dung'}"></h1>
+    <h4 class="mb-3">Khóa học: <span th:text="${course.name}"></span></h4>
+    <h5 class="mb-4">Bài học: <span th:text="${lesson.title}"></span></h5>
+
+    <!-- Form thêm/sửa nội dung -->
+    <div class="card">
+        <div class="card-body">
+            <form th:action="@{/contents/save}" th:object="${content}" method="POST">
+                <!-- Hidden field cho ID nội dung -->
+                <input type="hidden" th:field="*{id}" />
+
+                <!-- Hidden field cho lessonId -->
+                <input type="hidden" name="lessonId" th:value="${lesson.id}" />
+
+                <!-- Thứ tự hiển thị của nội dung -->
+                <div class="form-group row">
+                    <label for="orderNumber" class="col-sm-2 col-form-label">Thứ tự hiển thị:</label>
+                    <div class="col-sm-10">
+                        <input type="number" th:field="*{orderNumber}" class="form-control" min="1" required />
+                    </div>
+                </div>
+
+                <!-- Tiêu đề nội dung -->
+                <div class="form-group row">
+                    <label for="title" class="col-sm-2 col-form-label">Tiêu đề:</label>
+                    <div class="col-sm-10">
+                        <input type="text" th:field="*{title}" class="form-control" placeholder="Nhập tiêu đề nội dung" required />
+                        <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Loại nội dung -->
+                <div class="form-group row">
+                    <label for="contentType" class="col-sm-2 col-form-label">Loại nội dung:</label>
+                    <div class="col-sm-10">
+                        <select th:field="*{contentType}" class="form-control" required>
+                            <option value="">-- Chọn loại nội dung --</option>
+                            <option value="TEXT">Văn bản</option>
+                            <option value="VIDEO">Video</option>
+                            <option value="FILE">Tài liệu</option>
+                            <option value="CODE">Mã nguồn</option>
+                            <option value="IMAGE">Hình ảnh</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Nội dung -->
+                <div class="form-group row">
+                    <label for="contentData" class="col-sm-2 col-form-label">Nội dung:</label>
+                    <div class="col-sm-10">
+                        <textarea th:field="*{contentData}" id="contentEditor" class="form-control" rows="10"></textarea>
+                    </div>
+                </div>
+
+                <!-- Các nút hành động -->
+                <div class="form-group row">
+                    <div class="col-sm-10 offset-sm-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu
+                        </button>
+                        <a th:href="@{/contents/lesson/{id}(id=${lesson.id})}" class="btn btn-secondary ml-2">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Summernote JS -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Khởi tạo Summernote editor
+        $('#contentEditor').summernote({
+            height: 300,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+
+        // Thay đổi editor tùy theo loại nội dung
+        $('#contentType').change(function() {
+            let contentType = $(this).val();
+
+            // Hủy Summernote nếu đã khởi tạo
+            if ($('#contentEditor').summernote('isDestroyed') === false) {
+                $('#contentEditor').summernote('destroy');
+            }
+
+            if (contentType === 'TEXT') {
+                $('#contentEditor').summernote({
+                    height: 300,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+            } else if (contentType === 'CODE') {
+                $('#contentEditor').summernote({
+                    height: 300,
+                    toolbar: [
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ],
+                    codemirror: {
+                        theme: 'monokai'
+                    }
+                });
+                $('#contentEditor').summernote('codeview.activate');
+            } else {
+                // Chỉ hiển thị textarea thông thường cho các loại khác
+                $('#contentEditor').attr('rows', 10);
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -131,5 +131,9 @@ public class Teacher {
 		
 		courses.add(course);
 	}
+
+	public String getName() {
+		return firstName + " " + lastName;
+	}
 	
 }
