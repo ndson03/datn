@@ -1,0 +1,229 @@
+:root {
+    --primary-color: #4285f4;
+    --secondary-color: #34a853;
+    --accent-color: #ea4335;
+    --warning-color: #fbbc05;
+    --light-bg: #f8f9fa;
+    --dark-bg: #212529;
+    --border-radius: 0.5rem;
+    --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    padding-bottom: 2rem;
+}
+
+.container-fluid{
+    top: 50px;
+}
+
+/* Navbar styles */
+.top-navbar {
+    background: linear-gradient(135deg, var(--primary-color), #5c6bc0);
+    box-shadow: var(--box-shadow);
+}
+
+/* SIDEBAR STYLES MODIFIED - FIXED WIDTH */
+.side-navbar {
+    background-color: white;
+    box-shadow: var(--box-shadow);
+    height: calc(100vh - 60px);
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 250px; /* Fixed width */
+    overflow-y: auto;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+/* Removed hover effect for sidebar width */
+
+.side-navbar .nav-link {
+    padding: 0.8rem 1rem;
+    color: #555;
+    border-radius: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.side-navbar .nav-link:hover {
+    background-color: rgba(66, 133, 244, 0.1);
+    color: var(--primary-color);
+}
+
+.side-navbar .nav-link i {
+    width: 24px;
+    text-align: center;
+    margin-right: 1rem;
+}
+
+/* Removed opacity for sidebar text */
+.side-navbar .nav-link span {
+    opacity: 1; /* Ensure text is always visible */
+}
+
+/* Main content */
+.main-content {
+    margin-left: 250px; /* Adjusted to match fixed sidebar width */
+    padding: 2rem;
+    transition: margin-left 0.3s;
+}
+
+/* Modified media query for mobile */
+@media (max-width: 768px) {
+    .side-navbar {
+        transform: translateX(-100%); /* Hide sidebar off-screen */
+        width: 200px; /* Keep width consistent */
+    }
+
+    .side-navbar.show {
+        transform: translateX(0); /* Show sidebar when toggled */
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    font-weight: 500;
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: rgba(66, 133, 244, 0.05);
+    font-weight: 500;
+    border-top: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-success {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-danger {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: white;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    line-height: 36px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+/* Lesson cards */
+.lesson-item {
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s;
+}
+
+.lesson-item:hover {
+    border-left-width: 8px;
+}
+
+.lesson-actions .btn {
+    margin-left: 0.3rem;
+}
+
+/* Badge */
+.badge {
+    font-weight: 400;
+    padding: 0.35em 0.65em;
+}
+
+/* Counters */
+.counter-card {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.counter-card i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.counter-card .counter {
+    font-size: 1.75rem;
+    font-weight: 500;
+}
+
+.counter-card .counter-title {
+    font-size: 1rem;
+    color: #666;
+}
+
+/* User avatar */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+/* Dropdown */
+.user-dropdown .dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+.user-dropdown .dropdown-item i {
+    margin-right: 0.5rem;
+    width: 20px;
+    text-align: center;
+}
+
+/* Sidebar active item */
+.side-navbar .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}

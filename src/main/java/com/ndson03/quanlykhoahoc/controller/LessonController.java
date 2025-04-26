@@ -2,8 +2,10 @@ package com.ndson03.quanlykhoahoc.controller;
 
 import com.ndson03.quanlykhoahoc.entity.Course;
 import com.ndson03.quanlykhoahoc.entity.Lesson;
+import com.ndson03.quanlykhoahoc.entity.Teacher;
 import com.ndson03.quanlykhoahoc.service.CourseService;
 import com.ndson03.quanlykhoahoc.service.LessonService;
+import com.ndson03.quanlykhoahoc.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,11 +21,13 @@ public class LessonController {
 
     private LessonService lessonService;
     private CourseService courseService;
+    private TeacherService teacherService;
 
     @Autowired
-    public LessonController(LessonService lessonService, CourseService courseService) {
+    public LessonController(LessonService lessonService, CourseService courseService, TeacherService teacherService) {
         this.lessonService = lessonService;
         this.courseService = courseService;
+        this.teacherService = teacherService;
     }
 
     // Hiển thị danh sách bài học của khóa học
@@ -41,41 +45,48 @@ public class LessonController {
     }
 
     // Hiển thị form thêm bài học mới
-    @GetMapping("/showFormForAdd")
-    public String showFormForAdd(@RequestParam("courseId") int courseId, Model model) {
+    @GetMapping("/{teacherId}/showFormForAdd/{courseId}")
+    public String showFormForAdd(@PathVariable("teacherId") int teacherId, @PathVariable("courseId") int courseId, Model model) {
         Course course = courseService.findCourseById(courseId);
-
+        Teacher teacher = teacherService.findByTeacherId(teacherId);
+        List<Course> courses = teacher.getCourses();
         Lesson lesson = new Lesson();
         lesson.setCourse(course);
         lesson.setOrderNumber(lessonService.getNextOrderNumber(courseId));
 
         model.addAttribute("lesson", lesson);
         model.addAttribute("course", course);
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("courses", courses);
 
-        return "lesson/lesson-form";
+        return "teacher/lesson-form";
     }
 
     // Hiển thị form cập nhật bài học
-    @GetMapping("/showFormForUpdate")
-    public String showFormForUpdate(@RequestParam("lessonId") int id, Model model) {
-        // Lấy thông tin bài học
+    @GetMapping("/{teacherId}/showFormForUpdate/{lessonId}")
+    public String showFormForUpdate(@PathVariable("teacherId") int teacherId, @PathVariable("lessonId") int id, Model model) {
+        Teacher teacher = teacherService.findByTeacherId(teacherId);
+        List<Course> courses = teacher.getCourses();
         Lesson lesson = lessonService.findById(id);
         model.addAttribute("lesson", lesson);
         model.addAttribute("course", lesson.getCourse());
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("courses", courses);
 
-        return "lesson/lesson-form";
+        return "teacher/lesson-form";
     }
 
     // Lưu bài học
-    @PostMapping("/save")
+    @PostMapping("{teacherId}/save")
     public String saveLesson(@Valid @ModelAttribute("lesson") Lesson lesson,
                              BindingResult bindingResult,
                              @RequestParam("courseId") int courseId,
+                             @PathVariable("teacherId") int teacherId,
                              Model model) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("course", courseService.findCourseById(courseId));
-            return "lessons/lesson-form";
+            return "lesson/lesson-form";
         }
 
         // Thiết lập khóa học cho bài học
@@ -87,17 +98,19 @@ public class LessonController {
         // Lưu bài học
         lessonService.save(lesson);
 
-        return "redirect:/lessons/course/" + courseId;
+        return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
+
+
     }
 
     // Xóa bài học
-    @GetMapping("/delete")
-    public String delete(@RequestParam("lessonId") int id) {
+    @GetMapping("/{teacherId}/delete")
+    public String delete(@RequestParam("lessonId") int id, @PathVariable("teacherId") int teacherId, Model model) {
         Lesson lesson = lessonService.findById(id);
         int courseId = lesson.getCourse().getId();
 
         lessonService.deleteById(id);
 
-        return "redirect:/lessons/course/" + courseId;
+        return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
     }
 }
