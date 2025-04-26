@@ -4,22 +4,15 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import com.ndson03.quanlykhoahoc.entity.*;
+import com.ndson03.quanlykhoahoc.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.ndson03.quanlykhoahoc.entity.Assignment;
-import com.ndson03.quanlykhoahoc.entity.Course;
-import com.ndson03.quanlykhoahoc.entity.GradeDetails;
-import com.ndson03.quanlykhoahoc.entity.Student;
-import com.ndson03.quanlykhoahoc.entity.AssignmentDetails;
-import com.ndson03.quanlykhoahoc.entity.StudentCourseDetails;
-import com.ndson03.quanlykhoahoc.service.CourseService;
-import com.ndson03.quanlykhoahoc.service.AssignmentDetailsService;
-import com.ndson03.quanlykhoahoc.service.StudentCourseDetailsService;
-import com.ndson03.quanlykhoahoc.service.StudentService;
 
 
 @Controller
@@ -31,6 +24,12 @@ public class StudentController {
 	
 	@Autowired
 	private CourseService courseService;
+
+	@Autowired
+	private LessonService lessonService;
+
+	@Autowired
+	private ContentService contentService;
 	
 	
 	@Autowired
@@ -54,6 +53,7 @@ public class StudentController {
 		Student student = studentService.findByStudentId(studentId);
 		List<Course> courses = student.getCourses();
 		Course course = courseService.findCourseById(courseId);
+		List<Lesson> lessons = lessonService.findByCourseId(courseId);
 		StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
 		List<Assignment> assignments = studentCourseDetails.getAssignments();
 		
@@ -70,6 +70,7 @@ public class StudentController {
 		theModel.addAttribute("courses", courses);
 		theModel.addAttribute("student", student);
 		theModel.addAttribute("gradeDetails", gradeDetails);
+		theModel.addAttribute("lessons", lessons);
 		
 		return "student/student-course-detail";
 	}
@@ -123,6 +124,39 @@ public class StudentController {
 		}
 		
 		return -1;
+	}
+
+	@GetMapping("/lesson/{lessonId}/{studentId}")
+	public String listContentsByLesson(@PathVariable("lessonId") int lessonId, @PathVariable("studentId") int studentId, Model model) {
+
+		Student student = studentService.findByStudentId(studentId);
+		List<Course> courses = student.getCourses();
+		// Lấy thông tin bài học
+		Lesson lesson = lessonService.findById(lessonId);
+		model.addAttribute("lesson", lesson);
+		model.addAttribute("course", lesson.getCourse());
+		model.addAttribute("student", student);
+		model.addAttribute("courses", courses);
+
+		// Lấy danh sách nội dung
+		List<Content> contents = contentService.findByLessonId(lessonId);
+		model.addAttribute("contents", contents);
+
+		return "student/student-list-content";
+	}
+
+	@GetMapping("/{studentId}/content/{contentId}/view")
+	public String viewContent(@PathVariable int contentId,  @PathVariable("studentId") int studentId, Model model) {
+		Content content = contentService.findById(contentId);
+		Student student = studentService.findByStudentId(studentId);
+		List<Course> courses = student.getCourses();
+		model.addAttribute("content", content);
+		model.addAttribute("lesson", content.getLesson());
+		model.addAttribute("course", content.getLesson().getCourse());
+		model.addAttribute("student", student);
+		model.addAttribute("courses", courses);
+
+		return "student/student-view-content";
 	}
 
 }
