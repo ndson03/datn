@@ -1,0 +1,65 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container {
+    max-width: 450px;
+    margin: auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.btn-login {
+    background-color: #0d6efd;
+    border: none;
+    padding: 10px;
+    font-weight: 500;
+    width: 100%;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 25px 0;
+}
+
+.divider hr {
+    flex: 1;
+}
+
+.divider span {
+    padding: 0 15px;
+    color: #6c757d;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #842029;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c2c7;
+}
+
+.footer {
+    margin-top: auto;
+    background-color: #f8f9fa;
+    padding: 15px 0;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+}

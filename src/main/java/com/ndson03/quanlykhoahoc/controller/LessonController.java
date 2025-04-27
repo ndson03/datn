@@ -30,20 +30,6 @@ public class LessonController {
         this.teacherService = teacherService;
     }
 
-    // Hiển thị danh sách bài học của khóa học
-    @GetMapping("/course/{courseId}")
-    public String listLessonsByCourse(@PathVariable int courseId, Model model) {
-        // Lấy thông tin khóa học
-        Course course = courseService.findCourseById(courseId);
-        model.addAttribute("course", course);
-
-        // Lấy danh sách bài học
-        List<Lesson> lessons = lessonService.findByCourseId(courseId);
-        model.addAttribute("lessons", lessons);
-
-        return "lesson/list-lesson";
-    }
-
     // Hiển thị form thêm bài học mới
     @GetMapping("/{teacherId}/showFormForAdd/{courseId}")
     public String showFormForAdd(@PathVariable("teacherId") int teacherId, @PathVariable("courseId") int courseId, Model model) {
@@ -86,7 +72,7 @@ public class LessonController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("course", courseService.findCourseById(courseId));
-            return "lesson/lesson-form";
+            return "teacher/lesson-form";
         }
 
         // Thiết lập khóa học cho bài học
@@ -103,7 +89,6 @@ public class LessonController {
 
     }
 
-    // Xóa bài học
     @GetMapping("/{teacherId}/delete")
     public String delete(@RequestParam("lessonId") int id, @PathVariable("teacherId") int teacherId, Model model) {
         Lesson lesson = lessonService.findById(id);

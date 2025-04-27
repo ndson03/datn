@@ -14,11 +14,6 @@ import java.util.Map;
 @RequestMapping("/gemini")
 public class GeminiController {
 
-    @GetMapping("/qna")
-    public String qnaPage() {
-        return "gemini/qna";
-    }
-
 
     private final QnAService qnAService;
 

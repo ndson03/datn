@@ -99,6 +99,10 @@ textarea {
     align-self: flex-start;
 }
 
+.bot-message p{
+    align-content: center;
+    margin-bottom: 0;
+}
 
 /* Loading spinner */
 .loading {

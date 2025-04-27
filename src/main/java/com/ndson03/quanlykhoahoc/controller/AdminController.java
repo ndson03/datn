@@ -277,4 +277,10 @@ public class AdminController {
 		
 		return "redirect:/admin/courses/" + courseId + "/students";
 	}
+
+	@GetMapping("/chatbot")
+	public String qnaPage() {
+		return "admin/admin-chatbot";
+	}
+
 }
