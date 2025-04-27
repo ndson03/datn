@@ -4,15 +4,32 @@ import com.ndson03.quanlykhoahoc.dto.QuizSubmissionFormData;
 import com.ndson03.quanlykhoahoc.entity.*;
 import com.ndson03.quanlykhoahoc.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Controller
 @RequestMapping("/student")
 public class StudentAssignmentController {
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Autowired
     private AssignmentService assignmentService;
@@ -40,6 +57,9 @@ public class StudentAssignmentController {
 
     @Autowired
     private StudentCourseDetailsService studentCourseDetailsService;
+
+    @Autowired
+    private AssignmentFileSubmissionService fileSubmissionService;
 
     @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}")
     public String viewAssignmentDetails(@PathVariable("studentId") int studentId,
@@ -72,11 +92,202 @@ public class StudentAssignmentController {
 
             if (existingSubmission != null) {
                 model.addAttribute("score", existingSubmission.getScore());
+                model.addAttribute("endTime", existingSubmission.getSubmissionDate());
+            }
+        } else {
+            // For file submissions, load existing files
+            if (assignmentDetails != null) {
+                List<AssignmentFileSubmission> fileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
+                model.addAttribute("fileSubmissions", fileSubmissions);
             }
         }
 
         return "student/student-assignment-detail";
     }
+
+    @PostMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/submit-file")
+    public String submitFile(@PathVariable("studentId") int studentId,
+                             @PathVariable("courseId") int courseId,
+                             @PathVariable("assignmentId") int assignmentId,
+                             @RequestParam("file") MultipartFile file,
+                             @RequestParam(value = "comment", required = false) String comment,
+                             RedirectAttributes redirectAttributes) {
+
+        if (file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("message", "Vui lòng chọn file để tải lên");
+            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+            return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+        }
+
+        try {
+            // Get or create assignment details
+            StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+            AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
+                    assignmentId, studentCourseDetails.getId());
+
+            if (assignmentDetails == null) {
+                assignmentDetails = new AssignmentDetails();
+                assignmentDetails.setAssignmentId(assignmentId);
+                assignmentDetails.setStudentCourseDetailsId(studentCourseDetails.getId());
+                assignmentDetails.setIsDone(0);
+                assignmentDetails = assignmentDetailsService.save(assignmentDetails);
+            }
+
+            // Create directory for this student's assignment if it doesn't exist
+            String studentAssignmentDir = uploadDir + "/student_" + studentId + "/assignment_" + assignmentId;
+            Path uploadPath = Paths.get(studentAssignmentDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // Generate unique filename to avoid overwriting
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String uniqueFilename = UUID.randomUUID().toString() + extension;
+
+            // Save file to disk
+            Path filePath = uploadPath.resolve(uniqueFilename);
+            Files.copy(file.getInputStream(), filePath);
+
+            // Save file details to database
+            AssignmentFileSubmission fileSubmission = new AssignmentFileSubmission();
+            fileSubmission.setAssignmentDetailsId(assignmentDetails.getId());
+            fileSubmission.setFileName(uniqueFilename);
+            fileSubmission.setOriginalFileName(originalFilename);
+            fileSubmission.setFilePath(filePath.toString());
+            fileSubmission.setFileSize(file.getSize());
+            fileSubmission.setContentType(file.getContentType());
+            fileSubmission.setUploadDate(LocalDateTime.now());
+            fileSubmission.setSubmissionComment(comment);
+
+            fileSubmissionService.save(fileSubmission);
+
+            // Mark assignment as completed (or keep as in-progress based on your requirements)
+            if (assignmentDetails.getIsDone() == 0) {
+                assignmentDetails.setIsDone(1);
+                assignmentDetails.setSubmitTime(LocalDateTime.now());
+
+                // Calculate time spent if start time exists
+                if (assignmentDetails.getStartTime() != null) {
+                    long minutesSpent = assignmentDetails.getStartTime().until(LocalDateTime.now(), ChronoUnit.MINUTES);
+                    assignmentDetails.setTimeSpent((int) minutesSpent);
+                }
+
+                assignmentDetailsService.save(assignmentDetails);
+            }
+
+            redirectAttributes.addFlashAttribute("message", "File đã được tải lên thành công!");
+            redirectAttributes.addFlashAttribute("alertClass", "alert-success");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+        }
+
+        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+    }
+
+    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/download-file/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") int fileId) {
+        AssignmentFileSubmission fileSubmission = fileSubmissionService.findById(fileId);
+
+        if (fileSubmission != null) {
+            try {
+                Path filePath = Paths.get(fileSubmission.getFilePath());
+                Resource resource = new UrlResource(filePath.toUri());
+
+                if (resource.exists() || resource.isReadable()) {
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileSubmission.getOriginalFileName() + "\"")
+                            .body(resource);
+                } else {
+                    throw new RuntimeException("Could not read the file!");
+                }
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("Error: " + e.getMessage());
+            }
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/delete-file/{fileId}")
+    public String deleteFile(@PathVariable("studentId") int studentId,
+                             @PathVariable("courseId") int courseId,
+                             @PathVariable("assignmentId") int assignmentId,
+                             @PathVariable("fileId") int fileId,
+                             RedirectAttributes redirectAttributes) {
+
+        AssignmentFileSubmission fileSubmission = fileSubmissionService.findById(fileId);
+
+        if (fileSubmission != null) {
+            try {
+                // Delete file from disk
+                Path filePath = Paths.get(fileSubmission.getFilePath());
+                Files.deleteIfExists(filePath);
+
+                // Delete record from database
+                fileSubmissionService.deleteById(fileId);
+
+                StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+
+                // Check if this was the last file
+                AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
+                List<AssignmentFileSubmission> remainingFiles = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
+
+                if (remainingFiles.isEmpty()) {
+                    // No files left, mark as incomplete if your business logic requires it
+                    assignmentDetails.setIsDone(0);
+                    assignmentDetailsService.save(assignmentDetails);
+                }
+
+                redirectAttributes.addFlashAttribute("message", "File đã được xóa thành công!");
+                redirectAttributes.addFlashAttribute("alertClass", "alert-success");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                redirectAttributes.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
+                redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy file!");
+            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+        }
+
+        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+    }
+
+    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/start")
+    public String startAssignment(@PathVariable("studentId") int studentId,
+                                  @PathVariable("courseId") int courseId,
+                                  @PathVariable("assignmentId") int assignmentId) {
+
+        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+
+        if (studentCourseDetails != null) {
+            AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
+                    assignmentId, studentCourseDetails.getId());
+
+            if (assignmentDetails == null) {
+                assignmentDetails = new AssignmentDetails();
+                assignmentDetails.setAssignmentId(assignmentId);
+                assignmentDetails.setStudentCourseDetailsId(studentCourseDetails.getId());
+                assignmentDetails.setIsDone(0);
+            }
+
+            // Only set start time if it hasn't been set yet
+            if (assignmentDetails.getStartTime() == null) {
+                assignmentDetails.setStartTime(LocalDateTime.now());
+            }
+
+            assignmentDetailsService.save(assignmentDetails);
+        }
+
+        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+    }
+
 
     @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/quiz/take")
     public String takeQuiz(@PathVariable("studentId") int studentId,

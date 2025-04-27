@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ndson03.quanlykhoahoc.entity.AssignmentDetails;
 
+import java.util.Optional;
+
 @Service
 public class AssignmentDetailsServiceImpl implements AssignmentDetailsService {
 
@@ -21,8 +23,13 @@ public class AssignmentDetailsServiceImpl implements AssignmentDetailsService {
 
     @Override
     @Transactional
-    public void save(AssignmentDetails assignmentDetails) {
-        assignmentDetailsRepository.save(assignmentDetails);
+    public AssignmentDetails save(AssignmentDetails assignmentDetails) {
+        return assignmentDetailsRepository.save(assignmentDetails);
+    }
+
+    @Override
+    public Optional<AssignmentDetails> findById(int assignmentDetailsId) {
+        return assignmentDetailsRepository.findById(assignmentDetailsId);
     }
 
 }
