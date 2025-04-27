@@ -43,6 +43,7 @@ public class QuizSubmission {
     @OneToMany(mappedBy = "quizSubmission", cascade = CascadeType.ALL)
     private List<QuizAnswer> answers;
 
+
     public QuizSubmission() {
         this.submissionDate = new Date();
     }

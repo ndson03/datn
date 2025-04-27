@@ -36,6 +36,7 @@ public class QuizQuestion {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private List<QuizOption> options;
 
+
     @Column(name = "correct_option_id")
     private Integer correctOptionId;
 

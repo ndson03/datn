@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>Chi tiết bài làm học sinh</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <style>
+        .status-pill {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .table-student-status {
+            font-size: 14px;
+        }
+        .student-name {
+            font-weight: 500;
+            font-size: 18px;
+        }
+        .student-email {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .submission-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .student-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+        /* Quiz styles */
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #0d6efd;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .question:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .question-text {
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            color: #212529;
+        }
+        .options {
+            margin-left: 10px;
+        }
+        .option {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        .option.correct {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+        }
+        .option.wrong {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+        }
+        .option.selected {
+            background-color: rgba(13, 110, 253, 0.1);
+            border-left: 4px solid #0d6efd;
+        }
+        .question-counter {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background-color: #0d6efd;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        .header-info {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .score-display {
+            font-size: 36px;
+            font-weight: 700;
+            color: #198754;
+        }
+        .submission-details {
+            border-left: 3px solid #dee2e6;
+            padding-left: 20px;
+        }
+        .assignment-note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Top Navbar -->
+<nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" style="padding-left: 20px">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span>Trường SICT - HaUI</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" id="sidebarToggle">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown user-dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <div class="avatar me-2">
+                            <span th:text="${#strings.substring(teacher.firstName, 0, 1) + #strings.substring(teacher.lastName, 0, 1)}"></span>
+                        </div>
+                        <span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="#" th:action="@{/logout}" method="POST">
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Side Navbar - FIXED WIDTH -->
+<nav class="side-navbar">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+        <a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="/gemini/qna" title="Dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Chatbot</span>
+        </a>
+        <div class="mt-3 text-center">
+            <div class="small text-muted px-2">KHÓA HỌC</div>
+            <hr class="my-2">
+        </div>
+        <div th:each="course : ${courses}">
+            <a class="nav-link"
+               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
+               th:title="${course.name}"
+               th:classappend="${course.id == courseId ? 'active' : ''}">
+                <i class="fas fa-book"></i>
+                <span th:text="${course.name}"></span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content mt-5 pt-3">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4" style="padding-top: 30px">
+            <h1 class="h2 mb-0">Chi tiết bài làm học sinh</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">Khóa học</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}">Bài tập</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Chi tiết bài làm</li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Student and Assignment Info Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-user-graduate me-2"></i>
+                    Thông tin học sinh & bài tập
+                </h5>
+                <a class="btn btn-primary btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Student Info -->
+                    <div class="col-md-4 border-end">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="student-avatar" th:text="${#strings.substring(student.firstName, 0, 1) + #strings.substring(student.lastName, 0, 1)}"></div>
+                            <div>
+                                <h4 class="student-name mb-0" th:text="${student.firstName + ' ' + student.lastName}"></h4>
+                                <div class="student-email" th:text="${student.email != null ? student.email : 'Chưa có email'}"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Mã sinh viên:</strong> <span th:text="${student.id}"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Khóa học:</strong> <span th:text="${course.name}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Assignment Info -->
+                    <div class="col-md-4 border-end">
+                        <h5 class="mb-3">Thông tin bài tập</h5>
+                        <div class="mb-2">
+                            <strong>Tên bài tập:</strong> <span th:text="${assignment.name}"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Loại bài tập:</strong>
+                            <span th:if="${assignment.isQuiz}" class="badge bg-primary">
+                                <i class="fas fa-question-circle me-1"></i> Quiz
+                            </span>
+                            <span th:unless="${assignment.isQuiz}" class="badge bg-secondary">
+                                <i class="fas fa-file-alt me-1"></i> Bài tập thường
+                            </span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Ngày hết hạn:</strong> <span th:text="${assignment.dueDate}"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Mô tả:</strong> <span th:text="${assignment.description}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Submission Info -->
+                    <div class="col-md-4">
+                        <h5 class="mb-3">Kết quả nộp bài</h5>
+                        <div class="mb-3 text-center">
+                            <div class="mb-2">Điểm số</div>
+                            <div class="score-display" th:text="${submission.score + '/100'}"></div>
+                        </div>
+                        <div class="submission-details">
+                            <div class="mb-2">
+                                <strong>Ngày nộp:</strong> <span th:text="${submission.submissionDate}"></span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Trạng thái:</strong> <span class="badge bg-success">Đã hoàn thành</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Result -->
+        <div th:if="${assignment.isQuiz}" class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-clipboard-check me-2"></i>
+                    Kết quả bài làm
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex">
+                        <div style="font-size: 24px; margin-right: 15px;">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading">Thông tin chi tiết bài làm</h5>
+                            <p class="mb-0">Dưới đây là chi tiết các câu trả lời của học sinh. Các câu trả lời đúng được đánh dấu màu xanh, câu trả lời sai được đánh dấu màu đỏ.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:each="question, questionStat : ${questions}" class="question position-relative">
+                    <div class="question-counter" th:text="${questionStat.count}"></div>
+                    <div class="question-text">
+                        <span th:text="${question.questionText}"></span>
+                    </div>
+                    <div class="options">
+                        <div th:each="option : ${question.options}"
+                             th:with="selectedOptionId=${selectedAnswers.get(question.id)},
+                                     isSelectedOption=${option.id == selectedAnswers.get(question.id)},
+                                     isCorrectOption=${option.id == question.correctOptionId}"
+                             th:class="${isSelectedOption && isCorrectOption ? 'option correct' :
+                                      isSelectedOption && !isCorrectOption ? 'option wrong' :
+                                      !isSelectedOption && isCorrectOption ? 'option correct' : 'option'}">
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span th:text="${option.optionText}"></span>
+                                </div>
+                                <div>
+                                    <span th:if="${isSelectedOption && isCorrectOption}" class="text-success">
+                                        <i class="fas fa-check-circle"></i> Đáp án đúng
+                                    </span>
+                                    <span th:if="${isSelectedOption && !isCorrectOption}" class="text-danger">
+                                        <i class="fas fa-times-circle"></i> Đáp án sai
+                                    </span>
+                                    <span th:if="${!isSelectedOption && isCorrectOption}" class="text-success">
+                                        <i class="fas fa-check-circle"></i> Đáp án đúng
+                                    </span>
+                                    <span th:if="${isSelectedOption}" class="badge bg-primary ms-2">
+                                        <i class="fas fa-user-check"></i> Học sinh chọn
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Feedback Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-comment-dots me-2"></i>
+                    Phản hồi của giáo viên
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}/feedback/{studentId}(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id}, studentId=${student.id})}" method="POST">
+                    <div class="mb-3">
+                        <label for="feedbackText" class="form-label">Nhận xét</label>
+                        <textarea class="form-control" id="feedbackText" name="feedbackText" rows="4" placeholder="Nhập nhận xét của bạn..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="scoreAdjustment" class="form-label">Điều chỉnh điểm (nếu cần)</label>
+                        <div class="input-group" style="max-width: 200px;">
+                            <input type="number" class="form-control" id="scoreAdjustment" name="scoreAdjustment" min="0" max="100" th:value="${submission.score}">
+                            <span class="input-group-text">/100</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Lưu phản hồi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+<script>
+    // Modified for fixed sidebar
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sideNavbar = document.querySelector('.side-navbar');
+        const mainContent = document.querySelector('.main-content');
+
+        // Only for mobile view
+        sidebarToggle.addEventListener('click', function() {
+            sideNavbar.classList.toggle('show');
+        });
+    });
+</script>
+</body>
+</html>

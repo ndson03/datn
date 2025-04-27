@@ -75,39 +75,6 @@ public class StudentController {
         return "student/student-course-detail";
     }
 
-    @GetMapping("/{studentId}/courses/{courseId}/assignment/{assignmentId}")
-    public String showStudentAssignment(@PathVariable("studentId") int studentId, @PathVariable("courseId") int courseId,
-                                        @PathVariable("assignmentId") int assignmentId, Model theModel) {
-        Student student = studentService.findByStudentId(studentId);
-        List<Course> courses = student.getCourses();
-        Course course = courseService.findCourseById(courseId);
-        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-        Assignment assignment = studentCourseDetails.getAssignmentById(assignmentId);
-        AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
-
-        theModel.addAttribute("assignment", assignment);
-        theModel.addAttribute("assignmentDetails", assignmentDetails);
-        theModel.addAttribute("course", course);
-        theModel.addAttribute("courses", courses);
-        theModel.addAttribute("student", student);
-
-        return "student/student-assignment-detail";
-    }
-
-
-//    @GetMapping("/{studentId}/courses/{courseId}/markAsCompleted/{assignmentId}")
-//    public String markAsCompleted(@PathVariable("studentId") int studentId, @PathVariable("courseId") int courseId,
-//                                  @PathVariable("assignmentId") int assignmentId, Model theModel) {
-//        //Student student = studentService.findByStudentId(studentId);
-//        //Course course = courseService.findCourseById(courseId);
-//        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-//        AssignmentDetails assignmentDetails = assignmentDetailsService
-//                .findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
-//        assignmentDetails.setIsDone(1); //assignment is completed
-//        assignmentDetailsService.save(assignmentDetails);
-//        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignment/" + assignmentId;
-//    }
-
     //helper method to find day difference between assignment due date and today
     private int findDayDifference(Assignment assignment) {
         String dateString = assignment.getDueDate();

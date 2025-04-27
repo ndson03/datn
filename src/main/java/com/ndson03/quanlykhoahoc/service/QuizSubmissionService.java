@@ -17,4 +17,6 @@ public interface QuizSubmissionService {
 
     @Transactional
     void save(QuizSubmission submission);
+
+    void deleteSubmissionById(int id);
 }

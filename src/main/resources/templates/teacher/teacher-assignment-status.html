@@ -15,6 +15,107 @@
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 	<link rel="stylesheet" th:href="@{/css/layout.css}">
+	<style>
+		.status-pill {
+			padding: 6px 12px;
+			border-radius: 50px;
+			font-size: 13px;
+			font-weight: 500;
+		}
+		.table-student-status {
+			font-size: 14px;
+		}
+		.table-student-status th {
+			font-weight: 600;
+			border-bottom: 2px solid #dee2e6;
+			background-color: #f8f9fa;
+			padding: 12px 15px;
+		}
+		.table-student-status td {
+			padding: 12px 15px;
+			vertical-align: middle;
+		}
+		.student-name {
+			font-weight: 500;
+			font-size: 20px;
+		}
+		.student-email {
+			font-size: 12px;
+			color: #6c757d;
+		}
+		.submission-time {
+			font-size: 12px;
+			color: #6c757d;
+		}
+		.filter-container {
+			background-color: #f8f9fa;
+			border-radius: 6px;
+			padding: 15px;
+			margin-bottom: 20px;
+		}
+		.student-avatar {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			background-color: #e9ecef;
+			color: #495057;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 12px;
+			font-weight: 600;
+			margin-right: 10px;
+		}
+		/* Quiz styles */
+		.question {
+			margin-bottom: 25px;
+			padding: 20px;
+			background: #f8f9fa;
+			border-radius: 8px;
+			border-left: 4px solid #0d6efd;
+			transition: all 0.3s ease;
+			position: relative;
+		}
+		.question:hover {
+			box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+		}
+		.question-text {
+			font-size: 16px;
+			margin-bottom: 15px;
+			font-weight: 500;
+			color: #212529;
+		}
+		.options {
+			margin-left: 10px;
+		}
+		.option {
+			margin-bottom: 12px;
+			padding: 8px;
+			border-radius: 4px;
+			transition: background-color 0.2s ease;
+		}
+		.option.correct {
+			background-color: rgba(40, 167, 69, 0.2);
+			border-left: 4px solid #28a745;
+		}
+		.question-counter {
+			position: absolute;
+			right: 20px;
+			top: 20px;
+			background-color: #0d6efd;
+			color: white;
+			width: 30px;
+			height: 30px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			font-weight: bold;
+		}
+		.quiz-section {
+			margin-top: 30px;
+		}
+	</style>
 </head>
 
 <body>
@@ -97,6 +198,63 @@
 			</nav>
 		</div>
 
+		<!-- Assignment Info Card -->
+		<div class="card mb-4">
+			<div class="card-header bg-light">
+				<h5 class="mb-0 fw-bold">
+					<i class="fas fa-clipboard-list me-2"></i>
+					<span th:text="${assignment.name}"></span>
+				</h5>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-8">
+						<p class="mb-0" th:text="${assignment.description}"></p>
+					</div>
+					<div class="col-md-4">
+						<div class="d-flex justify-content-end">
+							<div class="text-end">
+								<div class="small text-muted">Ngày hết hạn</div>
+								<div class="fs-5 fw-bold text-danger" th:text="${assignment.dueDate}"></div>
+								<div class="mt-2">
+                                    <span class="badge bg-primary" th:if="${assignment.isQuiz}">
+                                        <i class="fas fa-question-circle me-1"></i> Quiz
+                                    </span>
+									<span class="badge bg-secondary" th:unless="${assignment.isQuiz}">
+                                        <i class="fas fa-file-alt me-1"></i> Bài tập
+                                    </span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Filter Controls -->
+		<div class="filter-container mb-4">
+			<div class="row align-items-center">
+				<div class="col-md-6">
+					<div class="input-group">
+						<span class="input-group-text"><i class="fas fa-search"></i></span>
+						<input type="text" class="form-control" placeholder="Tìm kiếm sinh viên..." id="searchInput">
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="d-flex justify-content-md-end mt-3 mt-md-0">
+						<select class="form-select me-2" style="max-width: 200px;" id="statusFilter">
+							<option value="all">Tất cả trạng thái</option>
+							<option value="completed">Đã hoàn thành</option>
+							<option value="incomplete">Chưa hoàn thành</option>
+						</select>
+						<button class="btn btn-outline-primary" type="button">
+							<i class="fas fa-filter me-1"></i> Lọc
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Assignment Status Card -->
 		<div class="card">
 			<div class="card-header d-flex justify-content-between align-items-center">
@@ -104,30 +262,128 @@
 					<i class="fas fa-tasks me-2"></i>
 					Trạng thái nộp bài
 				</h5>
-				<a class="btn btn-primary btn-sm" href="#" onclick="history.back()">
-					<i class="fas fa-arrow-left me-1"></i> Quay lại
-				</a>
+				<div>
+					<button class="btn btn-outline-success btn-sm me-2">
+						<i class="fas fa-file-excel me-1"></i> Xuất Excel
+					</button>
+					<a class="btn btn-primary btn-sm" href="#" onclick="history.back()">
+						<i class="fas fa-arrow-left me-1"></i> Quay lại
+					</a>
+				</div>
 			</div>
 			<div class="card-body p-0">
 				<div class="table-responsive">
-					<table class="table table-hover mb-0">
+					<table class="table table-hover mb-0 table-student-status">
 						<thead>
 						<tr>
-							<th style="width: 50%">Sinh viên</th>
-							<th style="width: 50%" class="text-center">Trạng thái</th>
+							<th style="width: 30%"><i class="fas fa-user me-1"></i> Sinh viên</th>
+							<th style="width: 15%" class="text-center"><i class="fas fa-check-circle me-1"></i> Trạng thái</th>
+							<th style="width: 15%" class="text-center"><i class="fas fa-star me-1"></i> Điểm số</th>
+							<th style="width: 20%" class="text-center"><i class="fas fa-clock me-1"></i> Giờ nộp</th>
+							<th style="width: 20%" class="text-center"><i class="fas fa-cog me-1"></i> Thao tác</th>
 						</tr>
 						</thead>
 						<tbody>
 						<tr th:each="entry : ${list}">
-							<td th:text="${entry.key.firstName + ' ' + entry.key.lastName}"></td>
+							<td>
+								<div class="d-flex align-items-center">
+									<div class="student-avatar" th:text="${#strings.substring(entry.key.firstName, 0, 1) + #strings.substring(entry.key.lastName, 0, 1)}"></div>
+									<div>
+										<div class="student-name" th:text="${entry.key.firstName + ' ' + entry.key.lastName}"></div>
+										<div class="student-email" th:text="${entry.key.email != null ? entry.key.email : 'Chưa có email'}"></div>
+									</div>
+								</div>
+							</td>
 							<td class="text-center">
-								<span th:if="${entry.value == 'Đã hoàn thành'}" class="badge bg-success rounded-pill">Đã hoàn thành</span>
-								<span th:if="${entry.value == 'Chưa hoàn thành'}" class="badge bg-warning rounded-pill">Chưa hoàn thành</span>
+								<span th:if="${entry.value == 'Đã hoàn thành'}" class="badge bg-success status-pill">Đã hoàn thành</span>
+								<span th:if="${entry.value == 'Chưa hoàn thành'}" class="badge bg-warning status-pill">Chưa hoàn thành</span>
+							</td>
+							<td class="text-center">
+								<span th:if="${entry.key.score != null}" th:text="${entry.key.score}"></span>
+								<span th:if="${entry.key.score == null}">-</span>
+							</td>
+							<td class="text-center">
+								<span th:if="${entry.key.submissionTime != null}" th:text="${entry.key.submissionTime}"></span>
+								<span th:if="${entry.key.submissionTime == null}">-</span>
+								<div class="submission-time" th:if="${entry.key.submissionDate != null}" th:text="${entry.key.submissionDate}"></div>
+							</td>
+							<td class="text-center">
+								<div class="btn-group">
+									<button type="button" class="btn btn-outline-primary btn-sm" title="Chấm điểm">
+										<i class="fas fa-pen"></i>
+									</button>
+									<a th:if="${entry.value == 'Đã hoàn thành'}" class="btn btn-outline-info btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/assignmentDetails/{studentId}/{assignmentId}(teacherId=${teacher.id}, courseId=${courseId}, studentId=${entry.key.id}, assignmentId=${assignmentId})}" title="Xem chi tiết">
+										<i class="fas fa-eye"></i>
+									</a>
+									<button type="button" class="btn btn-outline-danger btn-sm" title="Đặt lại trạng thái">
+										<a href="#" title="Đặt lại bài">
+											<i class="fas fa-redo-alt"></i>
+										</a>
+									</button>
+								</div>
 							</td>
 						</tr>
 						</tbody>
-
 					</table>
+				</div>
+			</div>
+			<div class="card-footer">
+				<div class="d-flex justify-content-between align-items-center">
+					<div>
+						<span class="text-muted">Hiển thị <strong>1-10</strong> trong tổng số <strong th:text="${list.size()}"></strong> sinh viên</span>
+					</div>
+					<nav aria-label="Page navigation">
+						<ul class="pagination pagination-sm mb-0">
+							<li class="page-item disabled">
+								<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+							</li>
+							<li class="page-item active"><a class="page-link" href="#">1</a></li>
+							<li class="page-item"><a class="page-link" href="#">2</a></li>
+							<li class="page-item"><a class="page-link" href="#">3</a></li>
+							<li class="page-item">
+								<a class="page-link" href="#">Sau</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+
+		<!-- Quiz Questions Card - Only show if this is a quiz assignment -->
+		<div th:if="${assignment != null && assignment.isQuiz && questions != null && !questions.isEmpty()}" class="card mt-4 quiz-section">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h5 class="mb-0">
+					<i class="fas fa-question-circle me-2"></i>
+					Nội dung Quiz
+				</h5>
+				<div>
+					<button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#quizContent">
+						<i class="fas fa-chevron-down"></i> Hiển thị/Ẩn
+					</button>
+				</div>
+			</div>
+			<div class="collapse show" id="quizContent">
+				<div class="card-body">
+					<div class="alert alert-info">
+						<i class="fas fa-info-circle me-2"></i>
+						Đây là nội dung quiz. Bạn có thể xem các câu hỏi và đáp án đúng để có thể đánh giá kết quả của sinh viên.
+					</div>
+
+					<div th:each="question, questionStat : ${questions}" class="question position-relative">
+						<div class="question-counter" th:text="${questionStat.count}"></div>
+						<div class="question-text">
+							<span th:text="${question.questionText}"></span>
+						</div>
+						<div class="options">
+							<div th:each="option : ${question.options}"
+								 th:class="${option.id == question.correctOptionId ? 'option correct' : 'option'}">
+								<span th:text="${option.optionText}"></span>
+								<span th:if="${option.id == question.correctOptionId}" class="ms-2 text-success">
+                                    <i class="fas fa-check-circle"></i> Đáp án đúng
+                                </span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -149,6 +405,32 @@
 		sidebarToggle.addEventListener('click', function() {
 			sideNavbar.classList.toggle('show');
 		});
+
+		// Tìm kiếm sinh viên
+		const searchInput = document.getElementById('searchInput');
+		const statusFilter = document.getElementById('statusFilter');
+		const tableRows = document.querySelectorAll('tbody tr');
+
+		searchInput.addEventListener('input', filterTable);
+		statusFilter.addEventListener('change', filterTable);
+
+		function filterTable() {
+			const searchTerm = searchInput.value.toLowerCase();
+			const statusValue = statusFilter.value;
+
+			tableRows.forEach(row => {
+				const studentName = row.querySelector('.student-name').textContent.toLowerCase();
+				const studentEmail = row.querySelector('.student-email').textContent.toLowerCase();
+				const status = row.querySelector('.status-pill').textContent.toLowerCase();
+
+				const matchesSearch = studentName.includes(searchTerm) || studentEmail.includes(searchTerm);
+				const matchesStatus = statusValue === 'all' ||
+						(statusValue === 'completed' && status.includes('đã hoàn thành')) ||
+						(statusValue === 'incomplete' && status.includes('chưa hoàn thành'));
+
+				row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+			});
+		}
 	});
 </script>
 </body>

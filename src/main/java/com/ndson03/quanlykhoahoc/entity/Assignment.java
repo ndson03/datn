@@ -1,15 +1,6 @@
 package com.ndson03.quanlykhoahoc.entity;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -50,8 +41,11 @@ public class Assignment implements Comparable{
             inverseJoinColumns = @JoinColumn(name="student_course_details_id"))
     private List<StudentCourseDetails> courseDetails;
 
-    @OneToMany(mappedBy = "assignment")
+    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizQuestion> questions;
+
+    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuizSubmission> quizSubmissions;
 
     public Assignment() {
         this.totalScore = 10.0; // Mặc định 10 điểm

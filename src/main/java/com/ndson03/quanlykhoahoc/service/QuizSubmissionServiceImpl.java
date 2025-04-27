@@ -37,4 +37,9 @@ public class QuizSubmissionServiceImpl implements QuizSubmissionService {
     public void save(QuizSubmission submission) {
         quizSubmissionRepository.save(submission);
     }
+
+    @Override
+    public void deleteSubmissionById(int id) {
+        quizSubmissionRepository.deleteById(id);
+    }
 }

@@ -1,6 +1,7 @@
 package com.ndson03.quanlykhoahoc.controller;
 
 import com.ndson03.quanlykhoahoc.dto.QuizFormData;
+import com.ndson03.quanlykhoahoc.dto.StudentDTO;
 import com.ndson03.quanlykhoahoc.entity.*;
 import com.ndson03.quanlykhoahoc.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +11,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/teacher")
@@ -32,7 +31,13 @@ public class TeacherAssignmentController {
     private QuizOptionService quizOptionService;
 
     @Autowired
+    private QuizSubmissionService quizSubmissionService;
+
+    @Autowired
     private TeacherService teacherService;
+
+    @Autowired
+    private StudentService studentService;
 
     @Autowired
     private CourseService courseService;
@@ -104,30 +109,126 @@ public class TeacherAssignmentController {
         Course course = courseService.findCourseById(courseId);
         List<Student> students = course.getStudents();
         List<Course> courses = teacher.getCourses();
-
-        List<AssignmentDetails> studentCourseAssignmentDetails = new ArrayList<>();
+        Assignment assignment = assignmentService.findById(assignmentId);
 
         // Create student - status map
-        HashMap<Student, String> list = new HashMap<>();
+        Map<StudentDTO, String> list = new HashMap<>();
 
         for (Student student : students) {
             StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
             AssignmentDetails ad = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
-            studentCourseAssignmentDetails.add(ad);
+            QuizSubmission quizSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
+            // Create a StudentDTO to store additional display info
+            StudentDTO studentDTO = new StudentDTO();
+            studentDTO.setId(student.getId());
+            studentDTO.setFirstName(student.getFirstName());
+            studentDTO.setLastName(student.getLastName());
+            studentDTO.setEmail(student.getEmail());
+
+            // Add submission details if available
+            if (ad.getIsDone() == 1) {
+                studentDTO.setScore(ad.getScore());
+                studentDTO.setSubmissionTime(formatTime(quizSubmission.getSubmissionDate()));
+                studentDTO.setSubmissionDate(formatDate(quizSubmission.getSubmissionDate()));
+            }
+
+            // Set status
             if (ad.getIsDone() == 0) {
-                list.put(student, "Chưa hoàn thành");
+                list.put(studentDTO, "Chưa hoàn thành");
             } else {
-                list.put(student, "Đã hoàn thành");
+                list.put(studentDTO, "Đã hoàn thành");
             }
         }
 
+        // If this is a quiz assignment, load quiz questions and answers
+        if (assignment.isQuiz()) {
+            List<QuizQuestion> questions = quizQuestionService.findByAssignmentId(assignmentId);
+
+            // Load options for each question
+            for (QuizQuestion question : questions) {
+                List<QuizOption> options = quizOptionService.findByQuestionId(question.getId());
+                question.setOptions(options);
+            }
+
+            theModel.addAttribute("questions", questions);
+        }
+
         theModel.addAttribute("list", list);
-        theModel.addAttribute("assignmentDetails", studentCourseAssignmentDetails);
-        theModel.addAttribute("students", students);
+        theModel.addAttribute("courseId", courseId);
+        theModel.addAttribute("assignmentId", assignmentId);
         theModel.addAttribute("courses", courses);
         theModel.addAttribute("teacher", teacher);
+        theModel.addAttribute("assignment", assignment);
 
         return "teacher/teacher-assignment-status";
+    }
+
+    // Add new method to view individual student's quiz submission
+    @GetMapping("/{teacherId}/courses/{courseId}/assignmentDetails/{studentId}/{assignmentId}")
+    public String viewStudentQuizSubmission(@PathVariable("teacherId") int teacherId,
+                                            @PathVariable("courseId") int courseId,
+                                            @PathVariable("studentId") int studentId,
+                                            @PathVariable("assignmentId") int assignmentId,
+                                            Model model) {
+        Teacher teacher = teacherService.findByTeacherId(teacherId);
+        Student student = studentService.findByStudentId(studentId);
+        Course course = courseService.findCourseById(courseId);
+        Assignment assignment = assignmentService.findById(assignmentId);
+        List<Course> courses = teacher.getCourses();
+
+        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+
+        if (studentCourseDetails == null || assignment == null) {
+            return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
+        }
+
+        QuizSubmission submission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(
+                assignmentId, studentCourseDetails.getId());
+
+        if (submission == null) {
+            return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/assignments/" + assignmentId;
+        }
+
+        // Load questions and answers for the quiz
+        List<QuizQuestion> questions = quizQuestionService.findByAssignmentId(assignmentId);
+        List<QuizAnswer> answers = submission.getAnswers();
+
+        // Create map of question id to selected answer
+        Map<Integer, Integer> selectedAnswers = new HashMap<>();
+        for (QuizAnswer answer : answers) {
+            selectedAnswers.put(answer.getQuestion().getId(), answer.getSelectedOptionId());
+        }
+
+        // Load options for each question
+        for (QuizQuestion question : questions) {
+            List<QuizOption> options = quizOptionService.findByQuestionId(question.getId());
+            question.setOptions(options);
+        }
+
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("student", student);
+        model.addAttribute("course", course);
+        model.addAttribute("courses", courses);
+        model.addAttribute("assignment", assignment);
+        model.addAttribute("submission", submission);
+        model.addAttribute("questions", questions);
+        model.addAttribute("selectedAnswers", selectedAnswers);
+
+        return "teacher/student-quiz-result";
+    }
+
+    // Helper method to format time (HH:mm)
+    private String formatTime(Date date) {
+        if (date == null) return null;
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        return sdf.format(date);
+    }
+
+    // Helper method to format date (dd/MM/yyyy)
+    private String formatDate(Date date) {
+        if (date == null) return null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.format(date);
     }
 
     @GetMapping("/{teacherId}/courses/{courseId}/assignments/{assignmentId}/delete")
@@ -137,6 +238,19 @@ public class TeacherAssignmentController {
 
         return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
     }
+
+//    @GetMapping("/{teacherId}/courses/{courseId}/assignments/{assignmentId}/student/{studentId}/reset")
+//    public String resetAssignment(@PathVariable("teacherId") int teacherId, @PathVariable("courseId") int courseId,
+//                                   @PathVariable("assignmentId") int assignmentId,
+//                                  @PathVariable("studentId") int studentId) {
+//        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+//        QuizSubmission quizSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
+//        quizSubmissionService.deleteSubmissionById(quizSubmission.getId());
+//        AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
+//        assignmentDetails.setIsDone(0);
+//
+//        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/assignments/" + assignmentId;
+//    }
 
     @GetMapping("/showFormForUpdate")
     public String showFormForUpdate(@RequestParam("assignmentId") int theId, Model theModel) {
