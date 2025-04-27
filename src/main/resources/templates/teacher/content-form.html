@@ -23,31 +23,32 @@
 <!-- Top Navbar -->
 <nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" style="padding-left: 20px">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
             <i class="fas fa-graduation-cap me-2"></i>
             <span>Trường SICT - HaUI</span>
         </a>
 
-        <button class="navbar-toggler" type="button" id="sidebarToggle">
+        <button class="navbar-toggler" type="button" id="mobileToggle">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown user-dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown">
                         <div class="avatar me-2">
                             <span th:text="${#strings.substring(teacher.firstName, 0, 1) + #strings.substring(teacher.lastName, 0, 1)}"></span>
                         </div>
                         <span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Cài đặt</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="#" th:action="@{/logout}" method="POST">
-                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
                             </form>
                         </li>
                     </ul>
@@ -57,28 +58,35 @@
     </div>
 </nav>
 
-<!-- Side Navbar - FIXED WIDTH -->
-<nav class="side-navbar">
+<!-- Sidebar Toggle Button -->
+<button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-chevron-left"></i>
+</button>
+
+<!-- Side Navbar -->
+<nav class="side-navbar" id="sideNav">
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
         <a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
         </a>
-        <a class="nav-link" href="/gemini/qna" title="Dashboard">
-            <i class="fas fa-tachometer-alt"></i>
+        <a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}" title="Chatbot">
+            <i class="fas fa-robot"></i>
             <span>Chatbot</span>
         </a>
-        <div class="mt-3 text-center">
-            <div class="small text-muted px-2">KHÓA HỌC</div>
+
+        <div class="mt-3 px-3">
+            <div class="small text-muted text-uppercase">Khóa học</div>
             <hr class="my-2">
         </div>
-        <div th:each="c : ${courses}">
+
+        <div th:each="course : ${courses}">
             <a class="nav-link"
-               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${c.id})}"
-               th:title="${c.name}"
-               th:classappend="${c.id == course.id ? 'active' : ''}">
+               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
+               th:title="${course.name}"
+               th:classappend="${course.id == courseId ? 'active' : ''}">
                 <i class="fas fa-book"></i>
-                <span th:text="${c.name}"></span>
+                <span th:text="${course.name}"></span>
             </a>
         </div>
     </div>
@@ -94,7 +102,7 @@
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
                     <li class="breadcrumb-item"><a href="#">Khóa học</a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/contents/lesson/{id}(id=${lesson.id})}">Nội dung bài học</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/contents/lesson/{id}/{teacherId}(id=${lesson.id},teacherId=${teacher.id})}">Nội dung bài học</a></li>
                     <li class="breadcrumb-item active" aria-current="page" th:text="${content.id == 0 ? 'Thêm mới' : 'Cập nhật'}"></li>
                 </ol>
             </nav>
@@ -115,7 +123,10 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form th:action="@{/contents/save/{teacherId}(teacherId=${teacher.id})}" th:object="${content}" method="POST">
+                <form th:action="@{/contents/save/{teacherId}(teacherId=${teacher.id})}"
+                      th:object="${content}"
+                      method="POST"
+                      enctype="multipart/form-data">
                     <!-- Hidden field cho ID nội dung -->
                     <input type="hidden" th:field="*{id}" />
 
@@ -143,7 +154,7 @@
                     <div class="row mb-3">
                         <label for="contentType" class="col-sm-2 col-form-label">Loại nội dung:</label>
                         <div class="col-sm-10">
-                            <select th:field="*{contentType}" class="form-select" required>
+                            <select th:field="*{contentType}" class="form-select" id="contentType" required>
                                 <option value="">-- Chọn loại nội dung --</option>
                                 <option value="TEXT">Văn bản</option>
                                 <option value="VIDEO">Video</option>
@@ -154,8 +165,29 @@
                         </div>
                     </div>
 
+                    <!-- Phần upload file -->
+                    <div class="row mb-3" id="fileUploadSection" style="display: none;">
+                        <label for="fileUpload" class="col-sm-2 col-form-label">Tải lên tệp:</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="fileUpload" id="fileUpload" class="form-control" />
+                            <small class="text-muted">Hỗ trợ các định dạng phổ biến (PDF, DOC, XLS, JPG, PNG, MP4...)</small>
+
+                            <!-- Hiển thị file hiện tại nếu đang chỉnh sửa -->
+                            <div th:if="${content.id != 0 && (content.contentType == 'FILE' || content.contentType == 'IMAGE' || content.contentType == 'VIDEO')}"
+                                 class="mt-2 p-2 border rounded">
+                                <p class="mb-1"><strong>File hiện tại:</strong> <span th:text="${content.contentData}"></span></p>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="keepExistingFile" name="keepExistingFile" value="true" checked>
+                                    <label class="form-check-label" for="keepExistingFile">
+                                        Giữ nguyên file (bỏ chọn nếu muốn thay thế bằng file mới)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Nội dung -->
-                    <div class="row mb-4">
+                    <div class="row mb-4" id="contentEditorSection">
                         <label for="contentData" class="col-sm-2 col-form-label">Nội dung:</label>
                         <div class="col-sm-10">
                             <textarea th:field="*{contentData}" id="contentEditor" class="form-control" rows="10"></textarea>
@@ -214,42 +246,106 @@
             ]
         });
 
+        // Kiểm tra loại nội dung ban đầu và hiển thị phù hợp
+        updateViewByContentType($('#contentType').val());
+
         // Thay đổi editor tùy theo loại nội dung
         $('#contentType').change(function() {
-            let contentType = $(this).val();
+            updateViewByContentType($(this).val());
+        });
 
+        function updateViewByContentType(contentType) {
             // Hủy Summernote nếu đã khởi tạo
             if ($('#contentEditor').summernote('isDestroyed') === false) {
                 $('#contentEditor').summernote('destroy');
             }
 
-            if (contentType === 'TEXT') {
-                $('#contentEditor').summernote({
-                    height: 300,
-                    toolbar: [
-                        ['style', ['style']],
-                        ['font', ['bold', 'underline', 'clear']],
-                        ['color', ['color']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['table', ['table']],
-                        ['insert', ['link', 'picture']],
-                        ['view', ['fullscreen', 'codeview', 'help']]
-                    ]
-                });
-            } else if (contentType === 'CODE') {
-                $('#contentEditor').summernote({
-                    height: 300,
-                    toolbar: [
-                        ['view', ['fullscreen', 'codeview', 'help']]
-                    ],
-                    codemirror: {
-                        theme: 'monokai'
-                    }
-                });
-                $('#contentEditor').summernote('codeview.activate');
+            // Hiển thị phần tương ứng dựa vào loại nội dung
+            if (contentType === 'FILE' || contentType === 'IMAGE' || contentType === 'VIDEO') {
+                $('#fileUploadSection').show();
+                $('#contentEditorSection').hide();
             } else {
-                // Chỉ hiển thị textarea thông thường cho các loại khác
-                $('#contentEditor').attr('rows', 10);
+                $('#fileUploadSection').hide();
+                $('#contentEditorSection').show();
+
+                if (contentType === 'TEXT') {
+                    $('#contentEditor').summernote({
+                        height: 300,
+                        toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'underline', 'clear']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['table', ['table']],
+                            ['insert', ['link', 'picture']],
+                            ['view', ['fullscreen', 'codeview', 'help']]
+                        ]
+                    });
+                } else if (contentType === 'CODE') {
+                    $('#contentEditor').summernote({
+                        height: 300,
+                        toolbar: [
+                            ['view', ['fullscreen', 'codeview', 'help']]
+                        ],
+                        codemirror: {
+                            theme: 'monokai'
+                        }
+                    });
+                    $('#contentEditor').summernote('codeview.activate');
+                } else {
+                    // Chỉ hiển thị textarea thông thường cho các loại khác
+                    $('#contentEditor').attr('rows', 10);
+                }
+            }
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sideNav = document.getElementById('sideNav');
+        const mainContent = document.querySelector('.main-content');
+
+        // Desktop toggle
+        sidebarToggle.addEventListener('click', function() {
+            sideNav.classList.toggle('collapsed');
+            if (mainContent) {
+                mainContent.classList.toggle('expanded');
+            }
+            sidebarToggle.classList.toggle('collapsed');
+
+            // Change icon direction
+            const icon = sidebarToggle.querySelector('i');
+            if (icon.classList.contains('fa-chevron-left')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+
+        // Mobile toggle
+        mobileToggle.addEventListener('click', function() {
+            sideNav.classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const isClickInsideSidebar = sideNav.contains(event.target);
+            const isClickOnToggle = mobileToggle.contains(event.target);
+
+            if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
+                sideNav.classList.remove('show');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 992) {
+                sideNav.classList.remove('show');
             }
         });
     });

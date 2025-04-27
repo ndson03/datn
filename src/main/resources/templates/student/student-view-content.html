@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <!-- Highlight.js -->
@@ -30,7 +32,7 @@
             height: 0;
             overflow: hidden;
         }
-        .video-container iframe {
+        .video-container iframe, .video-container video {
             position: absolute;
             top: 0;
             left: 0;
@@ -45,6 +47,29 @@
         code {
             font-family: 'Courier New', Courier, monospace;
         }
+        .download-btn {
+            margin-top: 15px;
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .file-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+        .file-details {
+            flex-grow: 1;
+        }
+        .file-name {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .file-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
         .navigation-arrows {
             display: flex;
             justify-content: space-between;
@@ -53,6 +78,24 @@
         .navigation-arrows .disabled {
             opacity: 0.5;
             pointer-events: none;
+        }
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        .comment-item {
+            background-color: #f9f9f9;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -130,7 +173,6 @@
     </div>
 </nav>
 
-
 <!-- Main Content -->
 <div class="main-content mt-5 pt-3">
     <div class="container-fluid">
@@ -148,20 +190,6 @@
             </nav>
         </div>
 
-        <!-- Progress Bar -->
-<!--        <div class="mb-4">-->
-<!--            <div class="d-flex justify-content-between align-items-center mb-2">-->
-<!--                <span>Tiến độ bài học</span>-->
-<!--                <span th:text="${currentPosition + '/' + totalContents}"></span>-->
-<!--            </div>-->
-<!--            <div class="progress" style="height: 10px;">-->
-<!--                <div class="progress-bar bg-success" role="progressbar"-->
-<!--                     th:style="'width: ' + ${(currentPosition * 100) / totalContents} + '%'"-->
-<!--                     th:aria-valuenow="${currentPosition}"-->
-<!--                     aria-valuemin="0"-->
-<!--                     th:aria-valuemax="${totalContents}"></div>-->
-<!--            </div>-->
-<!--        </div>-->
 
         <!-- Course and Lesson Info -->
         <div class="mb-4">
@@ -171,16 +199,16 @@
 
         <!-- Content Display Card -->
         <div class="card mb-4">
-            <div class="card-header d-flex align-items-center">
+            <div class="card-header bg-primary text-white d-flex align-items-center">
                 <!-- Icon based on content type -->
-                <i th:if="${content.contentType == 'VIDEO'}" class="fas fa-video fa-lg text-danger me-2"></i>
-                <i th:if="${content.contentType == 'TEXT'}" class="fas fa-file-alt fa-lg text-primary me-2"></i>
-                <i th:if="${content.contentType == 'PDF'}" class="fas fa-file-pdf fa-lg text-danger me-2"></i>
-                <i th:if="${content.contentType == 'IMAGE'}" class="fas fa-image fa-lg text-success me-2"></i>
-                <i th:if="${content.contentType == 'AUDIO'}" class="fas fa-headphones fa-lg text-warning me-2"></i>
-                <i th:if="${content.contentType == 'QUIZ'}" class="fas fa-question-circle fa-lg text-info me-2"></i>
-                <i th:if="${content.contentType == 'CODE'}" class="fas fa-code fa-lg text-secondary me-2"></i>
-                <i th:if="${content.contentType == 'FILE'}" class="fas fa-file fa-lg text-muted me-2"></i>
+                <i th:if="${content.contentType == 'VIDEO'}" class="fas fa-video me-2"></i>
+                <i th:if="${content.contentType == 'TEXT'}" class="fas fa-file-alt me-2"></i>
+                <i th:if="${content.contentType == 'PDF'}" class="fas fa-file-pdf me-2"></i>
+                <i th:if="${content.contentType == 'IMAGE'}" class="fas fa-image me-2"></i>
+                <i th:if="${content.contentType == 'AUDIO'}" class="fas fa-headphones me-2"></i>
+                <i th:if="${content.contentType == 'QUIZ'}" class="fas fa-question-circle me-2"></i>
+                <i th:if="${content.contentType == 'CODE'}" class="fas fa-code me-2"></i>
+                <i th:if="${content.contentType == 'FILE'}" class="fas fa-file me-2"></i>
 
                 <h5 class="mb-0" th:text="${content.orderNumber + '. ' + content.title}"></h5>
             </div>
@@ -191,11 +219,54 @@
                 </div>
 
                 <div th:if="${content.contentType == 'VIDEO'}" class="content-wrapper">
-                    <div class="video-container" th:utext="${content.contentData}"></div>
+                    <!-- Kiểm tra xem có phải là URL YouTube hay không -->
+                    <div th:if="${content.contentData != null && content.contentData.contains('youtube')}" class="video-container" th:utext="${content.contentData}"></div>
+
+                    <!-- Nếu là file video được tải lên -->
+                    <div th:if="${content.contentData != null && !content.contentData.contains('youtube')}" class="mb-3">
+                        <div class="video-container">
+                            <video controls>
+                                <source th:src="@{/contents/file/{filename}(filename=${content.contentData})}" type="video/mp4">
+                                Trình duyệt của bạn không hỗ trợ video này.
+                            </video>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a th:href="@{/contents/file/{filename}(filename=${content.contentData})}"
+                               class="btn btn-primary download-btn"
+                               download>
+                                <i class="fas fa-download me-2"></i>Tải xuống video
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <div th:if="${content.contentType == 'FILE'}" class="content-wrapper">
-                    <div th:utext="${content.contentData}"></div>
+                    <div class="file-info">
+                        <div class="file-icon">
+                            <!-- Icon dựa trên loại file -->
+                            <i th:class="${content.contentData.endsWith('.pdf') ? 'fas fa-file-pdf text-danger' :
+                                            content.contentData.endsWith('.doc') || content.contentData.endsWith('.docx') ? 'fas fa-file-word text-primary' :
+                                            content.contentData.endsWith('.xls') || content.contentData.endsWith('.xlsx') ? 'fas fa-file-excel text-success' :
+                                            content.contentData.endsWith('.ppt') || content.contentData.endsWith('.pptx') ? 'fas fa-file-powerpoint text-warning' :
+                                            'fas fa-file-alt text-secondary'}"></i>
+                        </div>
+                        <div class="file-details">
+                            <div class="file-name" th:text="${content.contentData}"></div>
+                            <div class="file-meta">
+                                <!-- Hiển thị loại file -->
+                                <span th:text="${content.contentData.substring(content.contentData.lastIndexOf('.') + 1).toUpperCase() + ' File'}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút tải xuống hoặc xem file -->
+                    <div class="mt-3">
+                        <a th:href="@{/contents/file/{filename}(filename=${content.contentData})}"
+                           class="btn btn-success"
+                           download>
+                            <i class="fas fa-download me-2"></i>Tải xuống
+                        </a>
+                    </div>
                 </div>
 
                 <div th:if="${content.contentType == 'CODE'}" class="content-wrapper">
@@ -203,7 +274,21 @@
                 </div>
 
                 <div th:if="${content.contentType == 'IMAGE'}" class="content-wrapper">
-                    <div class="text-center" th:utext="${content.contentData}"></div>
+                    <!-- Hiển thị ảnh được tải lên -->
+                    <div th:if="${content.contentData != null && !content.contentData.contains('<img')}" class="text-center">
+                        <img th:src="@{/contents/file/{filename}(filename=${content.contentData})}"
+                             class="img-fluid"
+                             alt="Hình ảnh">
+                        <div class="mt-3">
+                            <a th:href="@{/contents/file/{filename}(filename=${content.contentData})}"
+                               class="btn btn-primary"
+                               download>
+                                <i class="fas fa-download me-2"></i>Tải xuống ảnh
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Hiển thị ảnh từ HTML -->
+                    <div th:if="${content.contentData != null && content.contentData.contains('<img')}" class="text-center" th:utext="${content.contentData}"></div>
                 </div>
 
                 <div th:if="${content.contentType == 'PDF'}" class="content-wrapper">
@@ -241,7 +326,7 @@
                         <i class="fas fa-arrow-left me-1"></i> Nội dung trước
                     </a>
 
-                    <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{id}(id=${lesson.id}, studentId=${student.id}, courseId=${course.id})}"
+                    <a th:href="@{/student/{studentId}/lesson/{lessonId}/contents(studentId=${student.id}, lessonId=${lesson.id})}"
                        class="btn btn-outline-primary">
                         <i class="fas fa-list me-1"></i> Danh sách
                     </a>
@@ -255,9 +340,9 @@
             </div>
         </div>
 
-        <!-- Discussion Section (Optional) -->
+        <!-- Discussion Section -->
         <div class="card mb-4" th:if="${allowDiscussion}">
-            <div class="card-header">
+            <div class="card-header bg-light">
                 <h5 class="mb-0">
                     <i class="fas fa-comments me-2"></i>
                     Thảo luận
@@ -309,7 +394,7 @@
         const sidebarToggle = document.getElementById('sidebarToggle');
         const mobileToggle = document.getElementById('mobileToggle');
         const sideNav = document.getElementById('sideNav') || document.querySelector('.side-navbar');
-        const mainContent = document.getElementById('mainContent') || document.querySelector('.main-content');
+        const mainContent = document.querySelector('.main-content');
 
         // Sidebar toggle for desktop
         if (sidebarToggle) {
@@ -370,8 +455,11 @@
             });
         }
 
-        // Mark content as viewed (you must ensure studentId and contentId are defined)
-        if (typeof studentId !== 'undefined' && typeof contentId !== 'undefined') {
+        // Mark content as viewed
+        const studentId = document.querySelector('[name="studentId"]')?.value;
+        const contentId = document.querySelector('[name="contentId"]')?.value;
+
+        if (studentId && contentId) {
             fetch(`/api/student/${studentId}/content/${contentId}/mark-viewed`, {
                 method: 'POST',
                 headers: {
@@ -379,23 +467,7 @@
                 }
             });
         }
-
-        // Add hover effect to assignment cards
-        const assignmentCards = document.querySelectorAll('.assignment-card');
-        assignmentCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px)';
-                this.style.transition = 'transform 0.3s ease';
-                this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '';
-            });
-        });
     });
 </script>
-
 </body>
 </html>

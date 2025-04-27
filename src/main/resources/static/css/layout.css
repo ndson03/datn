@@ -303,3 +303,85 @@ body {
         display: none;
     }
 }
+
+/* Sidebar styling */
+.course-header, .lesson-header {
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.course-header:hover, .lesson-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.course-link, .lesson-link, .content-link {
+    padding: 0.5rem 1rem;
+    color: #333;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.3s;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    padding: 2px 8px;
+    transition: transform 0.3s ease;
+}
+
+.toggle-btn.active i {
+    transform: rotate(90deg);
+}
+
+.course-link.active {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 4px;
+}
+
+.lesson-link.active-lesson {
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+.content-link.active-content {
+    color: #0d6efd;
+    font-weight: 500;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 4px;
+}
+
+/* Animation for expanding/collapsing */
+.lesson-list, .content-list {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+/* For collapsed sidebar - hide text and adjust icons */
+.side-navbar.collapsed .nav-link span,
+.side-navbar.collapsed .course-header span,
+.side-navbar.collapsed .lesson-header span,
+.side-navbar.collapsed .content-list,
+.side-navbar.collapsed .small,
+.side-navbar.collapsed hr,
+.side-navbar.collapsed .toggle-btn {
+    display: none;
+}
+
+.side-navbar.collapsed .nav-link i,
+.side-navbar.collapsed .course-link i,
+.side-navbar.collapsed .lesson-link i {
+    font-size: 1.2rem;
+    margin-right: 0;
+}
+
+.side-navbar.collapsed .nav-link,
+.side-navbar.collapsed .course-link,
+.side-navbar.collapsed .lesson-link {
+    text-align: center;
+    padding: 0.5rem;
+}

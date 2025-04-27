@@ -77,31 +77,32 @@
 <!-- Top Navbar -->
 <nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" style="padding-left: 20px">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
             <i class="fas fa-graduation-cap me-2"></i>
             <span>Trường SICT - HaUI</span>
         </a>
 
-        <button class="navbar-toggler" type="button" id="sidebarToggle">
+        <button class="navbar-toggler" type="button" id="mobileToggle">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown user-dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown">
                         <div class="avatar me-2">
                             <span th:text="${#strings.substring(teacher.firstName, 0, 1) + #strings.substring(teacher.lastName, 0, 1)}"></span>
                         </div>
                         <span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Cài đặt</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="#" th:action="@{/logout}" method="POST">
-                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
                             </form>
                         </li>
                     </ul>
@@ -111,28 +112,35 @@
     </div>
 </nav>
 
-<!-- Side Navbar - FIXED WIDTH -->
-<nav class="side-navbar">
+<!-- Sidebar Toggle Button -->
+<button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-chevron-left"></i>
+</button>
+
+<!-- Side Navbar -->
+<nav class="side-navbar" id="sideNav">
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
         <a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
         </a>
-        <a class="nav-link" href="/gemini/qna" title="Dashboard">
-            <i class="fas fa-tachometer-alt"></i>
+        <a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}" title="Chatbot">
+            <i class="fas fa-robot"></i>
             <span>Chatbot</span>
         </a>
-        <div class="mt-3 text-center">
-            <div class="small text-muted px-2">KHÓA HỌC</div>
+
+        <div class="mt-3 px-3">
+            <div class="small text-muted text-uppercase">Khóa học</div>
             <hr class="my-2">
         </div>
-        <div th:each="courseItem : ${courses}">
+
+        <div th:each="course : ${courses}">
             <a class="nav-link"
-               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${courseItem.id})}"
-               th:title="${courseItem.name}"
-               th:classappend="${courseItem.id == course.id ? 'active' : ''}">
+               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
+               th:title="${course.name}"
+               th:classappend="${course.id == courseId ? 'active' : ''}">
                 <i class="fas fa-book"></i>
-                <span th:text="${courseItem.name}"></span>
+                <span th:text="${course.name}"></span>
             </a>
         </div>
     </div>

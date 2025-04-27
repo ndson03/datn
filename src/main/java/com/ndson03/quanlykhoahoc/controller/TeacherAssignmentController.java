@@ -239,18 +239,19 @@ public class TeacherAssignmentController {
         return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
     }
 
-//    @GetMapping("/{teacherId}/courses/{courseId}/assignments/{assignmentId}/student/{studentId}/reset")
-//    public String resetAssignment(@PathVariable("teacherId") int teacherId, @PathVariable("courseId") int courseId,
-//                                   @PathVariable("assignmentId") int assignmentId,
-//                                  @PathVariable("studentId") int studentId) {
-//        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-//        QuizSubmission quizSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
-//        quizSubmissionService.deleteSubmissionById(quizSubmission.getId());
-//        AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
-//        assignmentDetails.setIsDone(0);
-//
-//        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/assignments/" + assignmentId;
-//    }
+    @GetMapping("/{teacherId}/courses/{courseId}/assignments/{assignmentId}/student/{studentId}/reset")
+    public String resetAssignment(@PathVariable("teacherId") int teacherId, @PathVariable("courseId") int courseId,
+                                   @PathVariable("assignmentId") int assignmentId,
+                                  @PathVariable("studentId") int studentId) {
+        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+        QuizSubmission quizSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
+        quizSubmissionService.deleteSubmissionById(quizSubmission.getId());
+        AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
+        assignmentDetails.setIsDone(0);
+        assignmentDetailsService.save(assignmentDetails);
+
+        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/assignments/" + assignmentId;
+    }
 
     @GetMapping("/showFormForUpdate")
     public String showFormForUpdate(@RequestParam("assignmentId") int theId, Model theModel) {

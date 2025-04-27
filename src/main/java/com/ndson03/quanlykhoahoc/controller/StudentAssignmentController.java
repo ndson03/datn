@@ -67,6 +67,7 @@ public class StudentAssignmentController {
             QuizSubmission existingSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(
                     assignmentId, studentCourseDetails.getId());
 
+            model.addAttribute("isQuiz", assignment.isQuiz());
             model.addAttribute("existingSubmission", existingSubmission);
 
             if (existingSubmission != null) {
