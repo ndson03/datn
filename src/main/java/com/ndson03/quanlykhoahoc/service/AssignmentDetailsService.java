@@ -6,5 +6,5 @@ public interface AssignmentDetailsService {
 
 	public AssignmentDetails findByAssignmentAndStudentCourseDetailsId(int assignmentId, int studentCourseDetailsId);
 
-	public void save(AssignmentDetails studentCourseAssignmentDetails);
+	public void save(AssignmentDetails assignmentDetails);
 }

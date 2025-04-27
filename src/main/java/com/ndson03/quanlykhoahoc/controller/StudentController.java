@@ -95,18 +95,18 @@ public class StudentController {
     }
 
 
-    @GetMapping("/{studentId}/courses/{courseId}/markAsCompleted/{assignmentId}")
-    public String markAsCompleted(@PathVariable("studentId") int studentId, @PathVariable("courseId") int courseId,
-                                  @PathVariable("assignmentId") int assignmentId, Model theModel) {
-        //Student student = studentService.findByStudentId(studentId);
-        //Course course = courseService.findCourseById(courseId);
-        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-        AssignmentDetails assignmentDetails = assignmentDetailsService
-                .findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
-        assignmentDetails.setIsDone(1); //assignment is completed
-        assignmentDetailsService.save(assignmentDetails);
-        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignment/" + assignmentId;
-    }
+//    @GetMapping("/{studentId}/courses/{courseId}/markAsCompleted/{assignmentId}")
+//    public String markAsCompleted(@PathVariable("studentId") int studentId, @PathVariable("courseId") int courseId,
+//                                  @PathVariable("assignmentId") int assignmentId, Model theModel) {
+//        //Student student = studentService.findByStudentId(studentId);
+//        //Course course = courseService.findCourseById(courseId);
+//        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+//        AssignmentDetails assignmentDetails = assignmentDetailsService
+//                .findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
+//        assignmentDetails.setIsDone(1); //assignment is completed
+//        assignmentDetailsService.save(assignmentDetails);
+//        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignment/" + assignmentId;
+//    }
 
     //helper method to find day difference between assignment due date and today
     private int findDayDifference(Assignment assignment) {
