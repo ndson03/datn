@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import com.ndson03.quanlykhoahoc.entity.Student;
-import com.ndson03.quanlykhoahoc.entity.Teacher;
-import com.ndson03.quanlykhoahoc.service.StudentService;
-import com.ndson03.quanlykhoahoc.service.TeacherService;
+import com.ndson03.quanlykhoahoc.domain.entity.Student;
+import com.ndson03.quanlykhoahoc.domain.entity.Teacher;
+import com.ndson03.quanlykhoahoc.service.user.StudentService;
+import com.ndson03.quanlykhoahoc.service.user.TeacherService;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {

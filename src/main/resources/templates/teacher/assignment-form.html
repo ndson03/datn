@@ -83,13 +83,13 @@
 			<hr class="my-2">
 		</div>
 
-		<div th:each="course : ${courses}">
+		<div th:each="courseItem : ${courses}">
 			<a class="nav-link"
-			   th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
-			   th:title="${course.name}"
-			   th:classappend="${course.id == courseId ? 'active' : ''}">
+			   th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${courseItem.id})}"
+			   th:title="${courseItem.name}"
+			   th:classappend="${courseItem.id == course.id ? 'active' : ''}">
 				<i class="fas fa-book"></i>
-				<span th:text="${course.name}"></span>
+				<span th:text="${courseItem.name}"></span>
 			</a>
 		</div>
 	</div>
@@ -105,7 +105,9 @@
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb mb-0">
 					<li class="breadcrumb-item"><a href="#">Home</a></li>
-					<li class="breadcrumb-item"><a href="#">Khóa học</a></li>
+					<li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">Khóa học</a></li>
+					<li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}" th:text="${course.name}"></a></li>
+					<li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}" th:text="${lesson.title}"></a></li>
 					<li class="breadcrumb-item active" aria-current="page">Thêm bài tập</li>
 				</ol>
 			</nav>
@@ -116,11 +118,11 @@
 			<div class="card-header">
 				<h5 class="mb-0">
 					<i class="fas fa-tasks me-2"></i>
-					Thông tin bài tập mới
+					Thông tin bài tập mới cho bài học: <span th:text="${lesson.title}"></span>
 				</h5>
 			</div>
 			<div class="card-body">
-				<form action="#" th:action="@{/teacher/{teacherId}/courses/{courseId}/addNewAssignment/save(teacherId=${teacher.id}, courseId=${course.id})}"
+				<form action="#" th:action="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/addNewAssignment/save(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}"
 					  th:object="${assignment}" method="POST">
 
 					<!-- Hidden field for id -->
@@ -144,13 +146,18 @@
 						<div th:if="${#fields.hasErrors('dueDate')}" class="error-text">Please enter a date!</div>
 					</div>
 
+					<div class="mb-3">
+						<label for="totalScore" class="form-label">Điểm tối đa:</label>
+						<input type="number" class="form-control" id="totalScore" th:field="*{totalScore}" value="10" min="0" max="100" step="0.5">
+					</div>
+
 					<div class="form-check mb-3">
 						<input type="checkbox" th:field="*{quiz}" class="form-check-input" id="isQuiz">
 						<label class="form-check-label" for="isQuiz">Đây là bài kiểm tra</label>
 					</div>
 
 					<div class="text-end">
-						<a th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}" class="btn btn-outline-secondary me-2">
+						<a th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}" class="btn btn-outline-secondary me-2">
 							<i class="fas fa-times me-1"></i> Hủy
 						</a>
 						<button type="submit" class="btn btn-primary">

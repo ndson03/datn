@@ -129,16 +129,52 @@
 				</div>
 				<div class="col-md-3">
 					<div class="card counter-card">
-						<i class="fas fa-tasks"></i>
-						<div class="counter" th:text="${assignments != null ? assignments.size() : 0}"></div>
-						<div class="counter-title">Bài tập</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card counter-card">
 						<i class="fas fa-chart-line"></i>
 						<div class="counter">--</div>
 						<div class="counter-title">Điểm trung bình</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Lessons List -->
+			<div class="card mb-4">
+				<div class="card-header d-flex justify-content-between align-items-center">
+					<h5 class="mb-0">
+						<i class="fas fa-book-open me-2"></i>
+						Danh sách bài học
+					</h5>
+					<a class="btn btn-primary btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/showFormForAdd(courseId=${course.id}, teacherId=${teacher.id})}">
+						<i class="fas fa-plus me-1"></i> Thêm bài học mới
+					</a>
+				</div>
+				<div class="card-body">
+					<div th:if="${lessons == null || #lists.isEmpty(lessons)}" class="text-center py-5">
+						<div class="mb-3">
+							<i class="fas fa-folder-open text-muted" style="font-size: 3rem;"></i>
+						</div>
+						<p class="text-muted">Chưa có bài học nào trong khóa học này.</p>
+					</div>
+
+					<div class="list-group" th:if="${lessons != null && not #lists.isEmpty(lessons)}">
+						<div class="list-group-item lesson-item p-3 mb-2" th:each="lesson : ${lessons}">
+							<div class="d-flex justify-content-between align-items-center">
+								<h5 class="mb-1" th:text="${lesson.orderNumber + '. ' + lesson.title}"></h5>
+								<span class="badge bg-info rounded-pill" th:text="${lesson.contents != null ? lesson.contents.size() : 0} + ' nội dung'"></span>
+							</div>
+							<p class="mb-2 text-muted" th:text="${lesson.description}"></p>
+							<div class="text-end lesson-actions">
+								<a class="btn btn-outline-primary btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}(lessonId=${lesson.id}, courseId=${course.id}, teacherId=${teacher.id})}">
+									<i class="fas fa-list me-1"></i> Nội dung
+								</a>
+								<a class="btn btn-outline-secondary btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/showFormForUpdate(lessonId=${lesson.id}, courseId=${course.id}, teacherId=${teacher.id})}">
+									<i class="fas fa-edit me-1"></i> Sửa
+								</a>
+								<a class="btn btn-outline-danger btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/delete(lessonId=${lesson.id}, courseId=${course.id}, teacherId=${teacher.id})}"
+								   onclick="return confirm('Bạn có chắc chắn muốn xóa bài học này không?')">
+									<i class="fas fa-trash-alt me-1"></i> Xóa
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -191,128 +227,6 @@
 								<td class="text-center">
 									<span th:if="${entry.value.gradeThree == -1}" class="text-muted">-</span>
 									<span th:if="${entry.value.gradeThree != -1}" th:text="${entry.value.gradeThree}"></span>
-								</td>
-							</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-
-			<!-- Lessons List -->
-			<div class="card mb-4">
-				<div class="card-header d-flex justify-content-between align-items-center">
-					<h5 class="mb-0">
-						<i class="fas fa-book-open me-2"></i>
-						Danh sách bài học
-					</h5>
-					<a class="btn btn-primary btn-sm" th:href="@{/lessons/{teacherId}/showFormForAdd/{courseId}(courseId=${course.id}, teacherId=${teacher.id})}">
-						<i class="fas fa-plus me-1"></i> Thêm bài học mới
-					</a>
-				</div>
-				<div class="card-body">
-					<div th:if="${lessons == null || #lists.isEmpty(lessons)}" class="text-center py-5">
-						<div class="mb-3">
-							<i class="fas fa-folder-open text-muted" style="font-size: 3rem;"></i>
-						</div>
-						<p class="text-muted">Chưa có bài học nào trong khóa học này.</p>
-					</div>
-
-					<div class="list-group" th:if="${lessons != null && not #lists.isEmpty(lessons)}">
-						<div class="list-group-item lesson-item p-3 mb-2" th:each="lesson : ${lessons}">
-							<div class="d-flex justify-content-between align-items-center">
-								<h5 class="mb-1" th:text="${lesson.orderNumber + '. ' + lesson.title}"></h5>
-								<span class="badge bg-info rounded-pill" th:text="${lesson.contents != null ? lesson.contents.size() : 0} + ' nội dung'"></span>
-							</div>
-							<p class="mb-2 text-muted" th:text="${lesson.description}"></p>
-							<div class="text-end lesson-actions">
-								<a class="btn btn-outline-primary btn-sm" th:href="@{/contents/lesson/{id}/{teacherId}(id=${lesson.id}, teacherId=${teacher.id})}">
-									<i class="fas fa-list me-1"></i> Nội dung
-								</a>
-								<a class="btn btn-outline-secondary btn-sm" th:href="@{/lessons/{teacherId}/showFormForUpdate/{lessonId}(lessonId=${lesson.id}, teacherId=${teacher.id})}">
-									<i class="fas fa-edit me-1"></i> Sửa
-								</a>
-								<a class="btn btn-outline-danger btn-sm" th:href="@{/lessons/{teacherId}/delete(lessonId=${lesson.id}, teacherId=${teacher.id})}"
-								   onclick="return confirm('Bạn có chắc chắn muốn xóa bài học này không?')">
-									<i class="fas fa-trash-alt me-1"></i> Xóa
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Assignments List -->
-			<div class="card mb-4">
-				<div class="card-header d-flex justify-content-between align-items-center">
-					<h5 class="mb-0">
-						<i class="fas fa-tasks me-2"></i>
-						Danh sách bài tập
-					</h5>
-					<a class="btn btn-primary btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/addNewAssignment(teacherId=${teacher.id}, courseId=${course.id})}">
-						<i class="fas fa-plus me-1"></i> Thêm bài tập
-					</a>
-				</div>
-				<div class="card-body p-0">
-					<div th:if="${assignments == null}" class="text-center py-5">
-						<div class="mb-3">
-							<i class="fas fa-clipboard-list text-muted" style="font-size: 3rem;"></i>
-						</div>
-						<p class="text-muted">Không có bài tập nào.</p>
-					</div>
-
-					<div class="table-responsive" th:if="${assignments != null}">
-						<table class="table table-hover">
-							<thead>
-							<tr>
-								<th scope="col">Tên</th>
-								<th scope="col">Mô tả</th>
-								<th scope="col">Hạn nộp</th>
-								<th scope="col">Trạng thái</th>
-								<th scope="col">Loại</th>
-								<th scope="col" class="text-center">Thao tác</th>
-							</tr>
-							</thead>
-							<tbody>
-							<tr th:each="assignment : ${assignments}">
-								<td th:text="${assignment.name}"></td>
-								<td th:text="${assignment.description}"></td>
-								<td th:text="${assignment.dueDate}"></td>
-								<td>
-									<span th:if="${assignment.daysRemaining >= 3}" class="badge bg-success">Còn <span th:text="${assignment.daysRemaining}"></span> ngày</span>
-									<span th:if="${assignment.daysRemaining >= 0 && assignment.daysRemaining < 3}" class="badge bg-warning">Còn <span th:text="${assignment.daysRemaining}"></span> ngày</span>
-									<span th:if="${assignment.daysRemaining < 0}" class="badge bg-danger">Đã hết hạn</span>
-								</td>
-								<td>
-									<span th:if="${assignment.isQuiz()}" class="badge bg-info">Quiz</span>
-									<span th:unless="${assignment.isQuiz()}" class="badge bg-primary">Bài tập</span>
-								</td>
-								<td class="text-center">
-									<!-- Nếu là quiz -->
-									<a class="btn btn-outline-primary btn-sm"
-									   th:if="${assignment.isQuiz()}"
-									   th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/quiz/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
-									   th:title="'Xem quiz'">
-										<i class="fas fa-eye"></i>
-									</a>
-
-									<!-- Nếu không phải quiz -->
-									<a class="btn btn-outline-primary btn-sm"
-									   th:unless="${assignment.isQuiz()}"
-									   th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
-									   th:title="'Xem bài tập'">
-										<i class="fas fa-eye"></i>
-									</a>
-
-									<a class="btn btn-outline-secondary btn-sm ms-1"
-									   th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}/edit(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
-									   th:title="'Chỉnh sửa'">
-										<i class="fas fa-edit"></i>
-									</a>
-									<a class="btn btn-outline-danger btn-sm ms-1" th:href="@{/teacher/{teacherId}/courses/{courseId}/assignments/{assignmentId}/delete(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
-									   onclick="return confirm('Bạn có chắc chắn muốn xóa bài tập này không?')">
-										<i class="fas fa-trash-alt"></i>
-									</a>
 								</td>
 							</tr>
 							</tbody>

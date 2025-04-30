@@ -116,7 +116,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form th:action="@{/lessons/{teacherId}/save (teacherId=${teacher.id})}" th:object="${lesson}" method="POST">
+                <form th:action="@{/teacher/{teacherId}/courses/{courseId}/lessons/save (teacherId=${teacher.id}, courseId=${course.id})}" th:object="${lesson}" method="POST">
                     <!-- Hidden field cho ID bài học -->
                     <input type="hidden" th:field="*{id}" />
 

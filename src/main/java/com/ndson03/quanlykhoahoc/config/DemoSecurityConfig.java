@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.ndson03.quanlykhoahoc.service.StudentService;
-import com.ndson03.quanlykhoahoc.service.TeacherService;
+import com.ndson03.quanlykhoahoc.service.user.StudentService;
+import com.ndson03.quanlykhoahoc.service.user.TeacherService;
 
 @Configuration
 @EnableWebSecurity

@@ -166,8 +166,8 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="card-title mb-1" th:text="${quizFormData.assignment.name}"></h4>
-                        <p class="card-text mb-0">Hạn nộp: <span th:text="${quizFormData.assignment.dueDate}"></span></p>
+                        <h4 class="card-title mb-1" th:text="${quizFormDTO.assignment.name}"></h4>
+                        <p class="card-text mb-0">Hạn nộp: <span th:text="${quizFormDTO.assignment.dueDate}"></span></p>
                     </div>
                     <a th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
                        class="btn btn-outline-secondary">
@@ -180,7 +180,7 @@
         <!-- Question Entry Form -->
         <div class="question-entry-form">
             <h4 class="mb-3"><i class="fas fa-plus-circle me-2"></i>Thêm câu hỏi mới</h4>
-            <form th:action="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/addQuestion(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormData.assignment.id})}"
+            <form th:action="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/addQuestion(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormDTO.assignment.id})}"
                   method="POST">
 
                 <div class="form-group mb-3">
@@ -244,21 +244,21 @@
         </div>
 
         <!-- Existing Questions List -->
-        <div class="questions-list" th:if="${!quizFormData.questions.empty}">
+        <div class="questions-list" th:if="${!quizFormDTO.questions.empty}">
             <h4 class="question-list-title"><i class="fas fa-list me-2"></i>Danh sách câu hỏi đã thêm</h4>
 
-            <form th:action="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/save(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormData.assignment.id})}"
+            <form th:action="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/save(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormDTO.assignment.id})}"
                   method="POST">
 
-                <input type="hidden" name="assignmentId" th:value="${quizFormData.assignment.id}" />
+                <input type="hidden" name="assignmentId" th:value="${quizFormDTO.assignment.id}" />
 
-                <div th:each="question, questionStat : ${quizFormData.questions}" class="question-card">
+                <div th:each="question, questionStat : ${quizFormDTO.questions}" class="question-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">
                             <span class="badge bg-primary me-2" th:text="${questionStat.count}"></span>
                             <span th:text="${question.questionText}"></span>
                         </h5>
-                        <a th:href="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/removeQuestion(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormData.assignment.id}, questionId=${question.id})}"
+                        <a th:href="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/removeQuestion(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormDTO.assignment.id}, questionId=${question.id})}"
                            class="btn btn-sm btn-outline-danger">
                             <i class="fas fa-trash-alt me-1"></i> Xóa
                         </a>
@@ -287,7 +287,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mt-4">
-                    <span class="text-muted">Tổng số câu hỏi: <strong th:text="${quizFormData.questions.size()}"></strong></span>
+                    <span class="text-muted">Tổng số câu hỏi: <strong th:text="${quizFormDTO.questions.size()}"></strong></span>
                     <div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-1"></i> Lưu bài kiểm tra
@@ -302,7 +302,7 @@
         </div>
 
         <!-- No questions message -->
-        <div class="alert alert-info" th:if="${quizFormData.questions.empty}">
+        <div class="alert alert-info" th:if="${quizFormDTO.questions.empty}">
             <div class="d-flex align-items-center">
                 <i class="fas fa-info-circle me-3 fs-4"></i>
                 <div>
