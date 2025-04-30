@@ -1,7 +1,7 @@
 package com.ndson03.quanlykhoahoc.service;
 
 import com.ndson03.quanlykhoahoc.entity.AssignmentFileSubmission;
-import com.ndson03.quanlykhoahoc.dao.AssignmentFileSubmissionRepository;
+import com.ndson03.quanlykhoahoc.repository.AssignmentFileSubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

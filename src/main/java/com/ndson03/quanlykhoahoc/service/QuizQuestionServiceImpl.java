@@ -1,6 +1,6 @@
 package com.ndson03.quanlykhoahoc.service;
 
-import com.ndson03.quanlykhoahoc.dao.QuizQuestionRepository;
+import com.ndson03.quanlykhoahoc.repository.QuizQuestionRepository;
 import com.ndson03.quanlykhoahoc.entity.QuizQuestion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

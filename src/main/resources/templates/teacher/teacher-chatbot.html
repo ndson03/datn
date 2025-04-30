@@ -30,7 +30,7 @@
 <!-- Top Navbar -->
 <nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
             <i class="fas fa-graduation-cap me-2"></i>
             <span>Trường SICT - HaUI</span>
         </a>
@@ -45,9 +45,9 @@
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown">
                         <div class="avatar me-2">
-                            <span th:text="${#strings.substring(student.firstName, 0, 1) + #strings.substring(student.lastName, 0, 1)}"></span>
+                            <span th:text="${#strings.substring(teacher.firstName, 0, 1) + #strings.substring(teacher.lastName, 0, 1)}"></span>
                         </div>
-                        <span th:text="${student.firstName + ' ' + student.lastName}"></span>
+                        <span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
@@ -73,7 +73,7 @@
 <!-- Side Navbar -->
 <nav class="side-navbar" id="sideNav">
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-        <a class="nav-link" th:href="@{/student/{studentId}/courses(studentId=${student.id})}" title="Dashboard">
+        <a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
         </a>
@@ -89,7 +89,7 @@
 
         <div th:each="course : ${courses}">
             <a class="nav-link"
-               th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}"
+               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
                th:title="${course.name}"
                th:classappend="${course.id == courseId ? 'active' : ''}">
                 <i class="fas fa-book"></i>

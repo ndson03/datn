@@ -1,7 +1,7 @@
 package com.ndson03.quanlykhoahoc.service;
 
 import com.ndson03.quanlykhoahoc.entity.Lesson;
-import com.ndson03.quanlykhoahoc.dao.LessonDao;
+import com.ndson03.quanlykhoahoc.repository.LessonDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

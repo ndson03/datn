@@ -1,4 +1,4 @@
-package com.ndson03.quanlykhoahoc.dao;
+package com.ndson03.quanlykhoahoc.repository;
 
 import java.util.List;
 

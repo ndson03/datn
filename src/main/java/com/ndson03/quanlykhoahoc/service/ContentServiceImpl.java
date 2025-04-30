@@ -1,7 +1,7 @@
 package com.ndson03.quanlykhoahoc.service;
 
 import com.ndson03.quanlykhoahoc.entity.Content;
-import com.ndson03.quanlykhoahoc.dao.ContentDao;
+import com.ndson03.quanlykhoahoc.repository.ContentDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

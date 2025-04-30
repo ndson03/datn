@@ -14,8 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ndson03.quanlykhoahoc.dao.RoleDao;
-import com.ndson03.quanlykhoahoc.dao.TeacherDao;
+import com.ndson03.quanlykhoahoc.repository.RoleDao;
+import com.ndson03.quanlykhoahoc.repository.TeacherDao;
 import com.ndson03.quanlykhoahoc.entity.Role;
 import com.ndson03.quanlykhoahoc.entity.Teacher;
 import com.ndson03.quanlykhoahoc.user.UserDto;

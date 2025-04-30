@@ -1,7 +1,6 @@
 package com.ndson03.quanlykhoahoc.controller;
 
 import com.ndson03.quanlykhoahoc.dto.QuizFormData;
-import com.ndson03.quanlykhoahoc.dto.StudentDTO;
 import com.ndson03.quanlykhoahoc.entity.*;
 import com.ndson03.quanlykhoahoc.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,68 +99,9 @@ public class TeacherAssignmentController {
         return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/assignments/{assignmentId}")
-    public String showAssignmentDetails(@PathVariable("teacherId") int teacherId,
-                                        @PathVariable("courseId") int courseId,
-                                        @PathVariable("assignmentId") int assignmentId,
-                                        Model theModel) {
-        Teacher teacher = teacherService.findByTeacherId(teacherId);
-        Course course = courseService.findCourseById(courseId);
-        List<Student> students = course.getStudents();
-        List<Course> courses = teacher.getCourses();
-        Assignment assignment = assignmentService.findById(assignmentId);
 
-        // Create student - status map
-        Map<StudentDTO, String> list = new HashMap<>();
 
-        for (Student student : students) {
-            StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
-            AssignmentDetails ad = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
-            QuizSubmission quizSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
-            // Create a StudentDTO to store additional display info
-            StudentDTO studentDTO = new StudentDTO();
-            studentDTO.setId(student.getId());
-            studentDTO.setFirstName(student.getFirstName());
-            studentDTO.setLastName(student.getLastName());
-            studentDTO.setEmail(student.getEmail());
 
-            // Add submission details if available
-            if (ad.getIsDone() == 1) {
-                studentDTO.setScore(ad.getScore());
-                studentDTO.setSubmissionTime(formatTime(quizSubmission.getSubmissionDate()));
-                studentDTO.setSubmissionDate(formatDate(quizSubmission.getSubmissionDate()));
-            }
-
-            // Set status
-            if (ad.getIsDone() == 0) {
-                list.put(studentDTO, "Chưa hoàn thành");
-            } else {
-                list.put(studentDTO, "Đã hoàn thành");
-            }
-        }
-
-        // If this is a quiz assignment, load quiz questions and answers
-        if (assignment.isQuiz()) {
-            List<QuizQuestion> questions = quizQuestionService.findByAssignmentId(assignmentId);
-
-            // Load options for each question
-            for (QuizQuestion question : questions) {
-                List<QuizOption> options = quizOptionService.findByQuestionId(question.getId());
-                question.setOptions(options);
-            }
-
-            theModel.addAttribute("questions", questions);
-        }
-
-        theModel.addAttribute("list", list);
-        theModel.addAttribute("courseId", courseId);
-        theModel.addAttribute("assignmentId", assignmentId);
-        theModel.addAttribute("courses", courses);
-        theModel.addAttribute("teacher", teacher);
-        theModel.addAttribute("assignment", assignment);
-
-        return "teacher/teacher-assignment-status";
-    }
 
     // Add new method to view individual student's quiz submission
     @GetMapping("/{teacherId}/courses/{courseId}/assignmentDetails/{studentId}/{assignmentId}")

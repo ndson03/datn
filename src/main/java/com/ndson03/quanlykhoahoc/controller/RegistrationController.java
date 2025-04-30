@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.ndson03.quanlykhoahoc.dao.RoleDao;
+import com.ndson03.quanlykhoahoc.repository.RoleDao;
 import com.ndson03.quanlykhoahoc.entity.Role;
 import com.ndson03.quanlykhoahoc.service.StudentService;
 import com.ndson03.quanlykhoahoc.service.TeacherService;

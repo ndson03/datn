@@ -67,14 +67,14 @@ public class TeacherController {
         List<Lesson> lessons = lessonService.findByCourseId(courseId);
         theModel.addAttribute("lessons", lessons);
 
-        if(students.size() != 0) {
+        if(!students.isEmpty()) {
             List<Assignment> assignments = studentCourseDetailsService.findByStudentAndCourseId(students.get(0).getId(), courseId).getAssignments();
             for(Assignment assignment : assignments) {
                 int daysRemaining = findDayDifference(assignment);
                 assignment.setDaysRemaining(daysRemaining);
                 assignmentService.save(assignment);
             }
-            if(assignments.size() == 0) {
+            if(assignments.isEmpty()) {
                 assignments = null;
             }
             Map<Student, GradeDetails> studentGradeList = new HashMap<>();
@@ -138,6 +138,15 @@ public class TeacherController {
         return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
     }
 
+    @GetMapping("/{teacherId}/chatbot")
+    public String showChatbot(@PathVariable("teacherId") int teacherId, Model theModel) {
+        Teacher teacher = teacherService.findByTeacherId(teacherId); //accessing student logged in
+        List<Course> courses = teacher.getCourses();
+
+        theModel.addAttribute("teacher", teacher);
+        theModel.addAttribute("courses", courses);
+        return "teacher/teacher-chatbot";
+    }
 
     private int findDayDifference(Assignment assignment) {
         String dateString = assignment.getDueDate();

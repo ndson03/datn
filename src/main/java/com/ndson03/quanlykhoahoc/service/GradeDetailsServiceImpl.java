@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ndson03.quanlykhoahoc.dao.GradeDetailsDao;
+import com.ndson03.quanlykhoahoc.repository.GradeDetailsDao;
 import com.ndson03.quanlykhoahoc.entity.GradeDetails;
 
 @Service

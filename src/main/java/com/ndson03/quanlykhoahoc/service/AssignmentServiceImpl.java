@@ -1,6 +1,6 @@
 package com.ndson03.quanlykhoahoc.service;
 
-import com.ndson03.quanlykhoahoc.dao.AssignmentRepository;
+import com.ndson03.quanlykhoahoc.repository.AssignmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
