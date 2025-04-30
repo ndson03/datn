@@ -6,6 +6,7 @@ import com.ndson03.quanlykhoahoc.service.assignment.AssignmentDetailsService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentFileSubmissionService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentService;
 import com.ndson03.quanlykhoahoc.service.course.CourseService;
+import com.ndson03.quanlykhoahoc.service.course.LessonService;
 import com.ndson03.quanlykhoahoc.service.course.StudentCourseDetailsService;
 import com.ndson03.quanlykhoahoc.service.quiz.*;
 import com.ndson03.quanlykhoahoc.service.user.StudentService;
@@ -27,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -62,18 +64,23 @@ public class StudentAssignmentController {
     private CourseService courseService;
 
     @Autowired
+    private LessonService lessonService;
+
+    @Autowired
     private StudentCourseDetailsService studentCourseDetailsService;
 
     @Autowired
     private AssignmentFileSubmissionService fileSubmissionService;
 
-    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}")
+    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/345")
     public String viewAssignmentDetails(@PathVariable("studentId") int studentId,
                                         @PathVariable("courseId") int courseId,
+                                        @PathVariable("lessonId") int lessonId,
                                         @PathVariable("assignmentId") int assignmentId,
                                         Model model) {
         Student student = studentService.findByStudentId(studentId);
         Course course = courseService.findCourseById(courseId);
+        Lesson lesson = lessonService.findById(lessonId);
         Assignment assignment = assignmentService.findById(assignmentId);
         List<Course> courses = student.getCourses();
 
@@ -110,6 +117,102 @@ public class StudentAssignmentController {
 
         return "student/student-assignment-detail";
     }
+
+    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}")
+    public String viewAssignment(@PathVariable("studentId") int studentId,
+                                 @PathVariable("courseId") int courseId,
+                                 @PathVariable("lessonId") int lessonId,
+                                 @PathVariable("assignmentId") int assignmentId) {
+
+        Assignment assignment = assignmentService.findById(assignmentId);
+
+        if (assignment.isQuiz()) {
+            return "redirect:/student/" + studentId + "/course/" + courseId +
+                    "/lesson/" + lessonId + "/assignment/" + assignmentId + "/quiz";
+        } else {
+            return "redirect:/student/" + studentId + "/course/" + courseId +
+                    "/lesson/" + lessonId + "/assignment/" + assignmentId + "/file";
+        }
+    }
+
+    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz")
+    public String viewQuizAssignment(@PathVariable("studentId") int studentId,
+                                     @PathVariable("courseId") int courseId,
+                                     @PathVariable("lessonId") int lessonId,
+                                     @PathVariable("assignmentId") int assignmentId,
+                                     Model model) {
+        // Load common data
+        Student student = studentService.findByStudentId(studentId);
+        Course course = courseService.findCourseById(courseId);
+        Lesson lesson = lessonService.findById(lessonId);
+        Assignment assignment = assignmentService.findById(assignmentId);
+        List<Course> courses = student.getCourses();
+
+        // Get student course details
+        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+        AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
+                assignmentId, studentCourseDetails.getId());
+
+        // Add basic attributes
+        model.addAttribute("student", student);
+        model.addAttribute("course", course);
+        model.addAttribute("courses", courses);
+        model.addAttribute("lesson", lesson);
+        model.addAttribute("assignment", assignment);
+        model.addAttribute("assignmentDetails", assignmentDetails);
+        model.addAttribute("courseId", courseId);
+
+        // Quiz-specific data
+        QuizSubmission existingSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(
+                assignmentId, studentCourseDetails.getId());
+
+        model.addAttribute("existingSubmission", existingSubmission);
+
+        if (existingSubmission != null) {
+            model.addAttribute("score", existingSubmission.getScore());
+            model.addAttribute("endTime", existingSubmission.getSubmissionDate());
+        }
+
+        return "student/quiz-assignment";
+    }
+
+    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/file")
+    public String viewFileSubmissionAssignment(@PathVariable("studentId") int studentId,
+                                               @PathVariable("courseId") int courseId,
+                                               @PathVariable("lessonId") int lessonId,
+                                               @PathVariable("assignmentId") int assignmentId,
+                                               Model model) {
+        // Load common data
+        Student student = studentService.findByStudentId(studentId);
+        Course course = courseService.findCourseById(courseId);
+        Lesson lesson = lessonService.findById(lessonId);
+        Assignment assignment = assignmentService.findById(assignmentId);
+        List<Course> courses = student.getCourses();
+
+        // Get student course details
+        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+        AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
+                assignmentId, studentCourseDetails.getId());
+
+        // Add basic attributes
+        model.addAttribute("student", student);
+        model.addAttribute("course", course);
+        model.addAttribute("courses", courses);
+        model.addAttribute("lesson", lesson);
+        model.addAttribute("assignment", assignment);
+        model.addAttribute("assignmentDetails", assignmentDetails);
+        model.addAttribute("courseId", courseId);
+
+        // File submission specific data
+        if (assignmentDetails != null) {
+            List<AssignmentFileSubmission> fileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
+            model.addAttribute("fileSubmissions", fileSubmissions);
+        }
+
+        return "student/file-assignment";
+    }
+
+
 
     @PostMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/submit-file")
     public String submitFile(@PathVariable("studentId") int studentId,
@@ -259,38 +362,16 @@ public class StudentAssignmentController {
         return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
     }
 
-    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/start")
-    public String startAssignment(@PathVariable("studentId") int studentId,
-                                  @PathVariable("courseId") int courseId,
-                                  @PathVariable("assignmentId") int assignmentId) {
-
-        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-
-        if (studentCourseDetails != null) {
-            AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
-                    assignmentId, studentCourseDetails.getId());
-
-
-            // Only set start time if it hasn't been set yet
-            if (assignmentDetails.getStartTime() == null) {
-                assignmentDetails.setStartTime(LocalDateTime.now());
-            }
-
-            assignmentDetailsService.save(assignmentDetails);
-        }
-
-        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
-    }
-
-
-    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/quiz/take")
+    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/take")
     public String takeQuiz(@PathVariable("studentId") int studentId,
                            @PathVariable("courseId") int courseId,
+                           @PathVariable("lessonId") int lessonId,
                            @PathVariable("assignmentId") int assignmentId,
                            Model model) {
 
         Student student = studentService.findByStudentId(studentId);
         Course course = courseService.findCourseById(courseId);
+        Lesson lesson = lessonService.findById(lessonId);
         Assignment assignment = assignmentService.findById(assignmentId);
         List<Course> courses = student.getCourses();
 
@@ -323,6 +404,7 @@ public class StudentAssignmentController {
         model.addAttribute("student", student);
         model.addAttribute("course", course);
         model.addAttribute("courses", courses);
+        model.addAttribute("lesson", lesson);
         model.addAttribute("assignment", assignment);
         model.addAttribute("questions", questions);
         model.addAttribute("formData", formData);
@@ -330,10 +412,11 @@ public class StudentAssignmentController {
         return "student/quiz-take-form";
     }
 
-    @PostMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/quiz/submit")
+    @PostMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/submit")
     public String submitQuiz(@ModelAttribute("formData") QuizSubmissionFormDTO formData,
                              @PathVariable("studentId") int studentId,
                              @PathVariable("courseId") int courseId,
+                             @PathVariable("lessonId") int lessonId,
                              @PathVariable("assignmentId") int assignmentId,
                              Model model) {
 
@@ -344,6 +427,8 @@ public class StudentAssignmentController {
         if (assignment == null || !assignment.isQuiz() || studentCourseDetails == null) {
             return "redirect:/student/" + studentId + "/courses/" + courseId;
         }
+
+        System.out.println("Selected options: " + formData.getSelectedOptions());
 
         // Create new submission
         QuizSubmission submission = new QuizSubmission();
@@ -367,8 +452,13 @@ public class StudentAssignmentController {
                 answer.setQuestion(questions.get(i));
                 answer.setSelectedOptionId(formData.getSelectedOptions().get(i));
 
+                int selectedOption = formData.getSelectedOptions().get(i);
+                int correctOption = questions.get(i).getCorrectOptionId();
+
+                System.out.println("Question " + (i+1) + ": Selected=" + selectedOption
+                        + ", Correct=" + correctOption);
                 // Check if answer is correct
-                if (questions.get(i).getCorrectOptionId() == formData.getSelectedOptions().get(i)) {
+                if (Objects.equals(questions.get(i).getCorrectOptionId(), formData.getSelectedOptions().get(i))) {
                     correctAnswers++;
                 }
 
@@ -389,14 +479,21 @@ public class StudentAssignmentController {
 
 
         assignmentDetails.setIsDone(1); // Mark as completed
+        assignmentDetails.setScore(score);
+        Date date = submission.getSubmissionDate();
+        LocalDateTime localDateTime = date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        assignmentDetails.setSubmitTime(localDateTime);
         assignmentDetailsService.save(assignmentDetails);
 
-        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId + "/quiz/result";
+        return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId + "/quiz/result";
     }
 
-    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/quiz/result")
+    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/result")
     public String viewQuizResult(@PathVariable("studentId") int studentId,
                                  @PathVariable("courseId") int courseId,
+                                 @PathVariable("lessonId") int lessonId,
                                  @PathVariable("assignmentId") int assignmentId,
                                  Model model) {
 
@@ -408,14 +505,14 @@ public class StudentAssignmentController {
         StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
 
         if (studentCourseDetails == null || assignment == null || !assignment.isQuiz()) {
-            return "redirect:/student/" + studentId + "/courses/" + courseId;
+            return "redirect:/student/" + studentId + "/course/" + courseId;
         }
 
         QuizSubmission submission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(
                 assignmentId, studentCourseDetails.getId());
 
         if (submission == null) {
-            return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+            return "redirect:/student/" + studentId + "/course/" + courseId + "/assignment/" + assignmentId;
         }
 
         // Load questions and answers for the quiz
@@ -434,6 +531,8 @@ public class StudentAssignmentController {
             question.setOptions(options);
         }
 
+        Lesson lesson = lessonService.findById(lessonId);
+        model.addAttribute("lesson", lesson);
         model.addAttribute("student", student);
         model.addAttribute("course", course);
         model.addAttribute("courses", courses);
@@ -445,22 +544,4 @@ public class StudentAssignmentController {
         return "student/quiz-result";
     }
 
-    @GetMapping("/{studentId}/courses/{courseId}/markAsCompleted/{assignmentId}")
-    public String markAssignmentAsCompleted(@PathVariable("studentId") int studentId,
-                                            @PathVariable("courseId") int courseId,
-                                            @PathVariable("assignmentId") int assignmentId) {
-        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-
-        if (studentCourseDetails != null) {
-            AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
-                    assignmentId, studentCourseDetails.getId());
-
-            if (assignmentDetails != null) {
-                assignmentDetails.setIsDone(1);
-                assignmentDetailsService.save(assignmentDetails);
-            }
-        }
-
-        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
-    }
 }

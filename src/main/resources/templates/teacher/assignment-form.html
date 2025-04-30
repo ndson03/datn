@@ -122,7 +122,7 @@
 				</h5>
 			</div>
 			<div class="card-body">
-				<form action="#" th:action="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/addNewAssignment/save(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}"
+				<form action="#" th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/save(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}"
 					  th:object="${assignment}" method="POST">
 
 					<!-- Hidden field for id -->
@@ -146,18 +146,13 @@
 						<div th:if="${#fields.hasErrors('dueDate')}" class="error-text">Please enter a date!</div>
 					</div>
 
-					<div class="mb-3">
-						<label for="totalScore" class="form-label">Điểm tối đa:</label>
-						<input type="number" class="form-control" id="totalScore" th:field="*{totalScore}" value="10" min="0" max="100" step="0.5">
-					</div>
-
 					<div class="form-check mb-3">
 						<input type="checkbox" th:field="*{quiz}" class="form-check-input" id="isQuiz">
-						<label class="form-check-label" for="isQuiz">Đây là bài kiểm tra</label>
+						<label class="form-check-label" for="isQuiz">Đây là bài Quiz</label>
 					</div>
 
 					<div class="text-end">
-						<a th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}" class="btn btn-outline-secondary me-2">
+						<a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}" class="btn btn-outline-secondary me-2">
 							<i class="fas fa-times me-1"></i> Hủy
 						</a>
 						<button type="submit" class="btn btn-primary">

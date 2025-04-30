@@ -261,7 +261,7 @@
                     <p class="mb-0" th:text="${assignment.description}"></p>
                 </div>
 
-                <form th:action="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/quiz/submit(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
+                <form th:action="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/submit(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.Id}, assignmentId=${assignment.id})}"
                       method="POST" th:object="${formData}" id="quizForm">
 
                     <input type="hidden" th:field="*{assignmentId}" />

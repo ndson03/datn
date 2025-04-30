@@ -6,27 +6,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class StudentQuizResultDTO {
-    private int studentId;
+    private int id;
     private String firstName;
     private String lastName;
     private String email;
-    private String status;
-    private LocalDateTime startTime;
-    private Date submissionDate;
-    private double score;
-    private String completionTime;
-
-    // Default constructor
-    public StudentQuizResultDTO() {
-    }
+    private Double score;
+    private String submissionTime;
+    private String submissionDate;
 
     // Getters and setters
-    public int getStudentId() {
-        return studentId;
+    public int getId() {
+        return id;
     }
 
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -53,64 +47,27 @@ public class StudentQuizResultDTO {
         this.email = email;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getSubmissionDate() {
-        return submissionDate;
-    }
-
-    public void setSubmissionDate(Date submissionDate) {
-        this.submissionDate = submissionDate;
-    }
-
-    public double getScore() {
+    public Double getScore() {
         return score;
     }
 
-    public void setScore(double score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 
-    public String getCompletionTime() {
-        return completionTime;
+    public String getSubmissionTime() {
+        return submissionTime;
     }
 
-    public void setCompletionTime(String completionTime) {
-        this.completionTime = completionTime;
+    public void setSubmissionTime(String submissionTime) {
+        this.submissionTime = submissionTime;
     }
 
-    // Helper methods
-    public String getFullName() {
-        return firstName + " " + lastName;
+    public String getSubmissionDate() {
+        return submissionDate;
     }
 
-    public String getFormattedStartTime() {
-        if (startTime == null) return "N/A";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        return startTime.format(formatter);
-    }
-
-    public String getFormattedSubmissionDate() {
-        if (submissionDate == null) return "N/A";
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        return formatter.format(submissionDate);
-    }
-
-    public String getFormattedScore() {
-        return String.format("%.1f", score);
+    public void setSubmissionDate(String submissionDate) {
+        this.submissionDate = submissionDate;
     }
 }

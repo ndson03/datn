@@ -169,7 +169,7 @@
                         <h4 class="card-title mb-1" th:text="${quizFormDTO.assignment.name}"></h4>
                         <p class="card-text mb-0">Hạn nộp: <span th:text="${quizFormDTO.assignment.dueDate}"></span></p>
                     </div>
-                    <a th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
+                    <a th:href="@{/teacher/{teacherId}/course/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
                        class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-1"></i> Quay lại khóa học
                     </a>
@@ -180,7 +180,7 @@
         <!-- Question Entry Form -->
         <div class="question-entry-form">
             <h4 class="mb-3"><i class="fas fa-plus-circle me-2"></i>Thêm câu hỏi mới</h4>
-            <form th:action="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/addQuestion(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormDTO.assignment.id})}"
+            <form th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/addQuestion(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${quizFormDTO.assignment.id})}"
                   method="POST">
 
                 <div class="form-group mb-3">
@@ -247,7 +247,7 @@
         <div class="questions-list" th:if="${!quizFormDTO.questions.empty}">
             <h4 class="question-list-title"><i class="fas fa-list me-2"></i>Danh sách câu hỏi đã thêm</h4>
 
-            <form th:action="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/save(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormDTO.assignment.id})}"
+            <form th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/save(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${quizFormDTO.assignment.id})}"
                   method="POST">
 
                 <input type="hidden" name="assignmentId" th:value="${quizFormDTO.assignment.id}" />
@@ -258,7 +258,7 @@
                             <span class="badge bg-primary me-2" th:text="${questionStat.count}"></span>
                             <span th:text="${question.questionText}"></span>
                         </h5>
-                        <a th:href="@{/teacher/{teacherId}/course/{courseId}/assignment/{assignmentId}/quiz/removeQuestion(teacherId=${teacher.id}, courseId=${course.id}, assignmentId=${quizFormDTO.assignment.id}, questionId=${question.id})}"
+                        <a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/removeQuestion(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${quizFormDTO.assignment.id}, questionId=${question.id})}"
                            class="btn btn-sm btn-outline-danger">
                             <i class="fas fa-trash-alt me-1"></i> Xóa
                         </a>

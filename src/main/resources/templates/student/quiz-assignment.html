@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quiz Assignment Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <style>
+        /* Assignment-specific styles */
+        .assignment-action-btn {
+            padding: 12px 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn {
+            background-color: #6610f2;
+            border-color: #6610f2;
+        }
+
+        .quiz-btn:hover {
+            background-color: #520dc2;
+            border-color: #520dc2;
+        }
+
+        .assignment-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .assignment-status {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .assignment-status i {
+            font-size: 1.25rem;
+            margin-right: 10px;
+        }
+
+        .submission-heading {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .submission-heading i {
+            margin-right: 10px;
+            color: #0d6efd;
+        }
+
+        .quiz-result-card {
+            border-left: 4px solid #6610f2;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Top Navbar -->
+<nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span>Trường SICT - HaUI</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" id="mobileToggle">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown user-dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown">
+                        <div class="avatar me-2">
+                            <span th:text="${#strings.substring(student.firstName, 0, 1) + #strings.substring(student.lastName, 0, 1)}"></span>
+                        </div>
+                        <span th:text="${student.firstName + ' ' + student.lastName}"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="#" th:action="@{/logout}" method="POST">
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar Toggle Button -->
+<button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-chevron-left"></i>
+</button>
+
+<!-- Side Navbar -->
+<nav class="side-navbar" id="sideNav">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+        <a class="nav-link" th:href="@{/student/{studentId}/courses(studentId=${student.id})}" title="Dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        <a class="nav-link" th:href="@{/student/{studentId}/chatbot(studentId=${student.id})}" title="Chatbot">
+            <i class="fas fa-robot"></i>
+            <span>Chatbot</span>
+        </a>
+
+        <div class="mt-3 px-3">
+            <div class="small text-muted text-uppercase">Khóa học</div>
+            <hr class="my-2">
+        </div>
+
+        <div th:each="course : ${courses}">
+            <a class="nav-link"
+               th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}"
+               th:title="${course.name}"
+               th:classappend="${course.id == courseId ? 'active' : ''}">
+                <i class="fas fa-book"></i>
+                <span th:text="${course.name}"></span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <div class="container-fluid">
+        <!-- Assignment Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Quiz</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses(studentId=${student.id})}">Home</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}">Khóa học</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${assignment.name}"></li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Alert messages for operations -->
+        <div th:if="${message}" class="alert" th:classappend="${alertClass}" role="alert">
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Quiz Assignment Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-question-circle me-2"></i>
+                    <span th:text="${assignment.name}"></span>
+                    <span class="badge bg-info ms-2">Quiz</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Assignment Details Section -->
+                <div class="assignment-details mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Thông tin bài tập</h6>
+                            <table class="table table-sm">
+                                <tbody>
+                                <tr>
+                                    <td><i class="fas fa-book-open me-2"></i>Loại bài tập:</td>
+                                    <td><span class="badge bg-info">Quiz</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-calendar-check me-2"></i>Hạn nộp:</td>
+                                    <td th:text="${assignment.dueDate != null ? assignment.dueDate : 'N/A'}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Trạng thái</h6>
+                            <div class="assignment-status" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'bg-success text-white' : 'bg-warning text-dark'}">
+                                <i class="fas" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'fa-check-circle' : 'fa-clock'}"></i>
+                                <span th:text="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'Đã hoàn thành' : 'Đang thực hiện'}"></span>
+                            </div>
+                            <div th:if="${assignmentDetails != null && assignmentDetails.startTime != null}">
+                                <small class="text-muted">
+                                    Bắt đầu làm lúc: <span th:text="${#temporals.format(assignmentDetails.startTime, 'dd/MM/yyyy HH:mm')}"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assignment Description -->
+                    <div class="assignment-description mt-4">
+                        <h6 class="text-muted mb-2">Mô tả quiz</h6>
+                        <div class="p-3 bg-light rounded">
+                            <p th:text="${assignment.description ?: 'Không có mô tả cho quiz này.'}"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment Actions Section -->
+                <div class="assignment-actions">
+                    <!-- If assignment has not been started yet -->
+                    <div th:if="${assignmentDetails.isDone == 0}" class="text-center">
+                        <p class="mb-4">Nhấp vào nút bên dưới để bắt đầu làm quiz.</p>
+                        <a class="btn btn-primary assignment-action-btn" th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/take(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}">
+                            <i class="fas fa-play-circle me-2"></i>Bắt đầu làm quiz
+                        </a>
+                    </div>
+
+                    <!-- If quiz is completed -->
+                    <div th:if="${assignmentDetails != null && assignmentDetails.isDone == 1}" class="w-100">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Quiz đã hoàn thành!</strong> Bạn đã hoàn thành quiz này.
+                        </div>
+
+                        <!-- Display quiz result -->
+                        <div th:if="${existingSubmission != null}" class="mt-4">
+                            <div class="card quiz-result-card">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0 fw-bold"><i class="fas fa-poll me-2"></i>Kết quả Quiz</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="mb-3">Thông tin chi tiết</h6>
+                                            <ul class="list-group">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Điểm số
+                                                    <span class="badge bg-primary rounded-pill" th:text="${score}"></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Thời gian hoàn thành
+                                                    <span th:text="${endTime != null ? #dates.format(endTime, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6 d-flex align-items-center justify-content-center">
+                                            <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/result(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                               class="btn btn-primary btn-lg">
+                                                <i class="fas fa-eye me-2"></i>Xem chi tiết bài làm
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sideNav = document.getElementById('sideNav');
+        const mainContent = document.getElementById('mainContent');
+
+        // Desktop toggle
+        sidebarToggle.addEventListener('click', function() {
+            sideNav.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            sidebarToggle.classList.toggle('collapsed');
+
+            // Change icon direction
+            const icon = sidebarToggle.querySelector('i');
+            if (icon.classList.contains('fa-chevron-left')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+
+        // Mobile toggle
+        mobileToggle.addEventListener('click', function() {
+            sideNav.classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const isClickInsideSidebar = sideNav.contains(event.target);
+            const isClickOnToggle = mobileToggle.contains(event.target);
+
+            if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
+                sideNav.classList.remove('show');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 992) {
+                sideNav.classList.remove('show');
+            }
+        });
+    });
+</script>
+</body>
+</html>

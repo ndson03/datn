@@ -48,7 +48,7 @@ public class ContentController {
     @Value("${file.upload.directory}")
     private String uploadDirectory;
 
-    @GetMapping("/{teacherId}/courses/{coursesId}/lessons/{lessonId}")
+    @GetMapping("/{teacherId}/course/{coursesId}/lesson/{lessonId}")
     public String viewLessonContents(@PathVariable("lessonId") int lessonId,
                                      @PathVariable("teacherId") int teacherId,
                                      Model model) {
@@ -71,7 +71,7 @@ public class ContentController {
         return "teacher/teacher-view-lesson";
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/showFormForAdd")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/showFormForAdd")
     public String showAddContentForm(@PathVariable("lessonId") int lessonId,
                                      @PathVariable("teacherId") int teacherId,
                                      Model model) {
@@ -96,7 +96,7 @@ public class ContentController {
         return "teacher/content-form";
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/{contentId}/showFormForUpdate")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}/showFormForUpdate")
     public String showEditContentForm(@PathVariable("contentId") int contentId,
                                       @PathVariable("teacherId") int teacherId,
                                       Model model) {
@@ -117,7 +117,7 @@ public class ContentController {
         return "teacher/content-form";
     }
 
-    @PostMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/save")
+    @PostMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/save")
     public String saveContent(@PathVariable("teacherId") int teacherId,
                               @PathVariable("courseId") int courseId,
                               @Valid @ModelAttribute Content content,
@@ -230,7 +230,7 @@ public class ContentController {
         return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/{contentId}/delete")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}/delete")
     public String deleteContent(@PathVariable("contentId") int contentId,
                                 @PathVariable("teacherId") int teacherId,
                                 @PathVariable("courseId") int courseId,
@@ -290,7 +290,7 @@ public class ContentController {
         }
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/{contentId}")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}")
     public String viewContent(@PathVariable int contentId, @PathVariable("teacherId") int teacherId, Model model) {
         Content content = contentService.findById(contentId);
         Teacher teacher = teacherService.findByTeacherId(teacherId);

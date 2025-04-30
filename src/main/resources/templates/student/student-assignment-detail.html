@@ -323,7 +323,7 @@
 						<!-- If assignment has not been started yet -->
 						<div th:if="${assignmentDetails == null || assignmentDetails.startTime == null}" class="text-center">
 							<p class="mb-4">Nhấp vào nút bên dưới để bắt đầu làm bài.</p>
-							<a class="btn btn-primary assignment-action-btn" th:href="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/start(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id})}">
+							<a class="btn btn-primary assignment-action-btn" th:href="@{/student/{studentId}/courses/{courseId}/lessonId/{lessonId}/assignments/{assignmentId}/start(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.Id}assignmentId=${assignment.id})}">
 								<i class="fas fa-play-circle me-2"></i>Bắt đầu làm bài
 							</a>
 						</div>

@@ -1,6 +1,7 @@
 package com.ndson03.quanlykhoahoc.controller.teacher;
 
 import com.ndson03.quanlykhoahoc.domain.dto.QuizFormDTO;
+import com.ndson03.quanlykhoahoc.domain.dto.StudentQuizResultDTO;
 import com.ndson03.quanlykhoahoc.domain.entity.*;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentDetailsService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentService;
@@ -58,7 +59,7 @@ public class TeacherAssignmentController {
     @Autowired
     private AssignmentDetailsService assignmentDetailsService;
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/addNewAssignment")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/addNewAssignment")
     public String addNewAssignment(@PathVariable("teacherId") int teacherId,
                                    @PathVariable("courseId") int courseId,
                                    @PathVariable("lessonId") int lessonId,
@@ -78,7 +79,7 @@ public class TeacherAssignmentController {
         return "teacher/assignment-form";
     }
 
-    @PostMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/addNewAssignment/save")
+    @PostMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/save")
     public String saveAssignment(@Valid @ModelAttribute("assignment") Assignment assignment,
                                  BindingResult theBindingResult,
                                  @PathVariable("teacherId") int teacherId,
@@ -121,10 +122,10 @@ public class TeacherAssignmentController {
 
         theModel.addAttribute("teacher", teacher);
 
-        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
+        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/assignmentDetails/{studentId}/{assignmentId}")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignmentDetail/{assignmentId}/student/{studentId}")
     public String viewStudentQuizSubmission(@PathVariable("teacherId") int teacherId,
                                             @PathVariable("courseId") int courseId,
                                             @PathVariable("lessonId") int lessonId,
@@ -141,14 +142,14 @@ public class TeacherAssignmentController {
         StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
 
         if (studentCourseDetails == null || assignment == null) {
-            return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
+            return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
         }
 
         QuizSubmission submission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(
                 assignmentId, studentCourseDetails.getId());
 
         if (submission == null) {
-            return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId + "/assignments/" + assignmentId;
+            return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId;
         }
 
         // Load questions and answers for the quiz
@@ -180,17 +181,17 @@ public class TeacherAssignmentController {
         return "teacher/student-quiz-result";
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/assignments/{assignmentId}/delete")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete")
     public String deleteAssignment(@PathVariable("teacherId") int teacherId,
                                    @PathVariable("courseId") int courseId,
                                    @PathVariable("lessonId") int lessonId,
                                    @PathVariable("assignmentId") int assignmentId) {
         assignmentService.deleteAssignmentById(assignmentId);
 
-        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
+        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/assignments/{assignmentId}/student/{studentId}/reset")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/student/{studentId}/reset")
     public String resetAssignment(@PathVariable("teacherId") int teacherId,
                                   @PathVariable("courseId") int courseId,
                                   @PathVariable("lessonId") int lessonId,
@@ -203,15 +204,9 @@ public class TeacherAssignmentController {
         assignmentDetails.setIsDone(0);
         assignmentDetailsService.save(assignmentDetails);
 
-        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId + "/assignments/" + assignmentId;
+        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId + "quiz";
     }
 
-    @GetMapping("/showFormForUpdate")
-    public String showFormForUpdate(@RequestParam("assignmentId") int theId, Model theModel) {
-        Assignment assignment = assignmentService.findById(theId);
-        theModel.addAttribute("assignment", assignment);
-        return "assignment-form";
-    }
 
     // Display quiz creation form
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/create")
@@ -222,7 +217,7 @@ public class TeacherAssignmentController {
                                        Model model) {
         Assignment assignment = assignmentService.findById(assignmentId);
         if (assignment == null) {
-            return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
+            return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
         }
 
         Teacher teacher = teacherService.findByTeacherId(teacherId);
@@ -240,7 +235,7 @@ public class TeacherAssignmentController {
             quizFormDTO.setQuestions(new ArrayList<>());
         }
 
-        model.addAttribute("quizFormData", quizFormDTO);
+        model.addAttribute("quizFormDTO", quizFormDTO);
         model.addAttribute("teacher", teacher);
         model.addAttribute("course", course);
         model.addAttribute("lesson", lesson);
@@ -327,7 +322,74 @@ public class TeacherAssignmentController {
         assignment.setQuiz(true);
         assignmentService.save(assignment);
 
-        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
+        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
+    }
+
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz")
+    public String showAssignmentDetails(@PathVariable("teacherId") int teacherId,
+                                        @PathVariable("courseId") int courseId,
+                                        @PathVariable("lessonId") int lessonId,
+                                        @PathVariable("assignmentId") int assignmentId,
+                                        Model theModel) {
+        Teacher teacher = teacherService.findByTeacherId(teacherId);
+        Course course = courseService.findCourseById(courseId);
+        List<Student> students = course.getStudents();
+        List<Course> courses = teacher.getCourses();
+        Assignment assignment = assignmentService.findById(assignmentId);
+
+        // Create student - status map
+        Map<StudentQuizResultDTO, String> list = new HashMap<>();
+
+        for (Student student : students) {
+            StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
+            AssignmentDetails ad = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
+            QuizSubmission quizSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
+            // Create a StudentDTO to store additional display info
+            StudentQuizResultDTO studentDTO = new StudentQuizResultDTO();
+            studentDTO.setId(student.getId());
+            studentDTO.setFirstName(student.getFirstName());
+            studentDTO.setLastName(student.getLastName());
+            studentDTO.setEmail(student.getEmail());
+
+            // Add submission details if available
+            if (ad.getIsDone() == 1) {
+                studentDTO.setScore(ad.getScore());
+                studentDTO.setSubmissionTime(formatTime(quizSubmission.getSubmissionDate()));
+                studentDTO.setSubmissionDate(formatDate(quizSubmission.getSubmissionDate()));
+            }
+
+            // Set status
+            if (ad.getIsDone() == 0) {
+                list.put(studentDTO, "Chưa hoàn thành");
+            } else {
+                list.put(studentDTO, "Đã hoàn thành");
+            }
+        }
+
+        // If this is a quiz assignment, load quiz questions and answers
+        if (assignment.isQuiz()) {
+            List<QuizQuestion> questions = quizQuestionService.findByAssignmentId(assignmentId);
+
+            // Load options for each question
+            for (QuizQuestion question : questions) {
+                List<QuizOption> options = quizOptionService.findByQuestionId(question.getId());
+                question.setOptions(options);
+            }
+
+            theModel.addAttribute("questions", questions);
+        }
+
+        Lesson lesson = lessonService.findById(lessonId);
+        theModel.addAttribute("lesson", lesson);
+
+        theModel.addAttribute("list", list);
+        theModel.addAttribute("courseId", courseId);
+        theModel.addAttribute("assignmentId", assignmentId);
+        theModel.addAttribute("courses", courses);
+        theModel.addAttribute("teacher", teacher);
+        theModel.addAttribute("assignment", assignment);
+
+        return "teacher/quiz-assignment-status";
     }
 
     private int findDayDifference(Assignment assignment) {
@@ -345,5 +407,21 @@ public class TeacherAssignmentController {
         }
 
         return -1;
+    }
+
+    private String formatDate(Date date) {
+        if (date == null) {
+            return "";
+        }
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        return dateFormat.format(date);
+    }
+
+    private String formatTime(Date date) {
+        if (date == null) {
+            return "";
+        }
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm:ss");
+        return timeFormat.format(date);
     }
 }

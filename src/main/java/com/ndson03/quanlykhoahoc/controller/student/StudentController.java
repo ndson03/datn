@@ -111,6 +111,9 @@ public class StudentController {
         model.addAttribute("student", student);
         model.addAttribute("courses", courses);
 
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+
         // Lấy danh sách nội dung
         List<Content> contents = contentService.findByLessonId(lessonId);
         model.addAttribute("contents", contents);

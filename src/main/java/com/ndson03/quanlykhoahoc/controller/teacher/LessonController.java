@@ -31,7 +31,7 @@ public class LessonController {
     }
 
     // Hiển thị form thêm bài học mới
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/showFormForAdd")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/addNewLesson")
     public String showFormForAdd(@PathVariable("teacherId") int teacherId, @PathVariable("courseId") int courseId, Model model) {
         Course course = courseService.findCourseById(courseId);
         Teacher teacher = teacherService.findByTeacherId(teacherId);
@@ -49,7 +49,7 @@ public class LessonController {
     }
 
     // Hiển thị form cập nhật bài học
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/{lessonId}/showFormForUpdate")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/updateLesson")
     public String showFormForUpdate(@PathVariable("teacherId") int teacherId, @PathVariable("lessonId") int id, Model model) {
         Teacher teacher = teacherService.findByTeacherId(teacherId);
         List<Course> courses = teacher.getCourses();
@@ -63,7 +63,7 @@ public class LessonController {
     }
 
     // Lưu bài học
-    @PostMapping("/{teacherId}/courses/{courseId}/lessons/save")
+    @PostMapping("/{teacherId}/course/{courseId}/lesson/saveLesson")
     public String saveLesson(@Valid @ModelAttribute("lesson") Lesson lesson,
                              BindingResult bindingResult,
                              @RequestParam("courseId") int courseId,
@@ -89,7 +89,7 @@ public class LessonController {
 
     }
 
-    @GetMapping("/{teacherId}/courses/{courseId}/lessons/delete")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/deleteLesson")
     public String delete(@RequestParam("lessonId") int id, @PathVariable("teacherId") int teacherId) {
         Lesson lesson = lessonService.findById(id);
         int courseId = lesson.getCourse().getId();

@@ -150,13 +150,13 @@
                             <td th:text="${content.title}"></td>
                             <td th:text="${content.contentType}"></td>
                             <td class="text-center">
-                                <a th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/{contentId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, contentId=${content.id})}" class="btn btn-info btn-sm">
+                                <a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, contentId=${content.id})}" class="btn btn-info btn-sm">
                                     <i class="fas fa-eye me-1"></i> Xem
                                 </a>
-                                <a th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/{contentId}/showFormForUpdate(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, contentId=${content.id})}" class="btn btn-warning btn-sm ms-1">
+                                <a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}/showFormForUpdate(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, contentId=${content.id})}" class="btn btn-warning btn-sm ms-1">
                                     <i class="fas fa-edit me-1"></i> Sửa
                                 </a>
-                                <a th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/{contentId}/delete(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, contentId=${content.id})}"
+                                <a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}/delete(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, contentId=${content.id})}"
                                    class="btn btn-danger btn-sm ms-1"
                                    onclick="if (!(confirm('Bạn có chắc chắn muốn xóa nội dung này không?'))) return false">
                                     <i class="fas fa-trash me-1"></i> Xóa
@@ -176,7 +176,7 @@
                     <i class="fas fa-tasks me-2"></i>
                     Danh sách bài tập
                 </h5>
-                <a class="btn btn-primary btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/addNewAssignment(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}">
+                <a class="btn btn-primary btn-sm" th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/addNewAssignment(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}">
                     <i class="fas fa-plus me-1"></i> Thêm bài tập
                 </a>
             </div>
@@ -218,7 +218,7 @@
                                 <!-- Nếu là quiz -->
                                 <a class="btn btn-outline-primary btn-sm"
                                    th:if="${assignment.isQuiz()}"
-                                   th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/assignments/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
                                    th:title="'Xem quiz'">
                                     <i class="fas fa-eye"></i>
                                 </a>
@@ -226,18 +226,18 @@
                                 <!-- Nếu không phải quiz -->
                                 <a class="btn btn-outline-primary btn-sm"
                                    th:unless="${assignment.isQuiz()}"
-                                   th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/assignments/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
                                    th:title="'Xem bài tập'">
                                     <i class="fas fa-eye"></i>
                                 </a>
 
                                 <a class="btn btn-outline-secondary btn-sm ms-1"
-                                   th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/assignments/{assignmentId}/edit(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/edit(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
                                    th:title="'Chỉnh sửa'">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a class="btn btn-outline-danger btn-sm ms-1"
-                                   th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/assignments/{assignmentId}/delete(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
                                    onclick="return confirm('Bạn có chắc chắn muốn xóa bài tập này không?')">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
