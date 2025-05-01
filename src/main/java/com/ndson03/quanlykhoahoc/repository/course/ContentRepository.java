@@ -13,4 +13,6 @@ public interface ContentRepository extends JpaRepository<Content, Integer> {
 
     @Query("SELECT MAX(c.orderNumber) FROM Content c WHERE c.lesson.id = :lessonId")
     Integer findMaxOrderNumberByLessonId(@Param("lessonId") int lessonId);
+
+    Content findByContentData(String contentData);
 }

@@ -57,4 +57,9 @@ public class ContentServiceImpl implements ContentService {
         Integer maxOrderNumber = contentRepository.findMaxOrderNumberByLessonId(lessonId);
         return (maxOrderNumber != null) ? maxOrderNumber + 1 : 1;
     }
+
+    @Override
+    public Content findByContentData(String contentData) {
+        return contentRepository.findByContentData(contentData);
+    }
 }

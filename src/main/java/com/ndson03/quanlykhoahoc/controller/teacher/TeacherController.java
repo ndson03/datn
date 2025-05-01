@@ -116,6 +116,8 @@ public class TeacherController {
         theModel.addAttribute("teacher", teacher);
         theModel.addAttribute("students", students);
         theModel.addAttribute("gradeDetailsList", gradeDetailsList);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        theModel.addAttribute("lessons", lessons);
 
         return "teacher/edit-grades-form";
     }

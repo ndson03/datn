@@ -12,8 +12,7 @@
 	<!-- Material Design Icons -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
 	<!-- Google Fonts -->
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" th:href="@{/css/layout.css}">
 </head>
 
@@ -26,11 +25,42 @@
 			<span>Trường SICT - HaUI</span>
 		</a>
 
-		<button class="navbar-toggler" type="button" id="mobileToggle">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				<!-- Dashboard link moved to top navbar -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
+						<i class="fas fa-tachometer-alt"></i> Dashboard
+					</a>
+				</li>
+
+				<!-- Chatbot link moved to top navbar -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}">
+						<i class="fas fa-robot"></i> Chatbot
+					</a>
+				</li>
+
+				<!-- Courses dropdown menu -->
+				<li class="nav-item dropdown courses-dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="coursesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="fas fa-book"></i> Khóa học
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="coursesDropdown">
+						<li th:each="courseItem : ${courses}">
+							<a class="dropdown-item" th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${courseItem.id})}" th:text="${courseItem.name}"></a>
+						</li>
+						<li th:if="${courses.size() == 0}">
+							<span class="dropdown-item text-muted">Không có khóa học nào</span>
+						</li>
+					</ul>
+				</li>
+			</ul>
+
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item dropdown user-dropdown">
 					<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
@@ -57,34 +87,26 @@
 </nav>
 
 <!-- Sidebar Toggle Button -->
-<button class="sidebar-toggle" id="sidebarToggle">
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
 	<i class="fas fa-chevron-left"></i>
 </button>
 
 <!-- Side Navbar -->
 <nav class="side-navbar" id="sideNav">
 	<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-		<a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
-			<i class="fas fa-tachometer-alt"></i>
-			<span>Dashboard</span>
-		</a>
-		<a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}" title="Chatbot">
-			<i class="fas fa-robot"></i>
-			<span>Chatbot</span>
-		</a>
-
-		<div class="mt-3 px-3">
-			<div class="small text-muted text-uppercase">Khóa học</div>
-			<hr class="my-2">
-		</div>
-
-		<div th:each="course : ${courses}">
+		<div class="mt-4 px-3">
 			<a class="nav-link"
 			   th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
-			   th:title="${course.name}"
-			   th:classappend="${course.id == courseId ? 'active' : ''}">
-				<i class="fas fa-book"></i>
-				<span th:text="${course.name}"></span>
+			   th:title="${course.name}">
+				<span th:text="${'Khóa học: ' + course.name}" style="font-weight: 700"></span>
+			</a>
+			<hr class="my-2">
+		</div>
+		<div th:each="lessonItem : ${lessons}">
+			<a class="nav-link"
+			   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonItem.id})}"
+			   th:title="${lessonItem.orderNumber + '. ' + lessonItem.title}">
+				<span th:text="${lessonItem.orderNumber + '. ' + lessonItem.title}"></span>
 			</a>
 		</div>
 	</div>
@@ -94,12 +116,12 @@
 <div class="main-content mt-5 pt-3">
 	<div class="container-fluid">
 		<!-- Page Header -->
-		<div class="d-flex justify-content-between align-items-center mb-4" style="padding-top: 30px">
-			<h1 class="h2 mb-0" th:text="${'Nhập điểm ' + course.name}">Nhập điểm</h1>
+		<div class="page-header">
+			<h1 class="h3 mb-2" th:text="${'Nhập điểm - ' + course.name}"></h1>
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb mb-0">
-					<li class="breadcrumb-item"><a href="#">Home</a></li>
-					<li class="breadcrumb-item"><a href="#">Khóa học</a></li>
+					<li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">Home</a></li>
+					<li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}">Khóa học</a></li>
 					<li class="breadcrumb-item active" aria-current="page">Nhập điểm</li>
 				</ol>
 			</nav>
@@ -107,18 +129,21 @@
 
 		<!-- Grades Card -->
 		<div class="card">
-			<div class="card-header">
-				<h5 class="mb-0">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h5 class="mb-0 fw-bold">
 					<i class="fas fa-chart-line me-2"></i>
 					Bảng điểm sinh viên
 				</h5>
+				<a class="btn btn-secondary btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}">
+					<i class="fas fa-arrow-left me-1"></i> Quay lại
+				</a>
 			</div>
-			<div class="card-body">
+			<div class="card-body p-0">
 				<div class="table-responsive">
 					<table class="table table-hover">
-						<thead>
-						<tr>
-							<th scope="col">Sinh viên</th>
+						<thead class="table-light">
+						<tr class="text-center">
+							<th scope="col" style="width: 25%;">Họ tên</th>
 							<th scope="col">Điểm TX1</th>
 							<th scope="col">Điểm TX2</th>
 							<th scope="col">Điểm GK</th>
@@ -126,17 +151,17 @@
 						</tr>
 						</thead>
 						<tbody>
-						<tr th:each="student, iterStat : ${students}">
+						<tr th:each="student, iterStat : ${students}" class="text-center">
 							<td th:text="${student.firstName + ' ' + student.lastName}"></td>
 							<form th:action="@{/teacher/{teacherId}/courses/{courseId}/editGrades/save/{gradeDetailsId}(teacherId=${teacher.id}, courseId=${course.id}, gradeDetailsId=${gradeDetailsList[iterStat.index].id})}" method="POST">
 								<td>
-									<input type="number" step="0.1" min="0" max="10" class="form-control" th:name="gradeOne" th:value="${gradeDetailsList[iterStat.index].gradeOne}" />
+									<input type="number" step="0.1" min="0" max="10" class="form-control" th:name="gradeOne" th:value="${gradeDetailsList[iterStat.index].gradeOne != -1 ? gradeDetailsList[iterStat.index].gradeOne : ''}" placeholder="-" />
 								</td>
 								<td>
-									<input type="number" step="0.1" min="0" max="10" class="form-control" th:name="gradeTwo" th:value="${gradeDetailsList[iterStat.index].gradeTwo}" />
+									<input type="number" step="0.1" min="0" max="10" class="form-control" th:name="gradeTwo" th:value="${gradeDetailsList[iterStat.index].gradeTwo != -1 ? gradeDetailsList[iterStat.index].gradeTwo : ''}" placeholder="-" />
 								</td>
 								<td>
-									<input type="number" step="0.1" min="0" max="10" class="form-control" th:name="gradeThree" th:value="${gradeDetailsList[iterStat.index].gradeThree}" />
+									<input type="number" step="0.1" min="0" max="10" class="form-control" th:name="gradeThree" th:value="${gradeDetailsList[iterStat.index].gradeThree != -1 ? gradeDetailsList[iterStat.index].gradeThree : ''}" placeholder="-" />
 								</td>
 								<td>
 									<button type="submit" class="btn btn-primary btn-sm">
@@ -159,16 +184,24 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-	// Modified for fixed sidebar
 	document.addEventListener('DOMContentLoaded', function() {
 		const sidebarToggle = document.getElementById('sidebarToggle');
-		const sideNavbar = document.querySelector('.side-navbar');
+		const sideNav = document.getElementById('sideNav') || document.querySelector('.side-navbar');
 		const mainContent = document.querySelector('.main-content');
 
-		// Only for mobile view
-		sidebarToggle.addEventListener('click', function() {
-			sideNavbar.classList.toggle('show');
-		});
+		// Sidebar toggle for desktop
+		if (sidebarToggle) {
+			sidebarToggle.addEventListener('click', function() {
+				if (sideNav) {
+					sideNav.classList.toggle('collapsed');
+					sideNav.classList.toggle('show');
+				}
+				if (mainContent) {
+					mainContent.classList.toggle('expanded');
+				}
+				sidebarToggle.classList.toggle('collapsed');
+			});
+		}
 	});
 </script>
 </body>

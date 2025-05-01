@@ -9,398 +9,12 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome 6 -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- Material Design Icons -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
 	<!-- Google Fonts -->
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/layout.css}">
 
-	<style>
-		:root {
-			--primary-color: #4d61fc;
-			--primary-dark: #3a4cd1;
-			--secondary-color: #6c7aff;
-			--accent-color: #ff9f43;
-			--light-color: #f0f3ff;
-			--dark-color: #2d3748;
-			--success-color: #38c172;
-			--danger-color: #e3342f;
-			--warning-color: #ffce54;
-			--info-color: #3498db;
-			--gray-100: #f8f9fc;
-			--gray-200: #edf2f7;
-			--gray-300: #e2e8f0;
-			--gray-600: #718096;
-			--gray-700: #4a5568;
-			--border-radius: 12px;
-			--card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-			--hover-shadow: 0 15px 30px rgba(77, 97, 252, 0.15);
-			--content-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
-		}
-
-		body {
-			font-family: 'Poppins', sans-serif;
-			background-color: var(--gray-100);
-			color: var(--dark-color);
-			padding-top: 60px;
-		}
-
-		/* Top navbar styling */
-		.top-navbar {
-			background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
-			box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-			padding: 0.8rem 1.5rem;
-			border-bottom: none;
-		}
-
-		.navbar-brand {
-			font-weight: 600;
-			color: white;
-		}
-
-		.navbar-brand i {
-			font-size: 1.2rem;
-		}
-
-		/* Navigation links in top navbar */
-		.top-navbar .nav-link {
-			color: rgba(255, 255, 255, 0.85);
-			font-weight: 500;
-			padding: 0.5rem 1rem;
-			border-radius: 6px;
-			transition: all 0.3s ease;
-		}
-
-		.top-navbar .nav-link:hover {
-			color: white;
-			background-color: rgba(255, 255, 255, 0.1);
-		}
-
-		.top-navbar .nav-link.active {
-			color: white;
-			background-color: rgba(255, 255, 255, 0.15);
-		}
-
-		.top-navbar .nav-link i {
-			margin-right: 5px;
-		}
-
-		.avatar {
-			width: 36px;
-			height: 36px;
-			border-radius: 50%;
-			background: rgba(255, 255, 255, 0.2);
-			backdrop-filter: blur(5px);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: white;
-			font-weight: 600;
-			border: 2px solid rgba(255, 255, 255, 0.5);
-			transition: all 0.3s ease;
-		}
-
-		.user-dropdown:hover .avatar {
-			transform: scale(1.05);
-			box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
-		}
-
-		/* Side navbar styling */
-		.side-navbar {
-			background-color: white;
-			border-right: 1px solid var(--gray-200);
-			box-shadow: var(--content-shadow);
-			position: fixed;
-			left: 0;
-			top: 60px;
-			height: calc(100vh - 60px);
-			width: 250px;
-			z-index: 1000;
-			transition: all 0.3s ease;
-			overflow-y: auto;
-			padding-top: 15px;
-		}
-
-		.side-navbar.collapsed {
-			width: 60px;
-		}
-
-		.side-navbar .nav-link {
-			color: var(--gray-700);
-			border-radius: 8px;
-			margin: 3px 8px;
-			padding: 8px 15px;
-			transition: all 0.3s ease;
-		}
-
-		.side-navbar .nav-link:hover {
-			background-color: var(--light-color);
-			color: var(--primary-color);
-		}
-
-		.side-navbar .nav-link.active {
-			background-color: var(--primary-color);
-			color: white;
-			box-shadow: 0 5px 15px rgba(77, 97, 252, 0.25);
-		}
-
-		.side-navbar .nav-link.active i {
-			color: white;
-			transform: translateX(3px);
-		}
-
-		.side-navbar .nav-link i {
-			transition: all 0.3s ease;
-			width: 18px;
-			text-align: center;
-			margin-right: 8px;
-		}
-
-		.side-navbar .nav-link:hover i {
-			transform: translateX(3px);
-		}
-
-		.side-navbar.collapsed .nav-link span,
-		.side-navbar.collapsed .section-title {
-			display: none;
-		}
-
-		.side-navbar.collapsed .nav-link {
-			text-align: center;
-			padding: 12px 0;
-		}
-
-		.side-navbar.collapsed .nav-link i {
-			margin-right: 0;
-			font-size: 1.1rem;
-		}
-
-		/* Main content styling */
-		.main-content {
-			margin-left: 250px;
-			padding: 20px;
-			transition: all 0.3s ease;
-		}
-
-		.main-content.expanded {
-			margin-left: 60px;
-		}
-
-		/* Section title in sidebar */
-		.section-title {
-			padding: 0 15px;
-			margin-top: 15px;
-			margin-bottom: 8px;
-			font-size: 0.75rem;
-			text-transform: uppercase;
-			font-weight: 600;
-			color: var(--gray-600);
-		}
-
-		/* Sidebar toggle button */
-		.sidebar-toggle {
-			position: fixed;
-			left: 250px;
-			top: 70px;
-			background-color: white;
-			color: var(--primary-color);
-			border: none;
-			border-radius: 0 8px 8px 0;
-			padding: 8px 12px;
-			box-shadow: 5px 0 15px rgba(0, 0, 0, 0.05);
-			transition: all 0.3s ease;
-			z-index: 1001;
-		}
-
-		.sidebar-toggle.collapsed {
-			left: 60px;
-		}
-
-		.sidebar-toggle:hover {
-			background-color: var(--primary-color);
-			color: white;
-		}
-
-		/* Dropdown menu styling */
-		.dropdown-menu {
-			border-radius: 10px;
-			border: none;
-			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-			padding: 10px 0;
-		}
-
-		.dropdown-item {
-			padding: 8px 20px;
-			color: var(--gray-700);
-			transition: all 0.2s ease;
-		}
-
-		.dropdown-item:hover {
-			background-color: var(--light-color);
-			color: var(--primary-color);
-		}
-
-		.dropdown-divider {
-			margin: 8px 0;
-			border-top-color: var(--gray-200);
-		}
-
-		/* Course Detail Styling */
-		.counter-card {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			padding: 25px 15px;
-			border-radius: var(--border-radius);
-			background-color: white;
-			box-shadow: var(--card-shadow);
-			border: none;
-			transition: all 0.3s;
-			height: 100%;
-		}
-
-		.counter-card:hover {
-			transform: translateY(-5px);
-			box-shadow: var(--hover-shadow);
-		}
-
-		.counter-card i {
-			font-size: 32px;
-			color: var(--primary-color);
-			margin-bottom: 15px;
-		}
-
-		.counter-card .counter {
-			font-size: 28px;
-			font-weight: 700;
-			color: var(--dark-color);
-		}
-
-		.counter-card .counter-title {
-			font-size: 14px;
-			color: var(--gray-600);
-			margin-top: 5px;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-		}
-
-		.lesson-item {
-			border-radius: 8px;
-			border-left: 4px solid var(--primary-color);
-			background-color: white;
-			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
-			transition: all 0.3s;
-		}
-
-		.lesson-item:hover {
-			box-shadow: 0 5px 15px rgba(77, 97, 252, 0.15);
-			transform: translateY(-2px);
-		}
-
-		.lesson-actions {
-			opacity: 0.7;
-			transition: all 0.3s;
-		}
-
-		.lesson-item:hover .lesson-actions {
-			opacity: 1;
-		}
-
-		.table {
-			background-color: white;
-			border-radius: 8px;
-			overflow: hidden;
-			box-shadow: var(--content-shadow);
-		}
-
-		.table thead {
-			background-color: var(--gray-100);
-		}
-
-		.table th {
-			font-weight: 600;
-			color: var(--gray-700);
-			border-bottom-width: 1px;
-		}
-
-		.table td, .table th {
-			padding: 12px 15px;
-			vertical-align: middle;
-		}
-
-		.card {
-			border: none;
-			border-radius: var(--border-radius);
-			box-shadow: var(--content-shadow);
-			overflow: hidden;
-			margin-bottom: 25px;
-		}
-
-		.card-header {
-			background-color: var(--light-color);
-			border-bottom: 1px solid var(--gray-200);
-			padding: 15px 20px;
-		}
-
-		.card-header h5 {
-			margin: 0;
-			font-weight: 600;
-			color: var(--dark-color);
-		}
-
-		.btn-primary {
-			background-color: var(--primary-color);
-			border-color: var(--primary-color);
-			border-radius: 8px;
-			padding: 0.45rem 1rem;
-			font-weight: 500;
-			transition: all 0.3s ease;
-			box-shadow: 0 4px 10px rgba(77, 97, 252, 0.15);
-		}
-
-		.btn-primary:hover, .btn-primary:active {
-			background-color: var(--primary-dark) !important;
-			border-color: var(--primary-dark) !important;
-			transform: translateY(-2px);
-			box-shadow: 0 6px 15px rgba(77, 97, 252, 0.25);
-		}
-
-		.btn-outline-primary, .btn-outline-secondary, .btn-outline-danger {
-			border-radius: 6px;
-			font-weight: 500;
-			padding: 0.35rem 0.8rem;
-			transition: all 0.2s ease;
-		}
-
-		.btn-outline-primary:hover {
-			background-color: var(--primary-color);
-			border-color: var(--primary-color);
-			box-shadow: 0 4px 10px rgba(77, 97, 252, 0.2);
-		}
-
-		/* Mobile responsive styling */
-		@media (max-width: 991.98px) {
-			.side-navbar {
-				transform: translateX(-100%);
-				width: 270px;
-			}
-
-			.side-navbar.show {
-				transform: translateX(0);
-			}
-
-			.main-content {
-				margin-left: 0;
-				padding: 15px;
-			}
-
-			.main-content.expanded {
-				margin-left: 0;
-			}
-
-			.sidebar-toggle {
-				display: none;
-			}
-		}
-	</style>
 </head>
 
 <body>
@@ -412,11 +26,42 @@
 			<span>Trường SICT - HaUI</span>
 		</a>
 
-		<button class="navbar-toggler" type="button" id="mobileToggle">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				<!-- Dashboard link moved to top navbar -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
+						<i class="fas fa-tachometer-alt"></i> Dashboard
+					</a>
+				</li>
+
+				<!-- Chatbot link moved to top navbar -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}">
+						<i class="fas fa-robot"></i> Chatbot
+					</a>
+				</li>
+
+				<!-- Courses dropdown menu -->
+				<li class="nav-item dropdown courses-dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="coursesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="fas fa-book"></i> Khóa học
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="coursesDropdown">
+						<li th:each="courseItem : ${courses}">
+							<a class="dropdown-item" th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${courseItem.id})}" th:text="${courseItem.name}"></a>
+						</li>
+						<li th:if="${courses.size() == 0}">
+							<span class="dropdown-item text-muted">Không có khóa học nào</span>
+						</li>
+					</ul>
+				</li>
+			</ul>
+
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item dropdown user-dropdown">
 					<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
@@ -443,37 +88,42 @@
 </nav>
 
 <!-- Sidebar Toggle Button -->
-<button class="sidebar-toggle" id="sidebarToggle">
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
 	<i class="fas fa-chevron-left"></i>
 </button>
 
 <!-- Side Navbar -->
 <nav class="side-navbar" id="sideNav">
-	<div class="section-title">Danh sách khóa học</div>
 	<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-		<div th:each="course : ${courses}">
+		<div class="mt-4 px-3">
 			<a class="nav-link"
 			   th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
-			   th:title="${course.name}"
-			   th:classappend="${course.id == courseId ? 'active' : ''}">
-				<i class="fas fa-book"></i>
-				<span th:text="${course.name}"></span>
+			   th:title="${course.name}">
+				<span th:text="${'Khóa học: ' + course.name}" style="font-weight: 700"></span>
+			</a>
+			<hr class="my-2">
+		</div>
+		<div th:each="lessonItem : ${lessons}">
+			<a class="nav-link"
+			   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonItem.id})}"
+			   th:title="${lessonItem.orderNumber + '. ' + lessonItem.title}">
+				<span th:text="${lessonItem.orderNumber + '. ' + lessonItem.title}"></span>
 			</a>
 		</div>
 	</div>
 </nav>
 
 <!-- Main Content -->
-<div class="main-content">
+<div class="main-content mt-5 pt-3">
 	<div class="container-fluid">
-		<!-- Course Header -->
-		<div class="d-flex justify-content-between align-items-center mb-4" style="padding-top: 20px">
-			<h1 class="h2 mb-0" th:text="${course.name}"></h1>
+		<!-- Page Header -->
+		<div class="page-header">
+			<h1 class="h3 mb-2" th:text="${course.name}"></h1>
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb mb-0">
-					<li class="breadcrumb-item"><a href="#">Home</a></li>
+					<li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">Home</a></li>
 					<li class="breadcrumb-item"><a href="#">Khóa học</a></li>
-					<li class="breadcrumb-item active" aria-current="page" th:text="${course.code}"></li>
+					<li class="breadcrumb-item active" aria-current="page" th:text="${course.name}"></li>
 				</ol>
 			</nav>
 		</div>
@@ -510,9 +160,9 @@
 			</div>
 
 			<!-- Lessons List -->
-			<div class="card mb-4">
+			<div class="card">
 				<div class="card-header d-flex justify-content-between align-items-center">
-					<h5 class="mb-0">
+					<h5 class="mb-0 fw-bold">
 						<i class="fas fa-book-open me-2"></i>
 						Danh sách bài học
 					</h5>
@@ -553,9 +203,9 @@
 			</div>
 
 			<!-- Students List -->
-			<div class="card mb-4">
+			<div class="card">
 				<div class="card-header d-flex justify-content-between align-items-center">
-					<h5 class="mb-0">
+					<h5 class="mb-0 fw-bold">
 						<i class="fas fa-users me-2"></i>
 						Danh sách sinh viên và kết quả học tập
 					</h5>
@@ -569,34 +219,34 @@
 				<div class="card-body p-0">
 					<div class="table-responsive">
 						<table class="table table-hover">
-							<thead>
-							<tr>
+							<thead class="table-light">
+							<tr class="text-center">
 								<th scope="col" style="width: 25%;">Họ tên</th>
-								<th scope="col" class="text-center">Điểm TX1</th>
-								<th scope="col" class="text-center">Điểm TX2</th>
-								<th scope="col" class="text-center">Điểm GK</th>
+								<th scope="col">Điểm TX1</th>
+								<th scope="col">Điểm TX2</th>
+								<th scope="col">Điểm GK</th>
 							</tr>
 							</thead>
 							<tbody>
 							<!-- Thay đổi cấu trúc để hiển thị mỗi học sinh một hàng -->
-							<tr th:each="entry : ${studentGradeList}">
+							<tr th:each="entry : ${studentGradeList}" class="text-center">
 								<!-- Lấy thông tin sinh viên -->
 								<td th:text="${entry.key.firstName + ' ' + entry.key.lastName}"></td>
 
 								<!-- Điểm TX1 -->
-								<td class="text-center">
+								<td>
 									<span th:if="${entry.value.gradeOne == -1}" class="text-muted">-</span>
 									<span th:if="${entry.value.gradeOne != -1}" th:text="${entry.value.gradeOne}"></span>
 								</td>
 
 								<!-- Điểm TX2 -->
-								<td class="text-center">
+								<td>
 									<span th:if="${entry.value.gradeTwo == -1}" class="text-muted">-</span>
 									<span th:if="${entry.value.gradeTwo != -1}" th:text="${entry.value.gradeTwo}"></span>
 								</td>
 
 								<!-- Điểm GK -->
-								<td class="text-center">
+								<td>
 									<span th:if="${entry.value.gradeThree == -1}" class="text-muted">-</span>
 									<span th:if="${entry.value.gradeThree != -1}" th:text="${entry.value.gradeThree}"></span>
 								</td>
@@ -613,45 +263,27 @@
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
-		// Sidebar toggle functionality
 		const sidebarToggle = document.getElementById('sidebarToggle');
-		const sideNav = document.getElementById('sideNav');
+		const sideNav = document.getElementById('sideNav') || document.querySelector('.side-navbar');
 		const mainContent = document.querySelector('.main-content');
-		const mobileToggle = document.getElementById('mobileToggle');
 
-		// Desktop toggle
-		sidebarToggle.addEventListener('click', function() {
-			sideNav.classList.toggle('collapsed');
-			mainContent.classList.toggle('expanded');
-			sidebarToggle.classList.toggle('collapsed');
-
-			// Change icon direction
-			const icon = sidebarToggle.querySelector('i');
-			if (icon.classList.contains('fa-chevron-left')) {
-				icon.classList.remove('fa-chevron-left');
-				icon.classList.add('fa-chevron-right');
-			} else {
-				icon.classList.remove('fa-chevron-right');
-				icon.classList.add('fa-chevron-left');
-			}
-		});
-
-		// Mobile toggle
-		mobileToggle.addEventListener('click', function() {
-			sideNav.classList.toggle('show');
-		});
-
-		// Handle window resize
-		window.addEventListener('resize', function() {
-			if (window.innerWidth < 992) {
-				sideNav.classList.remove('collapsed');
-				mainContent.classList.remove('expanded');
-				sidebarToggle.classList.remove('collapsed');
-			}
-		});
+		// Sidebar toggle for desktop
+		if (sidebarToggle) {
+			sidebarToggle.addEventListener('click', function() {
+				if (sideNav) {
+					sideNav.classList.toggle('collapsed');
+					sideNav.classList.toggle('show');
+				}
+				if (mainContent) {
+					mainContent.classList.toggle('expanded');
+				}
+				sidebarToggle.classList.toggle('collapsed');
+			});
+		}
 	});
 </script>
 </body>

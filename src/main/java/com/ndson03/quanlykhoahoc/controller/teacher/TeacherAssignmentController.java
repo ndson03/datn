@@ -6,6 +6,7 @@ import com.ndson03.quanlykhoahoc.domain.entity.*;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentDetailsService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentFileSubmissionService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentService;
+import com.ndson03.quanlykhoahoc.service.course.ContentService;
 import com.ndson03.quanlykhoahoc.service.course.CourseService;
 import com.ndson03.quanlykhoahoc.service.course.LessonService;
 import com.ndson03.quanlykhoahoc.service.quiz.QuizOptionService;
@@ -63,6 +64,9 @@ public class TeacherAssignmentController {
 
     @Autowired
     private AssignmentDetailsService assignmentDetailsService;
+
+    @Autowired
+    private ContentService contentService;
 
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/addNewAssignment")
     public String addNewAssignment(@PathVariable("teacherId") int teacherId,
@@ -182,6 +186,12 @@ public class TeacherAssignmentController {
         model.addAttribute("submission", submission);
         model.addAttribute("questions", questions);
         model.addAttribute("selectedAnswers", selectedAnswers);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
 
         return "teacher/student-quiz-result";
     }
@@ -232,6 +242,12 @@ public class TeacherAssignmentController {
         model.addAttribute("assignmentDetails", assignmentDetails);
         model.addAttribute("assignmentFileSubmissions", assignmentFileSubmissions);
         model.addAttribute("courseId", courseId);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
 
         return "teacher/student-file-submission";
     }
@@ -438,11 +454,17 @@ public class TeacherAssignmentController {
         theModel.addAttribute("lesson", lesson);
 
         theModel.addAttribute("list", list);
-        theModel.addAttribute("courseId", courseId);
+        theModel.addAttribute("course", course);
         theModel.addAttribute("assignmentId", assignmentId);
         theModel.addAttribute("courses", courses);
         theModel.addAttribute("teacher", teacher);
         theModel.addAttribute("assignment", assignment);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        theModel.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        theModel.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        theModel.addAttribute("contents", contents);
 
         return "teacher/quiz-assignment-status";
     }
@@ -491,11 +513,17 @@ public class TeacherAssignmentController {
         theModel.addAttribute("lesson", lesson);
 
         theModel.addAttribute("list", list);
-        theModel.addAttribute("courseId", courseId);
+        theModel.addAttribute("course", course);
         theModel.addAttribute("assignmentId", assignmentId);
         theModel.addAttribute("courses", courses);
         theModel.addAttribute("teacher", teacher);
         theModel.addAttribute("assignment", assignment);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        theModel.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        theModel.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        theModel.addAttribute("contents", contents);
 
         return "teacher/file-assignment-status";
     }

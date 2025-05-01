@@ -16,4 +16,6 @@ public interface ContentService {
     void deleteById(int id);
 
     int getNextOrderNumber(int lessonId);
+
+    Content findByContentData(String contentData);
 }

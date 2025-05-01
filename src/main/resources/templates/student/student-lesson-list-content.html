@@ -15,180 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/layout.css}">
 
-    <style>
-        /* Responsive */
-        @media (max-width: 991.98px) {
-            .main-content {
-                padding: 20px 15px;
-                margin-left: 0;
-            }
-
-            .side-navbar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-
-            .side-navbar.show {
-                transform: translateX(0);
-            }
-
-            .sidebar-toggle {
-                display: none;
-            }
-        }
-
-        /* Page header styling */
-        .page-header {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 25px 30px;
-            margin-bottom: 30px;
-            box-shadow: var(--content-shadow);
-        }
-
-        .page-header h1 {
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-
-        .breadcrumb-item a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .breadcrumb-item.active {
-            color: var(--gray-600);
-        }
-
-        /* Card styling */
-        .card {
-            border-radius: var(--border-radius);
-            border: none;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 25px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid var(--gray-200);
-            padding: 15px 20px;
-        }
-
-        .card-header h5 {
-            color: var(--dark-color);
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        /* Content items styling */
-        .content-item {
-            transition: all 0.3s ease;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--gray-200);
-            margin-bottom: 10px;
-        }
-
-        .content-item:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--hover-shadow);
-            border-color: var(--secondary-color);
-        }
-
-        .content-item h5 {
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-
-        /* Clickable rows for tables */
-        .clickable-row {
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .clickable-row:hover {
-            background-color: var(--light-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        }
-
-        /* Badge styling */
-        .badge.bg-info {
-            background-color: var(--info-color) !important;
-            font-weight: 500;
-        }
-
-        /* Table styling */
-        .table {
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-
-        .table th {
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-
-        /* Empty state styling */
-        .text-center.py-5 i {
-            color: var(--gray-300);
-        }
-
-        /* Dropdown menu styling */
-        .dropdown-menu {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 10px 0;
-        }
-
-        .dropdown-item {
-            padding: 8px 20px;
-            color: var(--gray-700);
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-            background-color: var(--light-color);
-            color: var(--primary-color);
-        }
-
-        .dropdown-divider {
-            margin: 8px 0;
-            border-top-color: var(--gray-200);
-        }
-
-
-        /* Responsiveness improvements */
-        @media (max-width: 991.98px) {
-            .main-content {
-                padding: 20px 15px;
-                margin-left: 0;
-            }
-
-            .side-navbar {
-                transform: translateX(-100%);
-                width: 250px;
-            }
-
-            .side-navbar.show {
-                transform: translateX(0);
-            }
-
-            .sidebar-toggle {
-                display: none;
-            }
-        }
-
-        /* Icon colors for content types */
-        .text-primary { color: var(--primary-color) !important; }
-        .text-danger { color: var(--danger-color) !important; }
-        .text-success { color: var(--success-color) !important; }
-        .text-warning { color: var(--warning-color) !important; }
-        .text-info { color: var(--info-color) !important; }
-    </style>
 </head>
 
 <body>
@@ -279,22 +105,42 @@
                 <span th:text="${lessonItem.orderNumber + '. ' + lessonItem.title}"></span>
             </a>
 
-            <!-- Display contents for the current lesson -->
-            <div th:if="${lessonItem.id == lesson.id}" class="content-nav">
+            <!-- Display contents and assignments for the current lesson -->
+            <div th:if="${lessonItem.id == lesson.id}"
+                 class="content-nav">
+                <!-- Content items -->
+                <div class="nav-section-title ps-3" th:if="${not #lists.isEmpty(contents)}">
+                    <small class="text-muted fw-bold">Nội dung</small>
+                </div>
                 <div th:each="contentItem : ${contents}">
                     <a class="nav-link"
                        th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/content/{contentId}(studentId=${student.id}, courseId=${courseId}, lessonId=${lessonId}, contentId=${contentItem.id})}"
                        th:title="${contentItem.orderNumber + '. ' + contentItem.title}">
                         <i th:class="${
-                    contentItem.contentType == 'VIDEO' ? 'fas fa-video content-icon' :
-                    contentItem.contentType == 'TEXT' ? 'fas fa-file-alt content-icon' :
-                    contentItem.contentType == 'PDF' ? 'fas fa-file-pdf content-icon' :
-                    contentItem.contentType == 'IMAGE' ? 'fas fa-image content-icon' :
-                    contentItem.contentType == 'CODE' ? 'fas fa-code content-icon' :
-                    contentItem.contentType == 'QUIZ' ? 'fas fa-question-circle content-icon' :
-                    'fas fa-file content-icon'}"></i>
+            contentItem.contentType == 'VIDEO' ? 'fas fa-video content-icon' :
+            contentItem.contentType == 'TEXT' ? 'fas fa-file-alt content-icon' :
+            contentItem.contentType == 'PDF' ? 'fas fa-file-pdf content-icon' :
+            contentItem.contentType == 'IMAGE' ? 'fas fa-image content-icon' :
+            contentItem.contentType == 'CODE' ? 'fas fa-code content-icon' :
+            contentItem.contentType == 'QUIZ' ? 'fas fa-question-circle content-icon' :
+            'fas fa-file content-icon'}"></i>
                         <span th:text="${contentItem.orderNumber + '. ' + contentItem.title}"></span>
                     </a>
+                </div>
+
+                <!-- Assignment items -->
+                <div th:if="${not #lists.isEmpty(assignments)}" class="mt-2">
+                    <div class="nav-section-title ps-3">
+                        <small class="text-muted fw-bold">Bài tập</small>
+                    </div>
+                    <div th:each="assignment : ${assignments}">
+                        <a class="nav-link"
+                           th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}(studentId=${student.id}, courseId=${courseId}, lessonId=${lessonId}, assignmentId=${assignment.id})}"
+                           th:title="${assignment.name}">
+                            <i th:class="${assignment.isQuiz() ? 'fas fa-question-circle content-icon' : 'fas fa-tasks content-icon'}"></i>
+                            <span th:text="${assignment.name}"></span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

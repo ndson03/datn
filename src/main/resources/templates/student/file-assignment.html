@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>File Assignment Details</title>
+    <title>Chi tiết bài tập</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
@@ -9,9 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/layout.css}">
     <style>
         /* File submission styles */
@@ -152,11 +153,42 @@
             <span>Trường SICT - HaUI</span>
         </a>
 
-        <button class="navbar-toggler" type="button" id="mobileToggle">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Dashboard link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- Chatbot link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/student/{studentId}/chatbot(studentId=${student.id})}">
+                        <i class="fas fa-robot"></i> Chatbot
+                    </a>
+                </li>
+
+                <!-- Courses dropdown menu -->
+                <li class="nav-item dropdown courses-dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="coursesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i> Khóa học
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="coursesDropdown">
+                        <li th:each="coursItem : ${courses}">
+                            <a class="dropdown-item" th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${coursItem.id})}" th:text="${coursItem.name}"></a>
+                        </li>
+                        <li th:if="${courses.size() == 0}">
+                            <span class="dropdown-item text-muted">Không có khóa học nào</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown user-dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
@@ -182,287 +214,260 @@
     </div>
 </nav>
 
+<nav class="side-navbar" id="sideNav">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+        <div class="mt-4 px-3">
+            <a class="nav-link"
+               th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}"
+               th:title="${course.name}">
+                <span th:text="${'Khóa học: ' + course.name}" style="font-weight: 700"></span>
+            </a>
+            <hr class="my-2">
+        </div>
+        <div th:each="lessonItem : ${lessons}">
+            <a class="nav-link"
+               th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}(studentId=${student.id}, courseId=${courseId}, lessonId=${lessonItem.id})}"
+               th:classappend="${lessonItem.id == lesson.id ? 'active' : ''}"
+               th:title="${lessonItem.orderNumber + '. ' + lessonItem.title}">
+                <span th:text="${lessonItem.orderNumber + '. ' + lessonItem.title}"></span>
+            </a>
+
+            <!-- Display contents and assignments for the current lesson -->
+            <div th:if="${lessonItem.id == lesson.id}"
+                 class="content-nav">
+                <!-- Content items -->
+                <div class="nav-section-title ps-3" th:if="${not #lists.isEmpty(contents)}">
+                    <small class="text-muted fw-bold">Nội dung</small>
+                </div>
+                <div th:each="contentItem : ${contents}">
+                    <a class="nav-link"
+                       th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/content/{contentId}(studentId=${student.id}, courseId=${courseId}, lessonId=${lessonId}, contentId=${contentItem.id})}"
+                       th:title="${contentItem.orderNumber + '. ' + contentItem.title}">
+                        <i th:class="${
+            contentItem.contentType == 'VIDEO' ? 'fas fa-video content-icon' :
+            contentItem.contentType == 'TEXT' ? 'fas fa-file-alt content-icon' :
+            contentItem.contentType == 'PDF' ? 'fas fa-file-pdf content-icon' :
+            contentItem.contentType == 'IMAGE' ? 'fas fa-image content-icon' :
+            contentItem.contentType == 'CODE' ? 'fas fa-code content-icon' :
+            contentItem.contentType == 'QUIZ' ? 'fas fa-question-circle content-icon' :
+            'fas fa-file content-icon'}"></i>
+                        <span th:text="${contentItem.orderNumber + '. ' + contentItem.title}"></span>
+                    </a>
+                </div>
+
+                <!-- Assignment items -->
+                <div th:if="${not #lists.isEmpty(assignments)}" class="mt-2">
+                    <div class="nav-section-title ps-3">
+                        <small class="text-muted fw-bold">Bài tập</small>
+                    </div>
+                    <div th:each="assignmentIteam : ${assignments}">
+                        <a class="nav-link"
+                           th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}(studentId=${student.id}, courseId=${courseId}, lessonId=${lessonId}, assignmentId=${assignmentIteam.id})}"
+                           th:classappend="${assignmentIteam.id == assignment.id ? 'active' : ''}"
+                           th:title="${assignmentIteam.name}">
+                            <i th:class="${assignmentIteam.isQuiz() ? 'fas fa-question-circle content-icon' : 'fas fa-tasks content-icon'}"></i>
+                            <span th:text="${assignmentIteam.name}"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
 <!-- Sidebar Toggle Button -->
 <button class="sidebar-toggle" id="sidebarToggle">
     <i class="fas fa-chevron-left"></i>
 </button>
 
-<!-- Side Navbar -->
-<nav class="side-navbar" id="sideNav">
-    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-        <a class="nav-link" th:href="@{/student/{studentId}/courses(studentId=${student.id})}" title="Dashboard">
-            <i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-        </a>
-        <a class="nav-link" th:href="@{/student/{studentId}/chatbot(studentId=${student.id})}" title="Chatbot">
-            <i class="fas fa-robot"></i>
-            <span>Chatbot</span>
-        </a>
-
-        <div class="mt-3 px-3">
-            <div class="small text-muted text-uppercase">Khóa học</div>
-            <hr class="my-2">
-        </div>
-
-        <div th:each="course : ${courses}">
-            <a class="nav-link"
-               th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}"
-               th:title="${course.name}"
-               th:classappend="${course.id == courseId ? 'active' : ''}">
-                <i class="fas fa-book"></i>
-                <span th:text="${course.name}"></span>
-            </a>
-        </div>
-    </div>
-</nav>
-
 <!-- Main Content -->
-<div class="main-content" id="mainContent">
+<div class="main-content mt-5 pt-3">
     <div class="container-fluid">
-        <!-- Assignment Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">Chi tiết bài tập nộp file</h2>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="h3 mb-2" th:text="${assignment.name}"></h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses(studentId=${student.id})}">Home</a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}">Khóa học</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}" th:text="${course.name}"></a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id})}" th:text="${lesson.title}"></a></li>
                     <li class="breadcrumb-item active" aria-current="page" th:text="${assignment.name}"></li>
                 </ol>
             </nav>
         </div>
 
-        <!-- Assignment Section -->
+        <!-- Alert messages for file operations -->
+        <div th:if="${message}" class="alert mb-4" th:classappend="${alertClass}" role="alert">
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Assignment Details Section -->
         <div class="card mb-4">
-            <div class="card-header bg-light">
+            <div class="card-header">
                 <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-file-upload me-2"></i>
-                    <span th:text="${assignment.name}"></span>
+                    <i class="fas fa-info-circle me-2"></i>
+                    Thông tin bài tập
                 </h5>
             </div>
             <div class="card-body">
-                <!-- Alert messages for file operations -->
-                <div th:if="${message}" class="alert" th:classappend="${alertClass}" role="alert">
-                    <span th:text="${message}"></span>
-                    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-
-                <!-- Assignment Details Section -->
-                <div class="assignment-details mb-4">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-muted mb-2">Thông tin bài tập</h6>
-                            <table class="table table-sm">
-                                <tbody>
-                                <tr>
-                                    <td><i class="fas fa-book-open me-2"></i>Loại bài tập:</td>
-                                    <td><span class="badge bg-primary">Bài tập nộp file</span></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-calendar-check me-2"></i>Hạn nộp:</td>
-                                    <td th:text="${assignment.dueDate != null ? assignment.dueDate : 'N/A'}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted mb-2">Trạng thái</h6>
-                            <div class="assignment-status" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'bg-success text-white' : 'bg-warning text-dark'}">
-                                <i class="fas" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'fa-check-circle' : 'fa-clock'}"></i>
-                                <span th:text="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'Đã hoàn thành' : 'Đang thực hiện'}"></span>
-                            </div>
-                            <div th:if="${assignmentDetails != null && assignmentDetails.startTime != null}">
-                                <small class="text-muted">
-                                    Bắt đầu làm lúc: <span th:text="${#temporals.format(assignmentDetails.startTime, 'dd/MM/yyyy HH:mm')}"></span>
-                                </small>
-                            </div>
-                        </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <tbody>
+                            <tr>
+                                <td><i class="fas fa-book-open me-2"></i>Loại bài tập:</td>
+                                <td><span class="badge bg-primary">Bài tập</span></td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-calendar-check me-2"></i>Hạn nộp:</td>
+                                <td th:text="${assignment.dueDate != null ? assignment.dueDate : 'N/A'}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-
-                    <!-- Assignment Description -->
-                    <div class="assignment-description mt-4">
-                        <h6 class="text-muted mb-2">Mô tả bài tập</h6>
-                        <div class="p-3 bg-light rounded">
-                            <p th:text="${assignment.description ?: 'Không có mô tả cho bài tập này.'}"></p>
+                    <div class="col-md-6">
+                        <div class="assignment-status" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'bg-success text-white' : 'bg-warning text-dark'}">
+                            <i class="fas" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'fa-check-circle' : 'fa-clock'}"></i>
+                            <span th:text="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'Đã hoàn thành' : 'Đang thực hiện'}"></span>
+                        </div>
+                        <div th:if="${assignmentDetails != null && assignmentDetails.startTime != null}">
+                            <small class="text-muted">
+                                Bắt đầu làm lúc: <span th:text="${#temporals.format(assignmentDetails.startTime, 'dd/MM/yyyy HH:mm')}"></span>
+                            </small>
                         </div>
                     </div>
                 </div>
 
-                <!-- Assignment Actions Section -->
-                <div class="assignment-actions">
-                    <!-- If assignment is in progress -->
-                    <div th:if="${assignmentDetails.isDone == 0}" class="w-100">
-                        <!-- File submission section -->
-                        <div class="file-upload-container">
-                            <h5 class="submission-heading">
-                                <i class="fas fa-cloud-upload-alt"></i>Nộp file bài tập
-                            </h5>
+                <!-- Assignment Description -->
+                <div class="mt-4">
+                    <h6 class="text-muted mb-2">Mô tả bài tập</h6>
+                    <div class="p-3 bg-light rounded">
+                        <p th:text="${assignment.description ?: 'Không có mô tả cho bài tập này.'}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <form th:action="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
-                                  method="post" enctype="multipart/form-data">
+        <!-- File Submission Section -->
+        <div class="card mb-4" th:if="${assignmentDetails.isDone == 0}">
+            <div class="card-header">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>
+                    Nộp file bài tập
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                      method="post" enctype="multipart/form-data">
 
-                                <div class="mb-3">
-                                    <label for="file" class="form-label">Chọn file từ máy tính của bạn:</label>
-                                    <input type="file" class="form-control" id="file" name="file" required>
-                                    <div class="form-text">Hỗ trợ các file: .pdf, .doc, .docx, .xls, .xlsx, .zip, .rar (Max: 10MB)</div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="comment" class="form-label">Ghi chú (tùy chọn):</label>
-                                    <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Nhập ghi chú về bài nộp của bạn..."></textarea>
-                                </div>
-
-                                <div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-paper-plane me-2"></i>Nộp bài
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- List of submitted files -->
-                        <div class="file-list" th:if="${assignmentFileSubmissions != null && !assignmentFileSubmissions.isEmpty()}">
-                            <h5 class="submission-heading">
-                                <i class="fas fa-file-alt"></i>Các file đã nộp
-                            </h5>
-
-                            <div class="file-item" th:each="file : ${assignmentFileSubmissions}" th:id="'file-item-' + ${file.id}">
-                                <div class="file-info">
-                                    <div class="file-icon">
-                                        <i class="fas" th:classappend="${
-                                            file.contentType.contains('pdf') ? 'fa-file-pdf' :
-                                            file.contentType.contains('word') ? 'fa-file-word' :
-                                            file.contentType.contains('excel') || file.contentType.contains('spreadsheet') ? 'fa-file-excel' :
-                                            file.contentType.contains('zip') || file.contentType.contains('rar') ? 'fa-file-archive' :
-                                            file.contentType.contains('image') ? 'fa-file-image' : 'fa-file'
-                                        }"></i>
-                                    </div>
-                                    <div>
-                                        <div class="file-name" th:text="${file.originalFileName}"></div>
-                                        <div class="file-meta">
-                                            <span th:text="${#numbers.formatDecimal(file.fileSize / 1024, 0, 'COMMA', 2, 'POINT')} + ' KB'"></span> •
-                                            <span th:text="${file.uploadDate != null ? #temporals.format(file.uploadDate, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span>
-                                        </div>
-                                        <div class="file-comment" th:if="${file.submissionComment != null && !file.submissionComment.isEmpty()}">
-                                            <i class="fas fa-comment-alt me-1"></i>
-                                            <span th:text="${file.submissionComment}"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="file-actions">
-                                    <a th:href="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/download-file/{fileId}(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
-                                       class="btn btn-sm btn-outline-primary" title="Download">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary edit-file-btn" th:data-file-id="${file.id}" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <a th:href="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/delete-file/{fileId}(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
-                                       class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('Bạn có chắc chắn muốn xóa file này?');"
-                                       title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- If no files have been submitted yet -->
-                        <div class="alert alert-warning" th:if="${assignmentFileSubmissions == null || assignmentFileSubmissions.isEmpty()}">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Bạn chưa nộp file nào cho bài tập này.
-                        </div>
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Chọn file từ máy tính của bạn:</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                        <div class="form-text">Hỗ trợ các file: .pdf, .doc, .docx, .xls, .xlsx, .zip, .rar (Max: 10MB)</div>
                     </div>
 
-                    <!-- If assignment is completed -->
-                    <div th:if="${assignmentDetails.isDone == 1}" class="w-100">
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle me-2"></i>
-                            <strong>Bài tập đã hoàn thành!</strong> Bạn đã hoàn thành bài tập này.
-                        </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Ghi chú (tùy chọn):</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Nhập ghi chú về bài nộp của bạn..."></textarea>
+                    </div>
 
-                        <!-- Display submitted files -->
-                        <div class="mt-4">
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0 fw-bold"><i class="fas fa-file-alt me-2"></i>File bài tập đã nộp</h5>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Nộp bài
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Submitted Files Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-file-alt me-2"></i>
+                    Các file đã nộp
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- If no files have been submitted yet -->
+                <div class="alert alert-warning" th:if="${assignmentFileSubmissions == null || assignmentFileSubmissions.isEmpty()}">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Bạn chưa nộp file nào cho bài tập này.
+                </div>
+
+                <!-- List of submitted files -->
+                <div th:if="${assignmentFileSubmissions != null && !assignmentFileSubmissions.isEmpty()}">
+                    <div class="file-item" th:each="file : ${assignmentFileSubmissions}" th:id="'file-item-' + ${file.id}">
+                        <div class="file-info">
+                            <div class="file-icon">
+                                <i class="fas" th:classappend="${
+                                    file.contentType.contains('pdf') ? 'fa-file-pdf' :
+                                    file.contentType.contains('word') ? 'fa-file-word' :
+                                    file.contentType.contains('excel') || file.contentType.contains('spreadsheet') ? 'fa-file-excel' :
+                                    file.contentType.contains('zip') || file.contentType.contains('rar') ? 'fa-file-archive' :
+                                    file.contentType.contains('image') ? 'fa-file-image' : 'fa-file'
+                                }"></i>
+                            </div>
+                            <div>
+                                <div class="file-name" th:text="${file.originalFileName}"></div>
+                                <div class="file-meta">
+                                    <span th:text="${#numbers.formatDecimal(file.fileSize / 1024, 0, 'COMMA', 2, 'POINT')} + ' KB'"></span> •
+                                    <span th:text="${file.uploadDate != null ? #temporals.format(file.uploadDate, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span>
                                 </div>
-                                <div class="card-body">
-                                    <!-- If files have been submitted -->
-                                    <div th:if="${assignmentDetails.isDone==1}">
-                                        <div class="file-item" th:each="file : ${assignmentFileSubmissions}" th:id="'file-item-' + ${file.id}">
-                                            <div class="file-info">
-                                                <div class="file-icon">
-                                                    <i class="fas" th:classappend="${
-                                                        file.contentType.contains('pdf') ? 'fa-file-pdf' :
-                                                        file.contentType.contains('word') ? 'fa-file-word' :
-                                                        file.contentType.contains('excel') || file.contentType.contains('spreadsheet') ? 'fa-file-excel' :
-                                                        file.contentType.contains('zip') || file.contentType.contains('rar') ? 'fa-file-archive' :
-                                                        file.contentType.contains('image') ? 'fa-file-image' : 'fa-file'
-                                                    }"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="file-name" th:text="${file.originalFileName}"></div>
-                                                    <div class="file-meta">
-                                                        <span th:text="${#numbers.formatDecimal(file.fileSize / 1024, 0, 'COMMA', 2, 'POINT')} + ' KB'"></span> •
-                                                        <span th:text="${file.uploadDate != null ? #temporals.format(file.uploadDate, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span>
-                                                    </div>
-                                                    <div class="file-comment" th:if="${file.submissionComment != null && !file.submissionComment.isEmpty()}">
-                                                        <i class="fas fa-comment-alt me-1"></i>
-                                                        <span th:text="${file.submissionComment}"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="file-actions">
-                                                <a th:href="@{/download-assignment-file-submission/{fileId}(fileId=${file.id})}"
-                                                   class="btn btn-sm btn-outline-primary" title="Download">
-                                                    <i class="fas fa-download"></i>
-                                                </a>
-                                                <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete-file/{fileId}(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
-                                                   class="btn btn-sm btn-outline-danger"
-                                                   onclick="return confirm('Bạn có chắc chắn muốn xóa file này?');"
-                                                   title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- If no files have been submitted -->
-                                    <div class="alert alert-warning" th:if="${assignmentFileSubmissions == null || assignmentFileSubmissions.isEmpty()}">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                        Không có file nào được nộp cho bài tập này.
-                                    </div>
-
-                                    <!-- Add new file section -->
-                                    <div class="card mt-4">
-                                        <div class="card-header bg-light">
-                                            <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Thêm file mới</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <form th:action="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
-                                                  method="post" enctype="multipart/form-data">
-                                                <div class="mb-3">
-                                                    <label for="additionalFile" class="form-label">Chọn file từ máy tính của bạn:</label>
-                                                    <input type="file" class="form-control" id="additionalFile" name="file" required>
-                                                    <div class="form-text">Hỗ trợ các file: .pdf, .doc, .docx, .xls, .xlsx, .zip, .rar (Max: 10MB)</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="additionalComment" class="form-label">Ghi chú (tùy chọn):</label>
-                                                    <textarea class="form-control" id="additionalComment" name="comment" rows="3" placeholder="Nhập ghi chú về bài nộp của bạn..."></textarea>
-                                                </div>
-                                                <div class="d-flex justify-content-end">
-                                                    <button type="submit" class="btn btn-primary">
-                                                        <i class="fas fa-plus me-2"></i>Thêm file
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
+                                <div class="file-comment" th:if="${file.submissionComment != null && !file.submissionComment.isEmpty()}">
+                                    <i class="fas fa-comment-alt me-1"></i>
+                                    <span th:text="${file.submissionComment}"></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="file-actions">
+                            <a th:href="@{/download-assignment-file-submission/{fileId}(fileId=${file.id})}"
+                               class="btn btn-sm btn-outline-primary" title="Download">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary edit-file-btn" th:data-file-id="${file.id}" title="Edit"
+                                    th:if="${assignmentDetails.isDone == 0}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete-file/{fileId}(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa file này?');"
+                               title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Add new file section for completed assignments -->
+        <div class="card mb-4" th:if="${assignmentDetails.isDone == 1}">
+            <div class="card-header">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Thêm file mới
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                      method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="additionalFile" class="form-label">Chọn file từ máy tính của bạn:</label>
+                        <input type="file" class="form-control" id="additionalFile" name="file" required>
+                        <div class="form-text">Hỗ trợ các file: .pdf, .doc, .docx, .xls, .xlsx, .zip, .rar (Max: 10MB)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="additionalComment" class="form-label">Ghi chú (tùy chọn):</label>
+                        <textarea class="form-control" id="additionalComment" name="comment" rows="3" placeholder="Nhập ghi chú về bài nộp của bạn..."></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Thêm file
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -471,58 +476,51 @@
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Sidebar toggle functionality
         const sidebarToggle = document.getElementById('sidebarToggle');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const sideNav = document.getElementById('sideNav');
-        const mainContent = document.getElementById('mainContent');
+        const sideNav = document.getElementById('sideNav') || document.querySelector('.side-navbar');
+        const mainContent = document.querySelector('.main-content');
 
-        // Desktop toggle
-        sidebarToggle.addEventListener('click', function() {
-            sideNav.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            sidebarToggle.classList.toggle('collapsed');
+        // Sidebar toggle for desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                if (sideNav) {
+                    sideNav.classList.toggle('collapsed');
+                    sideNav.classList.toggle('show');
+                }
+                if (mainContent) {
+                    mainContent.classList.toggle('expanded');
+                }
+                sidebarToggle.classList.toggle('collapsed');
 
-            // Change icon direction
-            const icon = sidebarToggle.querySelector('i');
-            if (icon.classList.contains('fa-chevron-left')) {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
-            } else {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
-            }
-        });
+                // Change icon direction
+                const icon = sidebarToggle.querySelector('i');
+                if (icon.classList.contains('fa-chevron-left')) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-left');
+                }
+            });
+        }
 
-        // Mobile toggle
-        mobileToggle.addEventListener('click', function() {
-            sideNav.classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
-            const isClickInsideSidebar = sideNav.contains(event.target);
-            const isClickOnToggle = mobileToggle.contains(event.target);
-
-            if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
-                sideNav.classList.remove('show');
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 992) {
-                sideNav.classList.remove('show');
-            }
-        });
-
-        // File edit functionality
+        // Edit file functionality
         const editButtons = document.querySelectorAll('.edit-file-btn');
-        const cancelButtons = document.querySelectorAll('.cancel-edit-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const fileId = this.getAttribute('data-file-id');
+                const fileItem = document.getElementById('file-item-' + fileId);
 
+                if (fileItem) {
+                    fileItem.classList.toggle('edit-mode');
+                    // Additional edit functionality would go here
+                }
+            });
+        });
     });
 </script>
 </body>

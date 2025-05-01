@@ -42,15 +42,14 @@ public class ContentController {
     @Autowired
     private TeacherService teacherService;
 
-    @Autowired
-    private CourseService courseService;
 
     @Value("${file.upload.directory}")
     private String uploadDirectory;
 
-    @GetMapping("/{teacherId}/course/{coursesId}/lesson/{lessonId}")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}")
     public String viewLessonContents(@PathVariable("lessonId") int lessonId,
                                      @PathVariable("teacherId") int teacherId,
+                                     @PathVariable("courseId") int courseId,
                                      Model model) {
         // Lấy thông tin để hiển thị menu và breadcrumb
         Teacher teacher = teacherService.findByTeacherId(teacherId);
@@ -67,6 +66,8 @@ public class ContentController {
         model.addAttribute("contents", contents);
         model.addAttribute("courseId", course.getId());
         model.addAttribute("assignments", assignments);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
 
         return "teacher/teacher-view-lesson";
     }
@@ -128,6 +129,8 @@ public class ContentController {
                               Model model,
                               RedirectAttributes redirectAttributes) {
 
+        final String uploadDirectory = "uploads/content_file";
+
         // Kiểm tra lỗi validation
         if (bindingResult.hasErrors()) {
             Teacher teacher = teacherService.findByTeacherId(teacherId);
@@ -150,9 +153,13 @@ public class ContentController {
 
         // Lấy content hiện tại nếu đang cập nhật
         String originalFilePath = null;
+        String originalFilename = null;
         if (content.getId() != 0) {
             Content existingContent = contentService.findById(content.getId());
-            originalFilePath = existingContent != null ? existingContent.getContentData() : null;
+            if (existingContent != null) {
+                originalFilePath = existingContent.getContentData();
+                originalFilename = existingContent.getFilename();
+            }
         }
 
         // Xử lý upload file cho các loại nội dung là FILE, IMAGE, VIDEO
@@ -185,7 +192,7 @@ public class ContentController {
                         }
 
                         // Tạo tên file duy nhất để tránh trùng lặp
-                        String originalFilename = file.getOriginalFilename();
+                        originalFilename = file.getOriginalFilename();
                         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
                         String newFilename = UUID.randomUUID().toString() + extension;
 
@@ -193,8 +200,9 @@ public class ContentController {
                         Path fileNameAndPath = Paths.get(uploadDirectory, newFilename);
                         Files.write(fileNameAndPath, file.getBytes());
 
-                        // Lưu đường dẫn file vào nội dung
+                        // Lưu đường dẫn file và tên file gốc vào nội dung
                         content.setContentData(newFilename);
+                        content.setFilename(originalFilename);
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -209,15 +217,17 @@ public class ContentController {
                             Files.deleteIfExists(oldFile);
                         }
 
-                        // Reset contentData vì không có file nào
+                        // Reset contentData và filename vì không có file nào
                         content.setContentData("");
+                        content.setFilename("");
                     } catch (IOException e) {
                         System.err.println("Không thể xóa file cũ: " + e.getMessage());
                     }
                 }
             } else if (keepExistingFile != null && keepExistingFile && content.getId() != 0) {
-                // Giữ nguyên file cũ
+                // Giữ nguyên file cũ và tên file gốc
                 content.setContentData(originalFilePath);
+                content.setFilename(originalFilename);
             }
         }
 
@@ -261,37 +271,14 @@ public class ContentController {
         return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
     }
 
-    @GetMapping("/file/{filename:.+}")
-    @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        try {
-            Path file = Paths.get(uploadDirectory).resolve(filename);
-            Resource resource = new UrlResource(file.toUri());
 
-            if (resource.exists() || resource.isReadable()) {
-                // Xác định content type dựa trên phần mở rộng của file
-                String contentType = determineContentType(filename);
-
-                // Xác định cách hiển thị file (inline để hiển thị trực tiếp, attachment để tải về)
-                String contentDisposition = "inline";
-                if (!contentType.startsWith("image/") && !contentType.startsWith("video/") && !contentType.startsWith("audio/")) {
-                    contentDisposition = "attachment";
-                }
-
-                return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(contentType))
-                        .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition + "; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                throw new RuntimeException("Không thể đọc file: " + filename);
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Lỗi: " + e.getMessage());
-        }
-    }
 
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}")
-    public String viewContent(@PathVariable int contentId, @PathVariable("teacherId") int teacherId, Model model) {
+    public String viewContent(@PathVariable int contentId,
+                              @PathVariable("teacherId") int teacherId,
+                              @PathVariable("courseId") int courseId,
+                              @PathVariable("lessonId") int lessonId,
+                              Model model) {
         Content content = contentService.findById(contentId);
         Teacher teacher = teacherService.findByTeacherId(teacherId);
         List<Course> courses = teacher.getCourses();
@@ -301,59 +288,13 @@ public class ContentController {
         model.addAttribute("course", content.getLesson().getCourse());
         model.addAttribute("teacher", teacher);
         model.addAttribute("courses", courses);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Assignment> assignments = content.getLesson().getAssignments();
+        model.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
 
         return "teacher/view-content";
-    }
-
-    // Phương thức xác định content type dựa trên phần mở rộng của file
-    private String determineContentType(String filename) {
-        String extension = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
-        switch (extension) {
-            case "pdf":
-                return "application/pdf";
-            case "doc":
-            case "docx":
-                return "application/msword";
-            case "xls":
-            case "xlsx":
-                return "application/vnd.ms-excel";
-            case "ppt":
-            case "pptx":
-                return "application/vnd.ms-powerpoint";
-            case "jpg":
-            case "jpeg":
-                return "image/jpeg";
-            case "png":
-                return "image/png";
-            case "gif":
-                return "image/gif";
-            case "svg":
-                return "image/svg+xml";
-            case "mp4":
-                return "video/mp4";
-            case "webm":
-                return "video/webm";
-            case "mp3":
-                return "audio/mpeg";
-            case "wav":
-                return "audio/wav";
-            case "txt":
-                return "text/plain";
-            case "html":
-            case "htm":
-                return "text/html";
-            case "css":
-                return "text/css";
-            case "js":
-                return "application/javascript";
-            case "json":
-                return "application/json";
-            case "zip":
-                return "application/zip";
-            case "rar":
-                return "application/x-rar-compressed";
-            default:
-                return "application/octet-stream";
-        }
     }
 }

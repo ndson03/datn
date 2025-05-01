@@ -22,6 +22,9 @@ public class Content {
     @Column(name="content_data", columnDefinition = "TEXT")
     private String contentData;
 
+    @Column(name="filename")
+    private String filename;  // Lưu tên gốc của file
+
     @Column(name="order_number")
     private int orderNumber;
 
@@ -33,10 +36,11 @@ public class Content {
     public Content() {
     }
 
-    public Content(String title, String contentType, String contentData, int orderNumber) {
+    public Content(String title, String contentType, String contentData, String filename, int orderNumber) {
         this.title = title;
         this.contentType = contentType;
         this.contentData = contentData;
+        this.filename = filename;
         this.orderNumber = orderNumber;
     }
 
@@ -70,6 +74,14 @@ public class Content {
 
     public void setContentData(String contentData) {
         this.contentData = contentData;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public int getOrderNumber() {

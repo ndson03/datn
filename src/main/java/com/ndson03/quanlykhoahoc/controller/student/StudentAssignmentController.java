@@ -5,6 +5,7 @@ import com.ndson03.quanlykhoahoc.domain.entity.*;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentDetailsService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentFileSubmissionService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentService;
+import com.ndson03.quanlykhoahoc.service.course.ContentService;
 import com.ndson03.quanlykhoahoc.service.course.CourseService;
 import com.ndson03.quanlykhoahoc.service.course.LessonService;
 import com.ndson03.quanlykhoahoc.service.course.StudentCourseDetailsService;
@@ -71,51 +72,9 @@ public class StudentAssignmentController {
     @Autowired
     private AssignmentFileSubmissionService fileSubmissionService;
 
-    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/345")
-    public String viewAssignmentDetails(@PathVariable("studentId") int studentId,
-                                        @PathVariable("courseId") int courseId,
-                                        @PathVariable("lessonId") int lessonId,
-                                        @PathVariable("assignmentId") int assignmentId,
-                                        Model model) {
-        Student student = studentService.findByStudentId(studentId);
-        Course course = courseService.findCourseById(courseId);
-        Lesson lesson = lessonService.findById(lessonId);
-        Assignment assignment = assignmentService.findById(assignmentId);
-        List<Course> courses = student.getCourses();
+    @Autowired
+    private ContentService contentService;
 
-        StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-        AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
-                assignmentId, studentCourseDetails.getId());
-
-        model.addAttribute("student", student);
-        model.addAttribute("course", course);
-        model.addAttribute("courses", courses);
-        model.addAttribute("assignment", assignment);
-        model.addAttribute("assignmentDetails", assignmentDetails);
-
-        // Check if this is a quiz assignment
-        if (assignment.isQuiz()) {
-            // Check if student has already taken this quiz
-            QuizSubmission existingSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(
-                    assignmentId, studentCourseDetails.getId());
-
-            model.addAttribute("isQuiz", assignment.isQuiz());
-            model.addAttribute("existingSubmission", existingSubmission);
-
-            if (existingSubmission != null) {
-                model.addAttribute("score", existingSubmission.getScore());
-                model.addAttribute("endTime", existingSubmission.getSubmissionDate());
-            }
-        } else {
-            // For file submissions, load existing files
-            if (assignmentDetails != null) {
-                List<AssignmentFileSubmission> assignmentFileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
-                model.addAttribute("fileSubmissions", assignmentFileSubmissions);
-            }
-        }
-
-        return "student/student-assignment-detail";
-    }
 
     @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}")
     public String viewAssignment(@PathVariable("studentId") int studentId,
@@ -144,6 +103,7 @@ public class StudentAssignmentController {
         Student student = studentService.findByStudentId(studentId);
         Course course = courseService.findCourseById(courseId);
         Lesson lesson = lessonService.findById(lessonId);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
         Assignment assignment = assignmentService.findById(assignmentId);
         List<Course> courses = student.getCourses();
 
@@ -157,9 +117,14 @@ public class StudentAssignmentController {
         model.addAttribute("course", course);
         model.addAttribute("courses", courses);
         model.addAttribute("lesson", lesson);
+        model.addAttribute("lessons", lessons);
         model.addAttribute("assignment", assignment);
         model.addAttribute("assignmentDetails", assignmentDetails);
         model.addAttribute("courseId", courseId);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
 
         // Quiz-specific data
         QuizSubmission existingSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(
@@ -202,6 +167,13 @@ public class StudentAssignmentController {
         model.addAttribute("assignmentDetails", assignmentDetails);
         model.addAttribute("courseId", courseId);
 
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+
         // File submission specific data
         if (assignmentDetails != null) {
             List<AssignmentFileSubmission> assignmentFileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
@@ -209,126 +181,6 @@ public class StudentAssignmentController {
         }
 
         return "student/file-assignment";
-    }
-
-
-
-    @PostMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file")
-    public String submitFile(@PathVariable("studentId") int studentId,
-                             @PathVariable("courseId") int courseId,
-                             @PathVariable("lessonId") int lessonId,
-                             @PathVariable("assignmentId") int assignmentId,
-                             @RequestParam("file") MultipartFile file,
-                             @RequestParam(value = "comment", required = false) String comment,
-                             RedirectAttributes redirectAttributes) {
-
-        if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Vui lòng chọn file để tải lên");
-            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-            return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId + "/file";
-        }
-
-
-        try {
-            // Get or create assignment details
-            StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-            AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
-                    assignmentId, studentCourseDetails.getId());
-
-            // Create directory for this student's assignment if it doesn't exist
-            String studentAssignmentDir = uploadDir + "/student_" + studentId + "/course_" + courseId+ "/lesson_" + lessonId + "/assignment_" + assignmentId;
-            Path uploadPath = Paths.get(studentAssignmentDir);
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            // Generate unique filename to avoid overwriting
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String uniqueFilename = UUID.randomUUID().toString() + extension;
-
-            // Save file to disk
-            Path filePath = uploadPath.resolve(uniqueFilename);
-            Files.copy(file.getInputStream(), filePath);
-
-            // Save file details to database
-            AssignmentFileSubmission assignmentFileSubmission = new AssignmentFileSubmission();
-            assignmentFileSubmission.setAssignmentDetails(assignmentDetails);
-            assignmentFileSubmission.setFileName(uniqueFilename);
-            assignmentFileSubmission.setOriginalFileName(originalFilename);
-            assignmentFileSubmission.setFilePath(filePath.toString());
-            assignmentFileSubmission.setFileSize(file.getSize());
-            assignmentFileSubmission.setContentType(file.getContentType());
-            assignmentFileSubmission.setUploadDate(LocalDateTime.now());
-            assignmentFileSubmission.setSubmissionComment(comment);
-
-            fileSubmissionService.save(assignmentFileSubmission);
-
-            // Mark assignment as completed (or keep as in-progress based on your requirements)
-            if (assignmentDetails.getIsDone() == 0) {
-                assignmentDetails.setIsDone(1);
-                assignmentDetails.setSubmitTime(LocalDateTime.now());
-                assignmentDetailsService.save(assignmentDetails);
-            }
-
-            redirectAttributes.addFlashAttribute("message", "File đã được tải lên thành công!");
-            redirectAttributes.addFlashAttribute("alertClass", "alert-success");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-        }
-
-        return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId;
-    }
-
-    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete-file/{fileId}")
-    public String deleteFile(@PathVariable("studentId") int studentId,
-                             @PathVariable("courseId") int courseId,
-                             @PathVariable("lessonId") int lessonId,
-                             @PathVariable("assignmentId") int assignmentId,
-                             @PathVariable("fileId") int fileId,
-                             RedirectAttributes redirectAttributes) {
-
-        AssignmentFileSubmission assignmentFileSubmission = fileSubmissionService.findById(fileId);
-
-        if (assignmentFileSubmission != null) {
-            try {
-                // Delete file from disk
-                Path filePath = Paths.get(assignmentFileSubmission.getFilePath());
-                Files.deleteIfExists(filePath);
-
-                // Delete record from database
-                fileSubmissionService.deleteById(fileId);
-
-                StudentCourseDetails studentCourseDetails = studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
-
-                // Check if this was the last file
-                AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, studentCourseDetails.getId());
-                List<AssignmentFileSubmission> remainingFiles = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
-
-                if (remainingFiles.isEmpty()) {
-                    // No files left, mark as incomplete if your business logic requires it
-                    assignmentDetails.setIsDone(0);
-                    assignmentDetailsService.save(assignmentDetails);
-                }
-
-                redirectAttributes.addFlashAttribute("message", "File đã được xóa thành công!");
-                redirectAttributes.addFlashAttribute("alertClass", "alert-success");
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                redirectAttributes.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
-                redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-            }
-        } else {
-            redirectAttributes.addFlashAttribute("message", "Không tìm thấy file!");
-            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-        }
-
-        return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId;
     }
 
     @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/take")
@@ -377,6 +229,12 @@ public class StudentAssignmentController {
         model.addAttribute("assignment", assignment);
         model.addAttribute("questions", questions);
         model.addAttribute("formData", formData);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
 
         return "student/quiz-take-form";
     }
@@ -509,6 +367,14 @@ public class StudentAssignmentController {
         model.addAttribute("submission", submission);
         model.addAttribute("questions", questions);
         model.addAttribute("selectedAnswers", selectedAnswers);
+
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+
 
         return "student/quiz-result";
     }

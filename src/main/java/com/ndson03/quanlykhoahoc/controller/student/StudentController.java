@@ -141,6 +141,8 @@ public class StudentController {
         model.addAttribute("courses", courses);
         model.addAttribute("lessons", lessons);
         model.addAttribute("contents", contents);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
 
         return "student/student-view-content";
     }
