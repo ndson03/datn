@@ -44,6 +44,18 @@ public class Course {
 			fetch = FetchType.LAZY)
 	private List<Lesson> lessons;
 
+	@Column(name="image_path")
+	private String imagePath;
+
+	// Getter và setter cho trường mới
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+
 	public List<Lesson> getLessons() {
 		return lessons;
 	}

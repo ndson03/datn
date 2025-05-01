@@ -35,7 +35,7 @@ import java.util.*;
 @RequestMapping("/student")
 public class StudentAssignmentController {
 
-    @Value("${file.upload-dir}")
+    @Value("${file.upload.directory}")
     private String uploadDir;
 
     @Autowired

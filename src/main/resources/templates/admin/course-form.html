@@ -115,7 +115,7 @@
 						</h5>
 					</div>
 					<div class="card-body p-4">
-						<form action="#" th:action="@{/admin/saveCourse}" th:object="${course}" method="POST" class="needs-validation" novalidate>
+						<form action="#" th:action="@{/admin/saveCourse}" th:object="${course}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
 							<input type="hidden" th:field="*{id}">
 
 							<div class="mb-3">
@@ -152,6 +152,26 @@
 								</select>
 								<div class="invalid-feedback">
 									Vui lòng chọn giảng viên!
+								</div>
+							</div>
+
+							<!-- Thêm trường tải lên hình ảnh -->
+							<div class="mb-4">
+								<label for="courseImage" class="form-label">Hình ảnh đại diện</label>
+								<div class="input-group">
+									<input type="file" class="form-control" id="courseImage" name="imageFile" accept="image/*">
+									<label class="input-group-text" for="courseImage">
+										<i class="fas fa-upload"></i>
+									</label>
+								</div>
+								<div class="form-text">Chọn file JPG, PNG hoặc GIF, dung lượng tối đa 5MB</div>
+								<div class="mt-3" id="imagePreviewContainer" style="display: none;">
+									<div class="d-flex align-items-center">
+										<img id="imagePreview" class="img-thumbnail" style="max-height: 150px; max-width: 200px;" />
+										<button type="button" class="btn btn-sm btn-outline-danger ms-3" id="removeImage">
+											<i class="fas fa-times"></i> Xóa
+										</button>
+									</div>
 								</div>
 							</div>
 
@@ -236,6 +256,31 @@
 				}, false)
 			})
 		})()
+
+		// Image preview functionality
+		const courseImage = document.getElementById('courseImage');
+		const imagePreview = document.getElementById('imagePreview');
+		const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+		const removeImage = document.getElementById('removeImage');
+
+		courseImage.addEventListener('change', function() {
+			if (this.files && this.files[0]) {
+				const file = this.files[0];
+				const reader = new FileReader();
+
+				reader.onload = function(e) {
+					imagePreview.src = e.target.result;
+					imagePreviewContainer.style.display = 'block';
+				}
+
+				reader.readAsDataURL(file);
+			}
+		});
+
+		removeImage.addEventListener('click', function() {
+			courseImage.value = '';
+			imagePreviewContainer.style.display = 'none';
+		});
 	});
 </script>
 </body>

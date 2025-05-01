@@ -1,11 +1,18 @@
 package com.ndson03.quanlykhoahoc.controller.admin;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +33,7 @@ import com.ndson03.quanlykhoahoc.service.course.GradeDetailsService;
 import com.ndson03.quanlykhoahoc.service.course.StudentCourseDetailsService;
 import com.ndson03.quanlykhoahoc.service.user.StudentService;
 import com.ndson03.quanlykhoahoc.service.user.TeacherService;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Controller
@@ -47,6 +55,9 @@ public class AdminController {
 	
 	@Autowired
 	private GradeDetailsService gradeDetailsService;
+
+	@Value("${file.upload.directory}")
+	private String uploadDir;
 	
 	private int teacherDeleteErrorValue; //used for deleting teacher, 0 means the teacher has not any assigned courses, 1 means it has
 	
@@ -186,21 +197,61 @@ public class AdminController {
 		
 		return "admin/course-form";
 	}
-	
+
 	@PostMapping("/saveCourse")
-	public String saveCourse(@Valid @ModelAttribute("course") Course theCourse, 
-			BindingResult theBindingResult, @RequestParam("teacherId") int teacherId, Model theModel) {
-		
-		if (theBindingResult.hasErrors()) { //course form has data validation rules. If fields are not properly filled out, form is showed again
+	public String saveCourse(
+			@Valid @ModelAttribute("course") Course theCourse,
+			BindingResult theBindingResult,
+			@RequestParam("teacherId") int teacherId,
+			@RequestParam(name = "imageFile", required = false) MultipartFile imageFile,
+			Model theModel) {
+
+		if (theBindingResult.hasErrors()) {
+			// course form has data validation rules. If fields are not properly filled out, form is showed again
 			List<Teacher> teachers = teacherService.findAllTeachers();
 			theModel.addAttribute("teachers", teachers);
 			return "admin/course-form";
 		}
-		
-		theCourse.setTeacher(teacherService.findByTeacherId(teacherId)); //setTeacher method also sets the teacher's course as this	
+
+		// Lấy giảng viên từ teacherId và gán vào khóa học
+		theCourse.setTeacher(teacherService.findByTeacherId(teacherId)); // setTeacher method also sets the teacher's course as this
+
+		// Xử lý tải lên hình ảnh nếu có
+		if (imageFile != null && !imageFile.isEmpty()) {
+			try {
+				// Tạo thư mục upload nếu chưa tồn tại
+				File directory = new File(uploadDir);
+				if (!directory.exists()) {
+					directory.mkdirs();
+				}
+
+				// Tạo tên file duy nhất để tránh trùng lặp
+				String originalFilename = imageFile.getOriginalFilename();
+				String fileExtension = "";
+				if (originalFilename != null && originalFilename.contains(".")) {
+					fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+				}
+				String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+
+				// Đường dẫn đầy đủ đến file
+				Path targetLocation = Paths.get(uploadDir + "/course_image/").resolve(uniqueFilename);
+
+				// Lưu file
+				Files.copy(imageFile.getInputStream(), targetLocation);
+
+				// Lưu đường dẫn vào entity
+				theCourse.setImagePath("/uploads/course_image/" + uniqueFilename);
+
+			} catch (IOException ex) {
+				// Xử lý ngoại lệ khi tải file lên
+				System.err.println("Error uploading file: " + ex.getMessage());
+			}
+		}
+
+		// Lưu khóa học
 		courseService.save(theCourse);
-		
-		return "redirect:/admin/adminPanel"; 
+
+		return "redirect:/admin/adminPanel";
 	}
 	
 	@GetMapping("/courses")
@@ -209,21 +260,35 @@ public class AdminController {
 		
 		return "admin/course-list";
 	}
-	
-	
+
+
 	@GetMapping("/courses/delete")
-	public String deleteCourse(@RequestParam("courseId") int courseId) {		
+	public String deleteCourse(@RequestParam("courseId") int courseId) {
 		Course course = courseService.findCourseById(courseId);
 		List<Student> students = course.getStudents();
-		
+
+		// Xóa các liên kết sinh viên và điểm trước khi xóa khóa học
 		for(Student student : students) {
 			StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
 			int gradeId = scd.getGradeDetails().getId();
 			studentCourseDetailsService.deleteByStudentAndCourseId(student.getId(), courseId);
 			gradeDetailsService.deleteById(gradeId);
 		}
-		
+
+		// Xóa file ảnh nếu tồn tại
+		if (course.getImagePath() != null && !course.getImagePath().isEmpty()) {
+			try {
+				String filename = course.getImagePath().substring(course.getImagePath().lastIndexOf("/") + 1);
+				Path filePath = Paths.get(uploadDir).resolve(filename);
+				Files.deleteIfExists(filePath);
+			} catch (IOException ex) {
+				System.err.println("Error deleting image file: " + ex.getMessage());
+			}
+		}
+
+		// Xóa khóa học
 		courseService.deleteCourseById(courseId);
+
 		return "redirect:/admin/courses";
 	}
 	

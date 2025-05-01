@@ -227,7 +227,7 @@ public class ContentController {
         redirectAttributes.addFlashAttribute("successMessage",
                 content.getId() == 0 ? "Thêm nội dung mới thành công!" : "Cập nhật nội dung thành công!");
 
-        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
+        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
     }
 
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}/delete")
@@ -258,7 +258,7 @@ public class ContentController {
 
         redirectAttributes.addFlashAttribute("successMessage", "Xóa nội dung thành công!");
 
-        return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/lessons/" + lessonId;
+        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
     }
 
     @GetMapping("/file/{filename:.+}")

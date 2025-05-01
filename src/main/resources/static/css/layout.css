@@ -1,24 +1,40 @@
-
 :root {
-    --primary-color: #4361ee;
-    --secondary-color: #3f37c9;
-    --accent-color: #4895ef;
-    --success-color: #4cc9f0;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
+    --primary-color: #4d61fc;
+    --primary-dark: #3a4cd1;
+    --secondary-color: #6c7aff;
+    --accent-color: #ff9f43;
+    --light-color: #f0f3ff;
+    --dark-color: #2d3748;
+    --success-color: #38c172;
+    --danger-color: #e3342f;
+    --warning-color: #ffce54;
+    --info-color: #3498db;
+    --gray-100: #f8f9fc;
+    --gray-200: #edf2f7;
+    --gray-300: #e2e8f0;
+    --gray-600: #718096;
+    --gray-700: #4a5568;
+    --border-radius: 12px;
+    --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    --hover-shadow: 0 15px 30px rgba(77, 97, 252, 0.15);
+    --content-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
+    --box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     --transition-speed: 0.3s;
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f5f7fa;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--gray-100);
+    color: var(--dark-color);
     overflow-x: hidden;
 }
 
-/* Top Navbar */
+/* Top navbar styling */
 .top-navbar {
-    background: linear-gradient(135deg, var(--primary-color), #5c6bc0);
+    background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
     box-shadow: var(--box-shadow);
+    padding: 0.8rem 1.5rem;
+    border-bottom: none;
 }
 
 .navbar-brand {
@@ -27,84 +43,273 @@ body {
     font-size: 1.2rem;
 }
 
+.navbar-brand i {
+    font-size: 1.2rem;
+}
+
 .user-dropdown .avatar {
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background-color: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
 }
 
-/* Sidebar */
-.side-navbar {
-    position: fixed;
-    left: 0;
-    top: 60px;
-    bottom: 0;
-    width: 250px;
-    background: white;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-    z-index: 1020;
-    overflow-y: auto;
-    transition: all var(--transition-speed) ease;
-    padding-top: 20px;
+.user-dropdown:hover .avatar {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
-.side-navbar.collapsed {
-    width: 70px;
+/* Nav links in top bar */
+.top-navbar .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin: 0 5px;
 }
 
-.side-navbar .nav-link {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-    color: #495057;
-    border-radius: 0;
-    transition: all var(--transition-speed) ease;
-    position: relative;
-    margin-bottom: 5px;
+.top-navbar .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.top-navbar .nav-link.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
     font-weight: 500;
 }
 
-.side-navbar .nav-link i {
-    font-size: 1.2rem;
-    margin-right: 15px;
-    width: 24px;
-    text-align: center;
-    transition: all var(--transition-speed) ease;
+.top-navbar .nav-link i {
+    margin-right: 8px;
+}
+
+/* Courses dropdown in navbar */
+.courses-dropdown .dropdown-menu {
+    width: 280px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.courses-dropdown .dropdown-item {
+    white-space: normal;
+    padding: 10px 15px;
+}
+
+/* Sidebar cải tiến */
+.side-navbar {
+    background-color: white;
+    border-right: 1px solid var(--gray-200);
+    box-shadow: var(--content-shadow);
+    width: 400px;
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding-top: 1rem;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.side-navbar.collapsed {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    border-right: none;
+}
+
+.side-navbar .nav-link {
+    color: var(--gray-700);
+    border-radius: 8px;
+    margin: 3px 8px;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
 }
 
 .side-navbar .nav-link span {
-    transition: opacity var(--transition-speed) ease;
-}
-
-.side-navbar.collapsed .nav-link span {
-    opacity: 0;
-    width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
 }
 
 .side-navbar .nav-link:hover {
-    background-color: rgba(67, 97, 238, 0.1);
+    background-color: var(--light-color);
     color: var(--primary-color);
 }
 
 .side-navbar .nav-link.active {
-    background: linear-gradient(90deg, rgba(67, 97, 238, 0.1), rgba(67, 97, 238, 0.05));
+    background-color: rgba(77, 97, 252, 0.1);
     color: var(--primary-color);
-    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 5px 15px rgba(77, 97, 252, 0.25);
+}
+
+.side-navbar .nav-link i {
+    transition: all 0.3s ease;
+    width: 22px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
 }
 
 .side-navbar .nav-link.active i {
     color: var(--primary-color);
 }
 
+.side-navbar .section-title {
+    padding: 0 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--gray-600);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.side-navbar.collapsed .section-title,
+.side-navbar.collapsed .nav-link span {
+    display: none;
+}
+
+/* Cải tiến cho phần menu con (lesson-nav) */
+.side-navbar .lesson-nav {
+    position: relative;
+    padding-left: 1rem;
+    font-size: 0.9rem;
+    display: block !important;
+}
+
+.side-navbar .lesson-nav .nav-link {
+    padding: 0.4rem 0.8rem;
+    position: relative;
+    margin-left: 0.5rem;
+}
+
+/* Màu khi lesson active */
+.side-navbar .lesson-nav .nav-link.active {
+    background-color: rgba(108, 122, 255, 0.15);
+    color: var(--secondary-color);
+}
+
+/* Màu khi content active */
+.side-navbar .content-nav .nav-link.active {
+    background-color: rgba(77, 97, 252, 0.2);
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+.side-navbar .content-nav .nav-link.active i{
+    color: var(--primary-dark);
+}
+
+.side-navbar .lesson-nav .nav-link span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 350px; /* Giới hạn chiều rộng để không bị tràn */
+}
+
+/* Thêm đường kẻ dọc để hiển thị cấu trúc phân cấp */
+.side-navbar .lesson-nav:before {
+    content: '';
+    position: absolute;
+    left: 1.4rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--gray-300);
+    z-index: 0;
+}
+
+.side-navbar .lesson-nav .content-nav:before {
+    content: '';
+    position: absolute;
+    left: 2.4rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--gray-300);
+    z-index: 0;
+}
+
+/* Hiển thị nội dung trong lesson */
+.side-navbar .content-nav {
+    position: relative;
+    padding-left: 2rem;
+    font-size: 0.85rem;
+}
+
+.side-navbar .content-nav .nav-link {
+    padding: 0.3rem 0.6rem;
+    margin-left: 0.5rem;
+}
+
+.side-navbar .content-nav .nav-link span {
+    max-width: 250px;
+}
+
+/* Custom scrollbar cho sidebar */
+.side-navbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.side-navbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.side-navbar::-webkit-scrollbar-thumb {
+    background-color: var(--gray-300);
+    border-radius: 10px;
+}
+
+.side-navbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--gray-600);
+}
+
+/* Đảm bảo nút toggle sidebar luôn đúng vị trí */
+.sidebar-toggle {
+    background-color: white;
+    color: var(--primary-color);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    left: 400px; /* Cập nhật theo chiều rộng sidebar mới */
+    top: 70px;
+    z-index: 99;
+    width: 25px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.sidebar-toggle.collapsed {
+    left: 0;
+}
+
+.sidebar-toggle:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
 /* Main Content */
 .main-content {
-    margin-left: 250px;
+    margin-left: 400px;
     padding: 80px 30px 30px;
     transition: all var(--transition-speed) ease;
 }
@@ -113,43 +318,6 @@ body {
     margin-left: 70px;
 }
 
-/* Dashboard Cards */
-.counter-card {
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-    padding: 30px 20px;
-    transition: all var(--transition-speed) ease;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.counter-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-.counter-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: rgba(67, 97, 238, 0.1);
-    z-index: -1;
-    transform: translate(30%, 30%);
-}
-
-.counter-card:nth-child(2)::after {
-    background-color: rgba(72, 149, 239, 0.1);
-}
-
-.counter-card:nth-child(3)::after {
-    background-color: rgba(76, 201, 240, 0.1);
-}
 
 .counter-card i {
     font-size: 2.8rem;
@@ -160,84 +328,8 @@ body {
     display: inline-block;
 }
 
-.counter {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-    color: var(--dark-color);
-}
 
-.counter-title {
-    font-size: 1rem;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-/* Admin Action Cards */
-.admin-action-card {
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-    transition: all var(--transition-speed) ease;
-    height: 100%;
-    overflow: hidden;
-}
-
-.admin-action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-.admin-action-card .card-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    font-weight: 600;
-    border: none;
-    padding: 15px 20px;
-}
-
-.admin-action-btn {
-    padding: 15px;
-    font-size: 1rem;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    transition: all var(--transition-speed) ease;
-    background-color: #f8f9fa;
-    color: var(--dark-color);
-    border: none;
-    font-weight: 500;
-}
-
-.admin-action-btn:hover {
-    background-color: var(--primary-color);
-    color: white;
-    transform: translateX(5px);
-}
-
-.admin-action-btn i {
-    margin-right: 12px;
-    font-size: 1.2rem;
-    width: 24px;
-    text-align: center;
-}
-
-/* System Statistics Card */
-.stats-card {
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-}
-
-.stats-card .card-header {
-    background-color: transparent;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    padding: 20px;
-}
-
-/* Toggle Button */
+/* Sidebar Toggle Button */
 .sidebar-toggle {
     background-color: white;
     border: none;
@@ -254,6 +346,7 @@ body {
     z-index: 1030;
     cursor: pointer;
     transition: all var(--transition-speed) ease;
+    color: var(--primary-color);
 }
 
 .sidebar-toggle.collapsed {
@@ -285,80 +378,79 @@ body {
     text-decoration: none;
 }
 
-/* Responsive */
-@media (max-width: 991.98px) {
-    .side-navbar {
-        left: -250px;
-    }
-
-    .side-navbar.show {
-        left: 0;
-    }
-
-    .main-content {
-        margin-left: 0;
-    }
-
-    .sidebar-toggle {
-        display: none;
-    }
+.breadcrumb-item.active {
+    color: var(--gray-600);
 }
 
-/* Sidebar styling */
-.course-header, .lesson-header {
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+
+.course-content h5 {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+    line-height: 1.4;
 }
 
-.course-header:hover, .lesson-header:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.stat-item i {
+    color: var(--primary-color);
+    opacity: 0.8;
 }
 
-.course-link, .lesson-link, .content-link {
-    padding: 0.5rem 1rem;
-    color: #333;
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: all 0.3s;
+/* Page header styling */
+.page-header {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--content-shadow);
 }
 
-.toggle-btn {
-    background: none;
+.page-header h1 {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+/* Empty state styling */
+.empty-state i {
+    font-size: 4rem;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.empty-state h4 {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    border-radius: 10px;
     border: none;
-    color: #6c757d;
-    padding: 2px 8px;
-    transition: transform 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
 }
+
+.dropdown-item {
+    padding: 8px 20px;
+    color: var(--gray-700);
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--light-color);
+    color: var(--primary-color);
+}
+
+.dropdown-divider {
+    margin: 8px 0;
+    border-top-color: var(--gray-200);
+}
+
 
 .toggle-btn.active i {
     transform: rotate(90deg);
-}
-
-.course-link.active {
-    background-color: #0d6efd;
-    color: white;
-    border-radius: 4px;
-}
-
-.lesson-link.active-lesson {
-    color: #0d6efd;
-    font-weight: 500;
-}
-
-.content-link.active-content {
-    color: #0d6efd;
-    font-weight: 500;
-    background-color: rgba(13, 110, 253, 0.1);
-    border-radius: 4px;
-}
-
-/* Animation for expanding/collapsing */
-.lesson-list, .content-list {
-    overflow: hidden;
-    transition: max-height 0.3s ease;
 }
 
 /* For collapsed sidebar - hide text and adjust icons */
@@ -385,3 +477,85 @@ body {
     text-align: center;
     padding: 0.5rem;
 }
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .side-navbar {
+        left: -250px;
+    }
+
+    .side-navbar.show {
+        left: 0;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px 15px;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .page-header {
+        padding: 20px;
+    }
+
+    .courses-dropdown .dropdown-menu {
+        width: 100%;
+    }
+}
+
+.sidebar-toggle {
+    background-color: white;
+    color: var(--primary-color);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 400px; /* Aligns with the sidebar width */
+    top: 80px;
+    z-index: 99;
+    width: 24px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.sidebar-toggle.collapsed {
+    left: 0;
+}
+
+.sidebar-toggle i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-toggle.collapsed i {
+    transform: rotate(180deg);
+}
+
+.sidebar-toggle:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Adjust main content transition for smoother effect */
+.main-content {
+    margin-left: 400px;
+    padding: 80px 30px 30px;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.expanded {
+    margin-left: 0;
+}
+
+.text-primary { color: var(--primary-color) !important; }
+.text-danger { color: var(--danger-color) !important; }
+.text-success { color: var(--success-color) !important; }
+.text-warning { color: var(--warning-color) !important; }
+.text-info { color: var(--info-color) !important; }

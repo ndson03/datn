@@ -88,6 +88,6 @@ public class RegistrationController {
 		}
 		
 		
-		return "registration/registration-confirmation";
+		return "login/login-form";
 	}
 }

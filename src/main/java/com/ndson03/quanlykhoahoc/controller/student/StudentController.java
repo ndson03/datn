@@ -103,10 +103,13 @@ public class StudentController {
 
         Student student = studentService.findByStudentId(studentId);
         Course course = courseService.findCourseById(courseId);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+
         List<Course> courses = student.getCourses();
         // Lấy thông tin bài học
         Lesson lesson = lessonService.findById(lessonId);
         model.addAttribute("lesson", lesson);
+        model.addAttribute("lessons", lessons);
         model.addAttribute("course", course);
         model.addAttribute("student", student);
         model.addAttribute("courses", courses);
@@ -129,11 +132,15 @@ public class StudentController {
         Course course = courseService.findCourseById(courseId);
         Lesson lesson = lessonService.findById(lessonId);
         List<Course> courses = student.getCourses();
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
         model.addAttribute("content", content);
         model.addAttribute("lesson", lesson);
         model.addAttribute("course", course);
         model.addAttribute("student", student);
         model.addAttribute("courses", courses);
+        model.addAttribute("lessons", lessons);
+        model.addAttribute("contents", contents);
 
         return "student/student-view-content";
     }

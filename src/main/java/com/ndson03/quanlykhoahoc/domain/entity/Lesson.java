@@ -1,5 +1,8 @@
 package com.ndson03.quanlykhoahoc.domain.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -26,9 +29,9 @@ public class Lesson {
     @Column(name="order_number")
     private int orderNumber;
 
-    @ManyToOne(cascade= {CascadeType.DETACH, CascadeType.MERGE,
-            CascadeType.PERSIST, CascadeType.REFRESH}, fetch=FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "course_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Course course;
 
     @OneToMany(cascade = CascadeType.ALL,

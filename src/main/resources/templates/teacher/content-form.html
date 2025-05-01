@@ -123,7 +123,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form th:action="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/save(lessonId=${lesson.id}, courseId=${course.id}, teacherId=${teacher.id})}"
+                <form th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/save(lessonId=${lesson.id}, courseId=${course.id}, teacherId=${teacher.id})}"
                       th:object="${content}"
                       method="POST"
                       enctype="multipart/form-data">
