@@ -317,14 +317,12 @@
 							</td>
 							<td class="text-center">
 								<div class="btn-group">
-									<button type="button" class="btn btn-outline-primary btn-sm" title="Chấm điểm">
-										<i class="fas fa-pen"></i>
-									</button>
-									<a th:if="${entry.value == 'Đã hoàn thành'}" class="btn btn-outline-info btn-sm" th:href="@{/teacher/{teacherId}/courses/{courseId}/assignmentDetails/{studentId}/{assignmentId}(teacherId=${teacher.id}, courseId=${courseId}, studentId=${entry.key.id}, assignmentId=${assignmentId})}" title="Xem chi tiết">
+									<a th:if="${entry.value == 'Đã hoàn thành'}" class="btn btn-outline-info btn-sm" th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/result/student/{studentId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lesson.id}, studentId=${entry.key.id}, assignmentId=${assignmentId})}" title="Xem chi tiết">
 										<i class="fas fa-eye"></i>
 									</a>
 									<button th:if="${entry.value == 'Đã hoàn thành'}" type="button" class="btn btn-outline-danger btn-sm" title="Đặt lại trạng thái">
-										<a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/student/{studentId}/reset(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lesson.Id}, studentId=${entry.key.id}, assignmentId=${assignmentId})}" title="Đặt lại bài">
+										<a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/student/{studentId}/reset(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lesson.Id}, studentId=${entry.key.id}, assignmentId=${assignmentId})}"
+										   onclick="return confirm('Bạn có chắc chắn muốn reset không?')" title="Đặt lại bài">
 											<i class="fas fa-redo-alt"></i>
 										</a>
 									</button>

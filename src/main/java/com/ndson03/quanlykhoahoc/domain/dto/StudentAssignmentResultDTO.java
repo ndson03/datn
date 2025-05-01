@@ -1,11 +1,6 @@
 package com.ndson03.quanlykhoahoc.domain.dto;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-
-public class StudentQuizResultDTO {
+public class StudentAssignmentResultDTO {
     private int id;
     private String firstName;
     private String lastName;

@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Controller
@@ -110,8 +109,8 @@ public class StudentAssignmentController {
         } else {
             // For file submissions, load existing files
             if (assignmentDetails != null) {
-                List<AssignmentFileSubmission> fileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
-                model.addAttribute("fileSubmissions", fileSubmissions);
+                List<AssignmentFileSubmission> assignmentFileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
+                model.addAttribute("fileSubmissions", assignmentFileSubmissions);
             }
         }
 
@@ -205,8 +204,8 @@ public class StudentAssignmentController {
 
         // File submission specific data
         if (assignmentDetails != null) {
-            List<AssignmentFileSubmission> fileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
-            model.addAttribute("fileSubmissions", fileSubmissions);
+            List<AssignmentFileSubmission> assignmentFileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
+            model.addAttribute("assignmentFileSubmissions", assignmentFileSubmissions);
         }
 
         return "student/file-assignment";
@@ -214,9 +213,10 @@ public class StudentAssignmentController {
 
 
 
-    @PostMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/submit-file")
+    @PostMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file")
     public String submitFile(@PathVariable("studentId") int studentId,
                              @PathVariable("courseId") int courseId,
+                             @PathVariable("lessonId") int lessonId,
                              @PathVariable("assignmentId") int assignmentId,
                              @RequestParam("file") MultipartFile file,
                              @RequestParam(value = "comment", required = false) String comment,
@@ -225,8 +225,9 @@ public class StudentAssignmentController {
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("message", "Vui lòng chọn file để tải lên");
             redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-            return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+            return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId + "/file";
         }
+
 
         try {
             // Get or create assignment details
@@ -234,10 +235,8 @@ public class StudentAssignmentController {
             AssignmentDetails assignmentDetails = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
                     assignmentId, studentCourseDetails.getId());
 
-
-
             // Create directory for this student's assignment if it doesn't exist
-            String studentAssignmentDir = uploadDir + "/student_" + studentId + "/assignment_" + assignmentId;
+            String studentAssignmentDir = uploadDir + "/student_" + studentId + "/course_" + courseId+ "/lesson_" + lessonId + "/assignment_" + assignmentId;
             Path uploadPath = Paths.get(studentAssignmentDir);
 
             if (!Files.exists(uploadPath)) {
@@ -254,29 +253,22 @@ public class StudentAssignmentController {
             Files.copy(file.getInputStream(), filePath);
 
             // Save file details to database
-            AssignmentFileSubmission fileSubmission = new AssignmentFileSubmission();
-            fileSubmission.setAssignmentDetailsId(assignmentDetails.getId());
-            fileSubmission.setFileName(uniqueFilename);
-            fileSubmission.setOriginalFileName(originalFilename);
-            fileSubmission.setFilePath(filePath.toString());
-            fileSubmission.setFileSize(file.getSize());
-            fileSubmission.setContentType(file.getContentType());
-            fileSubmission.setUploadDate(LocalDateTime.now());
-            fileSubmission.setSubmissionComment(comment);
+            AssignmentFileSubmission assignmentFileSubmission = new AssignmentFileSubmission();
+            assignmentFileSubmission.setAssignmentDetails(assignmentDetails);
+            assignmentFileSubmission.setFileName(uniqueFilename);
+            assignmentFileSubmission.setOriginalFileName(originalFilename);
+            assignmentFileSubmission.setFilePath(filePath.toString());
+            assignmentFileSubmission.setFileSize(file.getSize());
+            assignmentFileSubmission.setContentType(file.getContentType());
+            assignmentFileSubmission.setUploadDate(LocalDateTime.now());
+            assignmentFileSubmission.setSubmissionComment(comment);
 
-            fileSubmissionService.save(fileSubmission);
+            fileSubmissionService.save(assignmentFileSubmission);
 
             // Mark assignment as completed (or keep as in-progress based on your requirements)
             if (assignmentDetails.getIsDone() == 0) {
                 assignmentDetails.setIsDone(1);
                 assignmentDetails.setSubmitTime(LocalDateTime.now());
-
-                // Calculate time spent if start time exists
-                if (assignmentDetails.getStartTime() != null) {
-                    long minutesSpent = assignmentDetails.getStartTime().until(LocalDateTime.now(), ChronoUnit.MINUTES);
-                    assignmentDetails.setTimeSpent((int) minutesSpent);
-                }
-
                 assignmentDetailsService.save(assignmentDetails);
             }
 
@@ -289,46 +281,23 @@ public class StudentAssignmentController {
             redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
         }
 
-        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+        return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId;
     }
 
-    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/download-file/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") int fileId) {
-        AssignmentFileSubmission fileSubmission = fileSubmissionService.findById(fileId);
-
-        if (fileSubmission != null) {
-            try {
-                Path filePath = Paths.get(fileSubmission.getFilePath());
-                Resource resource = new UrlResource(filePath.toUri());
-
-                if (resource.exists() || resource.isReadable()) {
-                    return ResponseEntity.ok()
-                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileSubmission.getOriginalFileName() + "\"")
-                            .body(resource);
-                } else {
-                    throw new RuntimeException("Could not read the file!");
-                }
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Error: " + e.getMessage());
-            }
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/{studentId}/courses/{courseId}/assignments/{assignmentId}/delete-file/{fileId}")
+    @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete-file/{fileId}")
     public String deleteFile(@PathVariable("studentId") int studentId,
                              @PathVariable("courseId") int courseId,
+                             @PathVariable("lessonId") int lessonId,
                              @PathVariable("assignmentId") int assignmentId,
                              @PathVariable("fileId") int fileId,
                              RedirectAttributes redirectAttributes) {
 
-        AssignmentFileSubmission fileSubmission = fileSubmissionService.findById(fileId);
+        AssignmentFileSubmission assignmentFileSubmission = fileSubmissionService.findById(fileId);
 
-        if (fileSubmission != null) {
+        if (assignmentFileSubmission != null) {
             try {
                 // Delete file from disk
-                Path filePath = Paths.get(fileSubmission.getFilePath());
+                Path filePath = Paths.get(assignmentFileSubmission.getFilePath());
                 Files.deleteIfExists(filePath);
 
                 // Delete record from database
@@ -359,7 +328,7 @@ public class StudentAssignmentController {
             redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
         }
 
-        return "redirect:/student/" + studentId + "/courses/" + courseId + "/assignments/" + assignmentId;
+        return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId;
     }
 
     @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/take")

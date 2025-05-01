@@ -289,23 +289,15 @@
 
                 <!-- Assignment Actions Section -->
                 <div class="assignment-actions">
-                    <!-- If assignment has not been started yet -->
-                    <div th:if="${assignmentDetails == null || assignmentDetails.startTime == null}" class="text-center">
-                        <p class="mb-4">Nhấp vào nút bên dưới để bắt đầu làm bài.</p>
-                        <a class="btn btn-primary assignment-action-btn" th:href="@{/student/{studentId}/courses/{courseId}/lessons/{lessonId}/assignments/{assignmentId}/start(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}">
-                            <i class="fas fa-play-circle me-2"></i>Bắt đầu làm bài
-                        </a>
-                    </div>
-
                     <!-- If assignment is in progress -->
-                    <div th:if="${assignmentDetails != null && assignmentDetails.startTime != null && assignmentDetails.isDone == 0}" class="w-100">
+                    <div th:if="${assignmentDetails.isDone == 0}" class="w-100">
                         <!-- File submission section -->
                         <div class="file-upload-container">
                             <h5 class="submission-heading">
                                 <i class="fas fa-cloud-upload-alt"></i>Nộp file bài tập
                             </h5>
 
-                            <form th:action="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
+                            <form th:action="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
                                   method="post" enctype="multipart/form-data">
 
                                 <div class="mb-3">
@@ -328,12 +320,12 @@
                         </div>
 
                         <!-- List of submitted files -->
-                        <div class="file-list" th:if="${fileSubmissions != null && !fileSubmissions.isEmpty()}">
+                        <div class="file-list" th:if="${assignmentFileSubmissions != null && !assignmentFileSubmissions.isEmpty()}">
                             <h5 class="submission-heading">
                                 <i class="fas fa-file-alt"></i>Các file đã nộp
                             </h5>
 
-                            <div class="file-item" th:each="file : ${fileSubmissions}" th:id="'file-item-' + ${file.id}">
+                            <div class="file-item" th:each="file : ${assignmentFileSubmissions}" th:id="'file-item-' + ${file.id}">
                                 <div class="file-info">
                                     <div class="file-icon">
                                         <i class="fas" th:classappend="${
@@ -371,52 +363,18 @@
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
-
-                                <!-- Edit form (hidden by default) -->
-                                <div class="file-edit-form w-100 mt-2" style="display:none;" th:id="'edit-form-' + ${file.id}">
-                                    <form th:action="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/update-file/{fileId}(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
-                                          method="post" enctype="multipart/form-data">
-                                        <div class="mb-3">
-                                            <label class="form-label">Thay thế file:</label>
-                                            <input type="file" class="form-control" name="updatedFile">
-                                            <div class="form-text">Để trống nếu không muốn thay đổi file</div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Cập nhật ghi chú:</label>
-                                            <textarea class="form-control" name="updatedComment" rows="2" th:text="${file.submissionComment}"></textarea>
-                                        </div>
-                                        <div class="d-flex justify-content-end">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary me-2 cancel-edit-btn" th:data-file-id="${file.id}">
-                                                <i class="fas fa-times me-1"></i>Hủy
-                                            </button>
-                                            <button type="submit" class="btn btn-sm btn-success">
-                                                <i class="fas fa-save me-1"></i>Lưu thay đổi
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
                         </div>
 
                         <!-- If no files have been submitted yet -->
-                        <div class="alert alert-warning" th:if="${fileSubmissions == null || fileSubmissions.isEmpty()}">
+                        <div class="alert alert-warning" th:if="${assignmentFileSubmissions == null || assignmentFileSubmissions.isEmpty()}">
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             Bạn chưa nộp file nào cho bài tập này.
-                        </div>
-
-                        <!-- Mark as completed button -->
-                        <div class="text-center mt-4">
-                            <hr>
-                            <p class="mb-3">Hoặc nếu bạn đã hoàn thành bài tập theo cách khác:</p>
-                            <a class="btn btn-success" th:href="@{/student/{studentId}/courses/{courseId}/markAsCompleted/{assignmentId}(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignmentDetails.getAssignmentId()})}"
-                               onclick="if (!(confirm('Bạn có chắc chắn muốn đánh dấu bài tập này là đã hoàn thành?'))) return false">
-                                <i class="fas fa-check-circle me-2"></i>Đánh dấu đã hoàn thành
-                            </a>
                         </div>
                     </div>
 
                     <!-- If assignment is completed -->
-                    <div th:if="${assignmentDetails != null && assignmentDetails.isDone == 1}" class="w-100">
+                    <div th:if="${assignmentDetails.isDone == 1}" class="w-100">
                         <div class="alert alert-success">
                             <i class="fas fa-check-circle me-2"></i>
                             <strong>Bài tập đã hoàn thành!</strong> Bạn đã hoàn thành bài tập này.
@@ -430,8 +388,8 @@
                                 </div>
                                 <div class="card-body">
                                     <!-- If files have been submitted -->
-                                    <div th:if="${fileSubmissions != null && !fileSubmissions.isEmpty()}">
-                                        <div class="file-item" th:each="file : ${fileSubmissions}" th:id="'file-item-' + ${file.id}">
+                                    <div th:if="${assignmentDetails.isDone==1}">
+                                        <div class="file-item" th:each="file : ${assignmentFileSubmissions}" th:id="'file-item-' + ${file.id}">
                                             <div class="file-info">
                                                 <div class="file-icon">
                                                     <i class="fas" th:classappend="${
@@ -455,49 +413,22 @@
                                                 </div>
                                             </div>
                                             <div class="file-actions">
-                                                <a th:href="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/download-file/{fileId}(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
+                                                <a th:href="@{/download-assignment-file-submission/{fileId}(fileId=${file.id})}"
                                                    class="btn btn-sm btn-outline-primary" title="Download">
                                                     <i class="fas fa-download"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary edit-file-btn" th:data-file-id="${file.id}" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <a th:href="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/delete-file/{fileId}(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
+                                                <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete-file/{fileId}(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
                                                    class="btn btn-sm btn-outline-danger"
                                                    onclick="return confirm('Bạn có chắc chắn muốn xóa file này?');"
                                                    title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>
-
-                                            <!-- Edit form (hidden by default) -->
-                                            <div class="file-edit-form w-100 mt-2" style="display:none;" th:id="'edit-form-' + ${file.id}">
-                                                <form th:action="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/update-file/{fileId}(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id}, fileId=${file.id})}"
-                                                      method="post" enctype="multipart/form-data">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Thay thế file:</label>
-                                                        <input type="file" class="form-control" name="updatedFile">
-                                                        <div class="form-text">Để trống nếu không muốn thay đổi file</div>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Cập nhật ghi chú:</label>
-                                                        <textarea class="form-control" name="updatedComment" rows="2" th:text="${file.submissionComment}"></textarea>
-                                                    </div>
-                                                    <div class="d-flex justify-content-end">
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2 cancel-edit-btn" th:data-file-id="${file.id}">
-                                                            <i class="fas fa-times me-1"></i>Hủy
-                                                        </button>
-                                                        <button type="submit" class="btn btn-sm btn-success">
-                                                            <i class="fas fa-save me-1"></i>Lưu thay đổi
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
                                         </div>
                                     </div>
 
                                     <!-- If no files have been submitted -->
-                                    <div class="alert alert-warning" th:if="${fileSubmissions == null || fileSubmissions.isEmpty()}">
+                                    <div class="alert alert-warning" th:if="${assignmentFileSubmissions == null || assignmentFileSubmissions.isEmpty()}">
                                         <i class="fas fa-exclamation-triangle me-2"></i>
                                         Không có file nào được nộp cho bài tập này.
                                     </div>
@@ -508,7 +439,7 @@
                                             <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Thêm file mới</h5>
                                         </div>
                                         <div class="card-body">
-                                            <form th:action="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
+                                            <form th:action="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/submit-file(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
                                                   method="post" enctype="multipart/form-data">
                                                 <div class="mb-3">
                                                     <label for="additionalFile" class="form-label">Chọn file từ máy tính của bạn:</label>
@@ -527,14 +458,6 @@
                                             </form>
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- Nút nộp lại bài tập -->
-                                <div class="text-center mt-4">
-                                    <a th:href="@{/student/{studentId}/courses/{courseId}/assignments/{assignmentId}/resubmit(studentId=${student.id}, courseId=${course.id}, assignmentId=${assignment.id})}"
-                                       class="btn btn-outline-primary">
-                                        <i class="fas fa-redo me-2"></i>Nộp lại bài tập
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -600,43 +523,6 @@
         const editButtons = document.querySelectorAll('.edit-file-btn');
         const cancelButtons = document.querySelectorAll('.cancel-edit-btn');
 
-        // Add click event for each edit button
-        editButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const fileId = this.getAttribute('data-file-id');
-                const fileItem = document.getElementById('file-item-' + fileId);
-                const editForm = document.getElementById('edit-form-' + fileId);
-
-                // Toggle edit form visibility
-                if (editForm.style.display === 'none' || editForm.style.display === '') {
-                    editForm.style.display = 'block';
-                    fileItem.classList.add('edit-mode');
-                    this.innerHTML = '<i class="fas fa-times"></i>';
-                    this.title = 'Cancel';
-                } else {
-                    editForm.style.display = 'none';
-                    fileItem.classList.remove('edit-mode');
-                    this.innerHTML = '<i class="fas fa-edit"></i>';
-                    this.title = 'Edit';
-                }
-            });
-        });
-
-        // Add click event for each cancel button
-        cancelButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const fileId = this.getAttribute('data-file-id');
-                const fileItem = document.getElementById('file-item-' + fileId);
-                const editForm = document.getElementById('edit-form-' + fileId);
-                const editButton = fileItem.querySelector('.edit-file-btn');
-
-                // Hide edit form
-                editForm.style.display = 'none';
-                fileItem.classList.remove('edit-mode');
-                editButton.innerHTML = '<i class="fas fa-edit"></i>';
-                editButton.title = 'Edit';
-            });
-        });
     });
 </script>
 </body>

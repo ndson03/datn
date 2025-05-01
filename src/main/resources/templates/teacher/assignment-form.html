@@ -19,6 +19,18 @@
 		.error-text {
 			color: red;
 		}
+		.card {
+			max-width: 800px;
+			margin: 0 auto;
+		}
+		.form-group {
+			margin-bottom: 1rem;
+		}
+		/* Thêm hiệu ứng hover cho các nút */
+		.btn:hover {
+			transform: translateY(-2px);
+			transition: transform 0.2s ease;
+		}
 	</style>
 </head>
 
@@ -69,7 +81,7 @@
 <!-- Side Navbar -->
 <nav class="side-navbar" id="sideNav">
 	<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-		<a class="nav-link	" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
+		<a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
 			<i class="fas fa-tachometer-alt"></i>
 			<span>Dashboard</span>
 		</a>
@@ -101,7 +113,7 @@
 	<div class="container-fluid">
 		<!-- Page Header -->
 		<div class="d-flex justify-content-between align-items-center mb-4" style="padding-top: 30px">
-			<h1 class="h2 mb-0">Thêm bài tập</h1>
+			<h1 class="h3 mb-0">Thêm bài tập</h1>
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb mb-0">
 					<li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -114,8 +126,8 @@
 		</div>
 
 		<!-- Assignment Form Card -->
-		<div class="card">
-			<div class="card-header">
+		<div class="card shadow-sm">
+			<div class="card-header bg-primary text-white">
 				<h5 class="mb-0">
 					<i class="fas fa-tasks me-2"></i>
 					Thông tin bài tập mới cho bài học: <span th:text="${lesson.title}"></span>
@@ -128,35 +140,55 @@
 					<!-- Hidden field for id -->
 					<input type="hidden" th:field="*{id}" />
 
-					<div class="mb-3">
-						<label for="name" class="form-label">Tên:</label>
-						<input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Tên bài tập">
-						<div th:if="${#fields.hasErrors('name')}" class="error-text">Please enter a name!</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group mb-3">
+								<label for="name" class="form-label">Tên bài tập:</label>
+								<input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Nhập tên bài tập">
+								<div th:if="${#fields.hasErrors('name')}" class="error-text">Vui lòng nhập tên bài tập!</div>
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group mb-3">
+								<label for="assignmentType" class="form-label">Loại bài tập:</label>
+								<select class="form-select" id="assignmentType" th:field="*{quiz}">
+									<option value="false">Bài tập thông thường</option>
+									<option value="true">Bài Quiz</option>
+								</select>
+							</div>
+						</div>
 					</div>
 
-					<div class="mb-3">
-						<label for="description" class="form-label">Mô tả:</label>
-						<textarea class="form-control" id="description" rows="3" th:field="*{description}" placeholder="Mô tả bài tập"></textarea>
-						<div th:if="${#fields.hasErrors('description')}" class="error-text">Please enter a description!</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group mb-3">
+								<label for="description" class="form-label">Mô tả:</label>
+								<textarea class="form-control" id="description" rows="4" th:field="*{description}" placeholder="Mô tả chi tiết về bài tập"></textarea>
+								<div th:if="${#fields.hasErrors('description')}" class="error-text">Vui lòng nhập mô tả!</div>
+							</div>
+						</div>
 					</div>
 
-					<div class="mb-3">
-						<label for="dateControl" class="form-label">Hạn nộp:</label>
-						<input type="date" class="form-control" id="dateControl" th:field="*{dueDate}">
-						<div th:if="${#fields.hasErrors('dueDate')}" class="error-text">Please enter a date!</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group mb-3">
+								<label for="dateControl" class="form-label">Hạn nộp:</label>
+								<div class="input-group">
+									<span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+									<input type="date" class="form-control" id="dateControl" th:field="*{dueDate}">
+								</div>
+								<div th:if="${#fields.hasErrors('dueDate')}" class="error-text">Vui lòng chọn hạn nộp!</div>
+							</div>
+						</div>
 					</div>
 
-					<div class="form-check mb-3">
-						<input type="checkbox" th:field="*{quiz}" class="form-check-input" id="isQuiz">
-						<label class="form-check-label" for="isQuiz">Đây là bài Quiz</label>
-					</div>
-
-					<div class="text-end">
+					<div class="d-flex justify-content-end mt-4">
 						<a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}" class="btn btn-outline-secondary me-2">
 							<i class="fas fa-times me-1"></i> Hủy
 						</a>
 						<button type="submit" class="btn btn-primary">
-							<i class="fas fa-save me-1"></i> Lưu
+							<i class="fas fa-save me-1"></i> Lưu bài tập
 						</button>
 					</div>
 				</form>
@@ -231,21 +263,6 @@
 			if (window.innerWidth >= 992 && sideNav) {
 				sideNav.classList.remove('show');
 			}
-		});
-
-		// Add hover effect to assignment cards
-		const assignmentCards = document.querySelectorAll('.assignment-card');
-		assignmentCards.forEach(card => {
-			card.addEventListener('mouseenter', function() {
-				this.style.transform = 'translateY(-5px)';
-				this.style.transition = 'transform 0.3s ease';
-				this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-			});
-
-			card.addEventListener('mouseleave', function() {
-				this.style.transform = 'translateY(0)';
-				this.style.boxShadow = '';
-			});
 		});
 
 		// Script for restricting past dates in input date

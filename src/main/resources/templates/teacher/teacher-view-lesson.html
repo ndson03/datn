@@ -226,7 +226,7 @@
                                 <!-- Nếu không phải quiz -->
                                 <a class="btn btn-outline-primary btn-sm"
                                    th:unless="${assignment.isQuiz()}"
-                                   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                   th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/file(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
                                    th:title="'Xem bài tập'">
                                     <i class="fas fa-eye"></i>
                                 </a>

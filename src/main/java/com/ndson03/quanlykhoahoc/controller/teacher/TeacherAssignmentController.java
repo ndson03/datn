@@ -1,9 +1,10 @@
 package com.ndson03.quanlykhoahoc.controller.teacher;
 
 import com.ndson03.quanlykhoahoc.domain.dto.QuizFormDTO;
-import com.ndson03.quanlykhoahoc.domain.dto.StudentQuizResultDTO;
+import com.ndson03.quanlykhoahoc.domain.dto.StudentAssignmentResultDTO;
 import com.ndson03.quanlykhoahoc.domain.entity.*;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentDetailsService;
+import com.ndson03.quanlykhoahoc.service.assignment.AssignmentFileSubmissionService;
 import com.ndson03.quanlykhoahoc.service.assignment.AssignmentService;
 import com.ndson03.quanlykhoahoc.service.course.CourseService;
 import com.ndson03.quanlykhoahoc.service.course.LessonService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -52,6 +54,9 @@ public class TeacherAssignmentController {
 
     @Autowired
     private LessonService lessonService;
+
+    @Autowired
+    private AssignmentFileSubmissionService assignmentFileSubmissionService;
 
     @Autowired
     private StudentCourseDetailsService studentCourseDetailsService;
@@ -125,7 +130,7 @@ public class TeacherAssignmentController {
         return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
     }
 
-    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignmentDetail/{assignmentId}/student/{studentId}")
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/result/student/{studentId}")
     public String viewStudentQuizSubmission(@PathVariable("teacherId") int teacherId,
                                             @PathVariable("courseId") int courseId,
                                             @PathVariable("lessonId") int lessonId,
@@ -181,6 +186,56 @@ public class TeacherAssignmentController {
         return "teacher/student-quiz-result";
     }
 
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/file/result/student/{studentId}")
+    public String viewFileSubmission(@PathVariable("teacherId") int teacherId,
+                                     @PathVariable("courseId") int courseId,
+                                     @PathVariable("lessonId") int lessonId,
+                                     @PathVariable("assignmentId") int assignmentId,
+                                     @PathVariable("studentId") int studentId,
+                                     Model model) {
+        // Load common data
+        Teacher teacher = teacherService.findByTeacherId(teacherId);
+        Student student = studentService.findByStudentId(studentId);
+        Course course = courseService.findCourseById(courseId);
+        Lesson lesson = lessonService.findById(lessonId);
+        Assignment assignment = assignmentService.findById(assignmentId);
+        List<Course> courses = teacher.getCourses();
+
+        // Get student course details
+        StudentCourseDetails studentCourseDetails =
+                studentCourseDetailsService.findByStudentAndCourseId(studentId, courseId);
+
+        if (studentCourseDetails == null || assignment == null) {
+            return "redirect:/teacher/" + teacherId + "/courses/" + courseId;
+        }
+
+        // Get assignment details for this student
+        AssignmentDetails assignmentDetails =
+                assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(
+                        assignmentId, studentCourseDetails.getId());
+
+        if (assignmentDetails == null) {
+            return "redirect:/teacher/" + teacherId + "/courses/" + courseId + "/assignments/" + assignmentId + "/submissions";
+        }
+
+        // Get file submissions
+        List<AssignmentFileSubmission> assignmentFileSubmissions =
+                assignmentFileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
+
+        // Add attributes to model
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("student", student);
+        model.addAttribute("course", course);
+        model.addAttribute("courses", courses);
+        model.addAttribute("lesson", lesson);
+        model.addAttribute("assignment", assignment);
+        model.addAttribute("assignmentDetails", assignmentDetails);
+        model.addAttribute("assignmentFileSubmissions", assignmentFileSubmissions);
+        model.addAttribute("courseId", courseId);
+
+        return "teacher/student-file-submission";
+    }
+
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/delete")
     public String deleteAssignment(@PathVariable("teacherId") int teacherId,
                                    @PathVariable("courseId") int courseId,
@@ -204,7 +259,7 @@ public class TeacherAssignmentController {
         assignmentDetails.setIsDone(0);
         assignmentDetailsService.save(assignmentDetails);
 
-        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId + "quiz";
+        return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId + "/quiz";
     }
 
 
@@ -326,7 +381,7 @@ public class TeacherAssignmentController {
     }
 
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz")
-    public String showAssignmentDetails(@PathVariable("teacherId") int teacherId,
+    public String showQuizAssignmentDetails(@PathVariable("teacherId") int teacherId,
                                         @PathVariable("courseId") int courseId,
                                         @PathVariable("lessonId") int lessonId,
                                         @PathVariable("assignmentId") int assignmentId,
@@ -338,14 +393,14 @@ public class TeacherAssignmentController {
         Assignment assignment = assignmentService.findById(assignmentId);
 
         // Create student - status map
-        Map<StudentQuizResultDTO, String> list = new HashMap<>();
+        Map<StudentAssignmentResultDTO, String> list = new HashMap<>();
 
         for (Student student : students) {
             StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
             AssignmentDetails ad = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
             QuizSubmission quizSubmission = quizSubmissionService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
             // Create a StudentDTO to store additional display info
-            StudentQuizResultDTO studentDTO = new StudentQuizResultDTO();
+            StudentAssignmentResultDTO studentDTO = new StudentAssignmentResultDTO();
             studentDTO.setId(student.getId());
             studentDTO.setFirstName(student.getFirstName());
             studentDTO.setLastName(student.getLastName());
@@ -392,6 +447,60 @@ public class TeacherAssignmentController {
         return "teacher/quiz-assignment-status";
     }
 
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/file")
+    public String showFileAssignmentDetails(@PathVariable("teacherId") int teacherId,
+                                            @PathVariable("courseId") int courseId,
+                                            @PathVariable("lessonId") int lessonId,
+                                            @PathVariable("assignmentId") int assignmentId,
+                                            Model theModel) {
+        Teacher teacher = teacherService.findByTeacherId(teacherId);
+        Course course = courseService.findCourseById(courseId);
+        List<Student> students = course.getStudents();
+        List<Course> courses = teacher.getCourses();
+        Assignment assignment = assignmentService.findById(assignmentId);
+
+        // Create student - status map
+        Map<StudentAssignmentResultDTO, String> list = new HashMap<>();
+
+        for (Student student : students) {
+            StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
+            AssignmentDetails ad = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
+            // Create a StudentDTO to store additional display info
+            StudentAssignmentResultDTO studentDTO = new StudentAssignmentResultDTO();
+            studentDTO.setId(student.getId());
+            studentDTO.setFirstName(student.getFirstName());
+            studentDTO.setLastName(student.getLastName());
+            studentDTO.setEmail(student.getEmail());
+
+            // Add submission details if available
+            if (ad.getIsDone() == 1) {
+                studentDTO.setScore(ad.getScore());
+                studentDTO.setSubmissionTime(formatTime(ad.getSubmitTime()));
+                studentDTO.setSubmissionDate(formatDate(ad.getSubmitTime()));
+            }
+
+            // Set status
+            if (ad.getIsDone() == 0) {
+                list.put(studentDTO, "Chưa hoàn thành");
+            } else {
+                list.put(studentDTO, "Đã hoàn thành");
+            }
+        }
+
+        Lesson lesson = lessonService.findById(lessonId);
+        theModel.addAttribute("lesson", lesson);
+
+        theModel.addAttribute("list", list);
+        theModel.addAttribute("courseId", courseId);
+        theModel.addAttribute("assignmentId", assignmentId);
+        theModel.addAttribute("courses", courses);
+        theModel.addAttribute("teacher", teacher);
+        theModel.addAttribute("assignment", assignment);
+
+        return "teacher/file-assignment-status";
+    }
+
+
     private int findDayDifference(Assignment assignment) {
         String dateString = assignment.getDueDate();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -424,4 +533,13 @@ public class TeacherAssignmentController {
         java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm:ss");
         return timeFormat.format(date);
     }
+
+    private String formatTime(LocalDateTime time) {
+        return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+    }
+
+    private String formatDate(LocalDateTime time) {
+        return time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
 }

@@ -15,8 +15,8 @@ public class AssignmentFileSubmissionServiceImpl implements AssignmentFileSubmis
     private AssignmentFileSubmissionRepository fileSubmissionRepository;
 
     @Override
-    public AssignmentFileSubmission save(AssignmentFileSubmission fileSubmission) {
-        return fileSubmissionRepository.save(fileSubmission);
+    public AssignmentFileSubmission save(AssignmentFileSubmission assignmentFileSubmission) {
+        return fileSubmissionRepository.save(assignmentFileSubmission);
     }
 
     @Override

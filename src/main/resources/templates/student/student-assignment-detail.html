@@ -369,12 +369,12 @@
 								</div>
 
 								<!-- List of submitted files -->
-								<div class="file-list" th:if="${fileSubmissions != null && !fileSubmissions.isEmpty()}">
+								<div class="file-list" th:if="${assignmentFileSubmissions != null && !assignmentFileSubmissions.isEmpty()}">
 									<h5 class="submission-heading">
 										<i class="fas fa-file-alt"></i>Các file đã nộp
 									</h5>
 
-									<div class="file-item" th:each="file : ${fileSubmissions}" th:id="'file-item-' + ${file.id}">
+									<div class="file-item" th:each="file : ${assignmentFileSubmissions}" th:id="'file-item-' + ${file.id}">
 										<div class="file-info">
 											<div class="file-icon">
 												<i class="fas" th:classappend="${
@@ -440,7 +440,7 @@
 								</div>
 
 								<!-- If no files have been submitted yet -->
-								<div class="alert alert-warning" th:if="${fileSubmissions == null || fileSubmissions.isEmpty()}">
+								<div class="alert alert-warning" th:if="${assignmentFileSubmissions == null || assignmentFileSubmissions.isEmpty()}">
 									<i class="fas fa-exclamation-triangle me-2"></i>
 									Bạn chưa nộp file nào cho bài tập này.
 								</div>
@@ -504,8 +504,8 @@
 									</div>
 									<div class="card-body">
 										<!-- If files have been submitted -->
-										<div th:if="${fileSubmissions != null && !fileSubmissions.isEmpty()}">
-											<div class="file-item" th:each="file : ${fileSubmissions}" th:id="'file-item-' + ${file.id}">
+										<div th:if="${assignmentFileSubmissions != null && !assignmentFileSubmissions.isEmpty()}">
+											<div class="file-item" th:each="file : ${assignmentFileSubmissions}" th:id="'file-item-' + ${file.id}">
 												<div class="file-info">
 													<div class="file-icon">
 														<i class="fas" th:classappend="${
@@ -571,7 +571,7 @@
 										</div>
 
 										<!-- If no files have been submitted -->
-										<div class="alert alert-warning" th:if="${fileSubmissions == null || fileSubmissions.isEmpty()}">
+										<div class="alert alert-warning" th:if="${assignmentFileSubmissions == null || assignmentFileSubmissions.isEmpty()}">
 											<i class="fas fa-exclamation-triangle me-2"></i>
 											Không có file nào được nộp cho bài tập này.
 										</div>
