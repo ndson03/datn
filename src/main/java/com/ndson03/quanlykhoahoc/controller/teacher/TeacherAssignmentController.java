@@ -16,12 +16,20 @@ import com.ndson03.quanlykhoahoc.service.course.StudentCourseDetailsService;
 import com.ndson03.quanlykhoahoc.service.user.StudentService;
 import com.ndson03.quanlykhoahoc.service.user.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -68,6 +76,9 @@ public class TeacherAssignmentController {
     @Autowired
     private ContentService contentService;
 
+    @Value("${file.upload.directory}")
+    private String uploadDirectory;
+
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/addNewAssignment")
     public String addNewAssignment(@PathVariable("teacherId") int teacherId,
                                    @PathVariable("courseId") int courseId,
@@ -91,13 +102,13 @@ public class TeacherAssignmentController {
         List<Content> contents = contentService.findByLessonId(lessonId);
         theModel.addAttribute("contents", contents);
 
-
         return "teacher/assignment-form";
     }
 
     @PostMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/save")
     public String saveAssignment(@Valid @ModelAttribute("assignment") Assignment assignment,
                                  BindingResult theBindingResult,
+                                 @RequestParam(value = "assignmentFile", required = false) MultipartFile assignmentFile,
                                  @PathVariable("teacherId") int teacherId,
                                  @PathVariable("courseId") int courseId,
                                  @PathVariable("lessonId") int lessonId,
@@ -108,6 +119,7 @@ public class TeacherAssignmentController {
         Course course = courseService.findCourseById(courseId);
         Lesson lesson = lessonService.findById(lessonId);
 
+
         if (theBindingResult.hasErrors()) {
             theModel.addAttribute("teacher", teacher);
             theModel.addAttribute("courses", courses);
@@ -115,6 +127,40 @@ public class TeacherAssignmentController {
             theModel.addAttribute("lesson", lesson);
             return "teacher/assignment-form";
         }
+
+        // Handle file upload if it's a regular assignment and file is provided
+        if (!assignment.isQuiz() && assignmentFile != null && !assignmentFile.isEmpty()) {
+            try {
+                // Create directory structure if it doesn't exist
+                String uploadDir = "uploads/assignment_file";
+                Path uploadPath = Paths.get(uploadDir);
+
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                // Generate a unique filename to avoid conflicts
+                String originalFilename = StringUtils.cleanPath(assignmentFile.getOriginalFilename());
+                String fileExtension = "";
+                if (originalFilename.contains(".")) {
+                    fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+                String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+
+                // Save the file
+                Path filePath = uploadPath.resolve(uniqueFilename);
+                Files.copy(assignmentFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                // Set file information in the assignment
+                assignment.setFilePath(uploadDir + "/" + uniqueFilename);
+                assignment.setFileName(originalFilename);
+
+            } catch (IOException e) {
+                // Handle file upload exception
+                e.printStackTrace();
+            }
+        }
+
         assignment.setDaysRemaining(findDayDifference(assignment));
         assignment.setLesson(lesson); // Set the lesson for this assignment
 

@@ -36,6 +36,13 @@ public class Assignment implements Comparable{
     @Column(name="total_score")
     private double totalScore;
 
+    // Added file path and filename fields
+    @Column(name="file_path")
+    private String filePath;
+
+    @Column(name="file_name")
+    private String fileName;
+
     // New relationship with Lesson instead of Course
     @ManyToOne(cascade= {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH}, fetch=FetchType.EAGER)
@@ -136,6 +143,23 @@ public class Assignment implements Comparable{
 
     public void setLesson(Lesson lesson) {
         this.lesson = lesson;
+    }
+
+    // Added getters and setters for filePath and fileName
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     // Tính điểm cho mỗi câu hỏi

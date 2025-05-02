@@ -32,15 +32,8 @@
             border-color: #520dc2;
         }
 
-        .assignment-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 2rem 0;
-        }
-
         .assignment-status {
-            padding: 8px 12px;
+            padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
             display: flex;
@@ -65,6 +58,38 @@
 
         .quiz-result-card {
             border-left: 4px solid #6610f2;
+        }
+
+        .assignment-info-card {
+            transition: all 0.3s ease;
+        }
+
+        .info-icon {
+            width: 24px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .assignment-description {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #0d6efd;
+            margin-top: 20px;
+        }
+
+        .quiz-wrapper {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #f0f7ff;
+        }
+
+        .quiz-result {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #28a745;
         }
     </style>
 </head>
@@ -104,8 +129,8 @@
                         <i class="fas fa-book"></i> Khóa học
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="coursesDropdown">
-                        <li th:each="course : ${courses}">
-                            <a class="dropdown-item" th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}" th:text="${course.name}"></a>
+                        <li th:each="coursItem : ${courses}">
+                            <a class="dropdown-item" th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${coursItem.id})}" th:text="${coursItem.name}"></a>
                         </li>
                         <li th:if="${courses.size() == 0}">
                             <span class="dropdown-item text-muted">Không có khóa học nào</span>
@@ -210,123 +235,107 @@
 <div class="main-content mt-5 pt-3">
     <div class="container-fluid">
         <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="h3 mb-2" th:text="${assignment.name}"></h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses(studentId=${student.id})}">Home</a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}" th:text="${course.name}"></a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id})}" th:text="${lesson.title}"></a></li>
-                    <li class="breadcrumb-item active" aria-current="page" th:text="${assignment.name}"></li>
-                </ol>
-            </nav>
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-2" th:text="${assignment.name}"></h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses(studentId=${student.id})}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}" th:text="${course.name}"></a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id})}" th:text="${lesson.title}"></a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${assignment.name}"></li>
+                    </ol>
+                </nav>
+            </div>
         </div>
 
         <!-- Alert messages for operations -->
-        <div th:if="${message}" class="alert" th:classappend="${alertClass}" role="alert">
+        <div th:if="${message}" class="alert mb-4" th:classappend="${alertClass}" role="alert">
             <span th:text="${message}"></span>
             <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <!-- Quiz Assignment Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-question-circle me-2"></i>
-                    Thông tin bài tập
-                    <span class="badge bg-info ms-2">Quiz</span>
-                </h5>
+        <!-- Assignment Details Section -->
+        <div class="card mb-4 assignment-info-card">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-info-circle me-2 text-primary"></i>
+                <h5 class="mb-0 fw-bold">Thông tin bài tập</h5>
             </div>
             <div class="card-body">
-                <!-- Assignment Details Section -->
-                <div class="assignment-details mb-4">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-muted mb-2">Thông tin chung</h6>
-                            <table class="table table-sm">
-                                <tbody>
-                                <tr>
-                                    <td><i class="fas fa-book-open me-2"></i>Loại bài tập:</td>
-                                    <td><span class="badge bg-info">Quiz</span></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-calendar-check me-2"></i>Hạn nộp:</td>
-                                    <td th:text="${assignment.dueDate != null ? assignment.dueDate : 'N/A'}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted mb-2">Trạng thái</h6>
-                            <div class="assignment-status" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'bg-success text-white' : 'bg-warning text-dark'}">
-                                <i class="fas" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'fa-check-circle' : 'fa-clock'}"></i>
-                                <span th:text="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'Đã hoàn thành' : 'Chưa hoàn thành'}"></span>
-                            </div>
-                            <div th:if="${assignmentDetails != null && assignmentDetails.startTime != null}">
-                                <small class="text-muted">
-                                    Bắt đầu làm lúc: <span th:text="${#temporals.format(assignmentDetails.startTime, 'dd/MM/yyyy HH:mm')}"></span>
-                                </small>
-                            </div>
-                        </div>
+                <div class="row">
+                    <!-- Thông tin loại bài tập và hạn nộp (theo chiều dọc) -->
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex align-items-center">
+                                <span class="info-icon"><i class="fas fa-question-circle text-primary"></i></span>
+                                <strong>Loại bài tập:</strong>
+                                <span class="badge bg-info ms-2">Quiz</span>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center">
+                                <span class="info-icon"><i class="fas fa-calendar-check text-primary"></i></span>
+                                <strong>Hạn nộp:</strong>
+                                <span class="ms-2" th:text="${assignment.dueDate != null ? assignment.dueDate : 'Không có hạn nộp'}"></span>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center">
+                                <span class="info-icon"><i class="fas" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'fa-check-circle text-success' : 'fa-clock text-warning'}"></i></span>
+                                <strong>Trạng thái:</strong>
+                                <span class="badge ms-2" th:classappend="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'bg-success' : 'bg-warning text-dark'}"
+                                      th:text="${assignmentDetails != null && assignmentDetails.isDone == 1 ? 'Đã hoàn thành' : 'Đang thực hiện'}"></span>
+                            </li>
+                        </ul>
                     </div>
 
-                    <!-- Assignment Description -->
-                    <div class="assignment-description mt-4">
-                        <h6 class="text-muted mb-2">Mô tả quiz</h6>
-                        <div class="p-3 bg-light rounded">
-                            <p th:text="${assignment.description ?: 'Không có mô tả cho quiz này.'}"></p>
+                    <!-- Quiz Action or Result Section -->
+                    <div class="col-md-6">
+                        <!-- If quiz has not been done -->
+                        <div th:if="${assignmentDetails.isDone == 0}" class="p-3 border rounded quiz-wrapper">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-question-circle text-primary fs-4 me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Bài kiểm tra:</h6>
+                                    <p class="mb-1">Nhấn nút để bắt đầu làm quiz</p>
+                                </div>
+                                <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/take(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                   class="btn btn-primary ms-auto">
+                                    <i class="fas fa-play-circle me-1"></i> Làm bài
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- If quiz is done -->
+                        <div th:if="${assignmentDetails != null && assignmentDetails.isDone == 1}" class="p-3 border rounded quiz-result">
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded text-center">
+                                        <h6 class="mb-1">Điểm số</h6>
+                                        <span class="fw-bold" th:text="${score}"></span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded text-center">
+                                        <h6 class="mb-1">Thời gian hoàn thành</h6>
+                                        <span class="small" th:text="${endTime != null ? #dates.format(endTime, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/result(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
+                                   class="btn btn-primary">
+                                    <i class="fas fa-eye me-1"></i> Xem lại bài làm
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Assignment Actions Section -->
-                <div class="assignment-actions">
-                    <!-- If assignment has not been started yet -->
-                    <div th:if="${assignmentDetails.isDone == 0}" class="text-center">
-                        <p class="mb-4">Nhấp vào nút bên dưới để bắt đầu làm quiz.</p>
-                        <a class="btn btn-primary assignment-action-btn" th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/take(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}">
-                            <i class="fas fa-play-circle me-2"></i>Bắt đầu làm quiz
-                        </a>
-                    </div>
-
-                    <!-- If quiz is completed -->
-                    <div th:if="${assignmentDetails != null && assignmentDetails.isDone == 1}" class="w-100">
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle me-2"></i>
-                            <strong>Quiz đã hoàn thành!</strong> Bạn đã hoàn thành quiz này.
-                        </div>
-
-                        <!-- Display quiz result -->
-                        <div th:if="${existingSubmission != null}" class="mt-4">
-                            <div class="card quiz-result-card">
-                                <div class="card-header">
-                                    <h5 class="mb-0 fw-bold"><i class="fas fa-poll me-2"></i>Kết quả Quiz</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6 class="mb-3">Thông tin chi tiết</h6>
-                                            <ul class="list-group">
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    Điểm số
-                                                    <span class="badge bg-primary rounded-pill" th:text="${score}"></span>
-                                                </li>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    Thời gian hoàn thành
-                                                    <span th:text="${endTime != null ? #dates.format(endTime, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-6 d-flex align-items-center justify-content-center">
-                                            <a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz/result(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id}, assignmentId=${assignment.id})}"
-                                               class="btn btn-primary">
-                                                <i class="fas fa-eye me-2"></i>Xem chi tiết bài làm
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Assignment Description -->
+                <div class="assignment-description">
+                    <h6 class="mb-3 fw-bold">
+                        <i class="fas fa-align-left me-2"></i>
+                        Mô tả bài tập
+                    </h6>
+                    <div class="text-secondary">
+                        <p th:text="${assignment.description ?: 'Không có mô tả cho bài tập này.'}" class="mb-0"></p>
                     </div>
                 </div>
             </div>
@@ -356,6 +365,16 @@
                     mainContent.classList.toggle('expanded');
                 }
                 sidebarToggle.classList.toggle('collapsed');
+
+                // Change icon direction
+                const icon = sidebarToggle.querySelector('i');
+                if (icon.classList.contains('fa-chevron-left')) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-left');
+                }
             });
         }
     });

@@ -184,8 +184,11 @@
 				<span class="badge bg-primary" th:text="${lesson.title}"></span>
 			</div>
 			<div class="card-body">
-				<form action="#" th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/save(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}"
-					  th:object="${assignment}" method="POST">
+				<form action="#"
+					  th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/save(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}"
+					  th:object="${assignment}"
+					  method="POST"
+					  enctype="multipart/form-data">
 
 					<!-- Hidden field for id -->
 					<input type="hidden" th:field="*{id}" />
@@ -231,6 +234,15 @@
 								<div th:if="${#fields.hasErrors('dueDate')}" class="error-text">Vui lòng chọn hạn nộp!</div>
 							</div>
 						</div>
+
+						<!-- File upload field -->
+						<div class="col-md-6">
+							<div class="mb-3 file-upload-container">
+								<label for="assignmentFile" class="form-label">Tệp đề bài:</label>
+								<input type="file" class="form-control" id="assignmentFile" name="assignmentFile">
+								<small class="form-text text-muted">Chỉ hiển thị cho bài tập thông thường. Chấp nhận PDF, DOC, DOCX, XLS, XLSX, etc.</small>
+							</div>
+						</div>
 					</div>
 
 					<div class="d-flex justify-content-end mt-4">
@@ -257,6 +269,23 @@
 		const sidebarToggle = document.getElementById('sidebarToggle');
 		const sideNav = document.getElementById('sideNav') || document.querySelector('.side-navbar');
 		const mainContent = document.querySelector('.main-content');
+		const assignmentTypeSelect = document.getElementById('assignmentType');
+		const fileUploadContainer = document.querySelector('.file-upload-container');
+
+		// Toggle file upload field visibility based on assignment type
+		function toggleFileUploadVisibility() {
+			if (assignmentTypeSelect.value === 'true') { // Quiz
+				fileUploadContainer.style.display = 'none';
+			} else { // Regular assignment
+				fileUploadContainer.style.display = 'block';
+			}
+		}
+
+		// Initial check
+		toggleFileUploadVisibility();
+
+		// Listen for changes
+		assignmentTypeSelect.addEventListener('change', toggleFileUploadVisibility);
 
 		// Sidebar toggle for desktop
 		if (sidebarToggle) {
