@@ -201,7 +201,7 @@
 <nav class="side-navbar" id="sideNav">
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
         <div class="mt-4 px-3">
-            <a class="nav-link"
+            <a class="nav-link active"
                th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
                th:title="${course.name}">
                 <span th:text="${'Khóa học: ' + course.name}" style="font-weight: 700"></span>
@@ -244,12 +244,13 @@
                     <div class="nav-section-title ps-3">
                         <small class="text-muted fw-bold">Bài tập</small>
                     </div>
-                    <div th:each="assignment : ${assignments}">
+                    <div th:each="assignmentItem : ${assignments}">
                         <a class="nav-link"
-                           th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonId}, assignmentId=${assignment.id})}"
-                           th:title="${assignment.name}">
-                            <i th:class="${assignment.isQuiz() ? 'fas fa-question-circle content-icon' : 'fas fa-tasks content-icon'}"></i>
-                            <span th:text="${assignment.name}"></span>
+                           th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonId}, assignmentId=${assignmentItem.id})}"
+                           th:classappend="${assignmentItem.id == assignment.id ? 'active' : ''}"
+                           th:title="${assignmentItem.name}">
+                            <i th:class="${assignmentItem.isQuiz() ? 'fas fa-question-circle content-icon' : 'fas fa-tasks content-icon'}"></i>
+                            <span th:text="${assignmentItem.name}"></span>
                         </a>
                     </div>
                 </div>

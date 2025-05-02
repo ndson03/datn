@@ -91,7 +91,7 @@
 <nav class="side-navbar" id="sideNav">
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
         <div class="mt-4 px-3">
-            <a class="nav-link"
+            <a class="nav-link active"
                th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
                th:title="${course.name}">
                 <span th:text="${'Khóa học: ' + course.name}" style="font-weight: 700"></span>
@@ -116,6 +116,7 @@
                 <div th:each="contentItem : ${contents}">
                     <a class="nav-link"
                        th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonId}, contentId=${contentItem.id})}"
+                       th:classappend="${contentItem.id == content.id ? 'active' : ''}"
                        th:title="${contentItem.orderNumber + '. ' + contentItem.title}">
                         <i th:class="${
             contentItem.contentType == 'VIDEO' ? 'fas fa-video content-icon' :
@@ -171,11 +172,13 @@
 
         <!-- Form thêm/sửa nội dung -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
                     <i class="fas fa-edit me-2"></i>
                     <span th:text="${content.id == 0 ? 'Thêm nội dung mới' : 'Cập nhật nội dung'}"></span>
+
                 </h5>
+                <span class="badge bg-primary" th:text="${lesson.title}"></span>
             </div>
             <div class="card-body">
                 <form th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/save(lessonId=${lesson.id}, courseId=${course.id}, teacherId=${teacher.id})}"

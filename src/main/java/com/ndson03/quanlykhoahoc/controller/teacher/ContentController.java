@@ -145,7 +145,7 @@ public class ContentController {
                               Model model,
                               RedirectAttributes redirectAttributes) {
 
-        final String uploadDirectory = "uploads/content_file";
+        final String uploadDirectory = "uploads/content_file" + "/content_" + content.getId();
 
         // Kiểm tra lỗi validation
         if (bindingResult.hasErrors()) {

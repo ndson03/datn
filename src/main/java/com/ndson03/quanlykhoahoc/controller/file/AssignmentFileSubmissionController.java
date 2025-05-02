@@ -104,7 +104,7 @@ public class AssignmentFileSubmissionController {
                     assignmentId, studentCourseDetails.getId());
 
             // Create directory for this student's assignment if it doesn't exist
-            String studentAssignmentDir = uploadDir + "/student_" + studentId + "/course_" + courseId+ "/lesson_" + lessonId + "/assignment_" + assignmentId;
+            String studentAssignmentDir = uploadDir +"/student_file" + "/student_" + studentId + "/course_" + courseId+ "/lesson_" + lessonId + "/assignment_" + assignmentId;
             Path uploadPath = Paths.get(studentAssignmentDir);
 
             if (!Files.exists(uploadPath)) {

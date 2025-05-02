@@ -273,30 +273,7 @@
 			<p class="mb-0">Chào mừng bạn quay trở lại với hệ thống quản lý SICT. Bạn có thể quản lý tất cả các tác vụ của hệ thống từ trang này.</p>
 		</div>
 
-		<!-- Dashboard Cards -->
-		<div class="row mb-4">
-			<div class="col-md-4 mb-3">
-				<div class="counter-card">
-					<i class="fas fa-book"></i>
-					<div class="counter"><span th:text="${courseSize}"></span></div>
-					<div class="counter-title">Khóa học</div>
-				</div>
-			</div>
-			<div class="col-md-4 mb-3">
-				<div class="counter-card">
-					<i class="fas fa-user-graduate"></i>
-					<div class="counter"><span th:text="${studentSize}"></span></div>
-					<div class="counter-title">Sinh viên</div>
-				</div>
-			</div>
-			<div class="col-md-4 mb-3">
-				<div class="counter-card">
-					<i class="fas fa-chalkboard-teacher"></i>
-					<div class="counter"><span th:text="${teacherSize}"></span></div>
-					<div class="counter-title">Giảng viên</div>
-				</div>
-			</div>
-		</div>
+
 
 		<!-- Admin Management Section -->
 		<h3 class="section-title mb-4">Quản lý hệ thống</h3>
@@ -343,6 +320,31 @@
 						<p class="mb-0">Quản lý cấu hình</p>
 					</div>
 				</a>
+			</div>
+		</div>
+
+		<!-- Dashboard Cards -->
+		<div class="row mb-4">
+			<div class="col-md-4 mb-3">
+				<div class="counter-card">
+					<i class="fas fa-book"></i>
+					<div class="counter"><span th:text="${courseSize}"></span></div>
+					<div class="counter-title">Khóa học</div>
+				</div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<div class="counter-card">
+					<i class="fas fa-user-graduate"></i>
+					<div class="counter"><span th:text="${studentSize}"></span></div>
+					<div class="counter-title">Sinh viên</div>
+				</div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<div class="counter-card">
+					<i class="fas fa-chalkboard-teacher"></i>
+					<div class="counter"><span th:text="${teacherSize}"></span></div>
+					<div class="counter-title">Giảng viên</div>
+				</div>
 			</div>
 		</div>
 

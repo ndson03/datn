@@ -132,7 +132,7 @@ public class TeacherAssignmentController {
         if (!assignment.isQuiz() && assignmentFile != null && !assignmentFile.isEmpty()) {
             try {
                 // Create directory structure if it doesn't exist
-                String uploadDir = "uploads/assignment_file";
+                String uploadDir = "uploads/assignment_file" + "/assignment_" + assignment.getId();
                 Path uploadPath = Paths.get(uploadDir);
 
                 if (!Files.exists(uploadPath)) {

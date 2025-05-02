@@ -212,7 +212,7 @@
 <nav class="side-navbar" id="sideNav">
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
         <div class="mt-4 px-3">
-            <a class="nav-link"
+            <a class="nav-link active"
                th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}"
                th:title="${course.name}">
                 <span th:text="${'Khóa học: ' + course.name}" style="font-weight: 700"></span>
