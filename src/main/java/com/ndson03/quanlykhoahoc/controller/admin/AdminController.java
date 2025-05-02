@@ -102,15 +102,21 @@ public class AdminController {
 		
 		return "redirect:/admin/students";
 	}
-	
+
 	@GetMapping("/students/{studentId}/courses")
 	public String editCoursesForStudent(@PathVariable("studentId") int studentId, Model theModel) {
 		Student student = studentService.findByStudentId(studentId);
-		List<Course> courses = student.getCourses();
-		
+		List<Course> enrolledCourses = student.getCourses();
+
+		// Get available courses (courses that the student hasn't enrolled in yet)
+		List<Course> allCourses = courseService.findAllCourses();
+		List<Course> availableCourses = new ArrayList<>(allCourses);
+		availableCourses.removeAll(enrolledCourses);
+
 		theModel.addAttribute("student", student);
-		theModel.addAttribute("courses", courses);
-		
+		theModel.addAttribute("courses", enrolledCourses);
+		theModel.addAttribute("availableCourses", availableCourses);
+
 		return "admin/student-course-list";
 	}
 
@@ -125,23 +131,6 @@ public class AdminController {
 		return "admin/teacher-course-list";
 	}
 
-	@GetMapping("/students/{studentId}/addCourse")
-	public String addCourseToStudent(@PathVariable("studentId") int studentId, Model theModel) {
-		Student student = studentService.findByStudentId(studentId);
-		List<Course> courses = courseService.findAllCourses();
-		
-		for(int i = 0; i < courses.size(); i++) { //finding the courses that the current student has not enrolled yet
-			if(student.getCourses().contains(courses.get(i))) {
-				courses.remove(i);
-				i--;
-			}
-		}
-		theModel.addAttribute("student", student);
-		theModel.addAttribute("courses", courses); //unenrolled courses are displayed as drop-down list
-		theModel.addAttribute("listSize", courses.size());
-		return "admin/add-course";
-	}
-	
 	@RequestMapping("/students/{studentId}/addCourse/save")
 	public String saveCourseToStudent(@PathVariable("studentId") int studentId, @RequestParam("courseId") int courseId) {
 		
@@ -291,16 +280,45 @@ public class AdminController {
 
 		return "redirect:/admin/courses";
 	}
-	
+
 	@GetMapping("/courses/{courseId}/students")
-	public String showSudents(@PathVariable("courseId") int courseId, Model theModel) {		
+	public String showStudentsInCourse(@PathVariable("courseId") int courseId, Model theModel) {
+		// Get course, students, and teacher info
 		Course course = courseService.findCourseById(courseId);
 		List<Student> students = course.getStudents();
 		Teacher teacher = course.getTeacher();
+
+		// Get all students not already in this course for the add student form
+		List<Student> allStudents = studentService.findAllStudents();
+		List<Student> availableStudents = new ArrayList<>(allStudents);
+
+		// Remove students who are already enrolled in the course
+		availableStudents.removeAll(students);
+
+		// Add attributes to the model
 		theModel.addAttribute("students", students);
 		theModel.addAttribute("course", course);
 		theModel.addAttribute("teacher", teacher);
+		theModel.addAttribute("availableStudents", availableStudents);
+
+		// Return the view that includes both the student list and add student form
 		return "admin/course-student-list";
+	}
+
+	@GetMapping("/courses/{courseId}/students/addStudent/save")
+	public String saveStudentToCourse(@RequestParam("studentId") int studentId,
+									  @PathVariable("courseId") int courseId) {
+		// Create and save the student-course relationship
+		StudentCourseDetails sc = new StudentCourseDetails(
+				studentId,
+				courseId,
+				new ArrayList<Assignment>(),
+				new GradeDetails()
+		);
+		studentCourseDetailsService.save(sc);
+
+		// Redirect back to the course students page
+		return "redirect:/admin/courses/" + courseId + "/students";
 	}
 	
 	
@@ -315,37 +333,4 @@ public class AdminController {
 		
 		return "redirect:/admin/courses/" + courseId + "/students";
 	}
-	
-	@GetMapping("/courses/{courseId}/students/addStudent")
-	public String addStudentToCourse(@PathVariable("courseId") int courseId, Model theModel) {
-		Course course = courseService.findCourseById(courseId);
-		List<Student> students = studentService.findAllStudents();
-		
-		for(int i = 0; i < students.size(); i++) { 
-			if(course.getStudents().contains(students.get(i))) {
-				students.remove(students.get(i));
-				i--;
-			}
-		}
-		theModel.addAttribute("students", students); //all students who are not enrolled to the current course yet
-		theModel.addAttribute("course", course);
-		theModel.addAttribute("listSize", students.size());
-		return "admin/add-student";
-		
-	}
-	
-	@RequestMapping("/courses/{courseId}/students/addStudent/save")
-	public String saveStudentToCourse(@RequestParam("studentId") int studentId, @PathVariable("courseId") int courseId) {
-		
-		StudentCourseDetails sc = new StudentCourseDetails(studentId, courseId, new ArrayList<Assignment>() ,new GradeDetails());
-		studentCourseDetailsService.save(sc);
-		
-		return "redirect:/admin/courses/" + courseId + "/students";
-	}
-
-	@GetMapping("/chatbot")
-	public String qnaPage() {
-		return "admin/admin-chatbot";
-	}
-
 }

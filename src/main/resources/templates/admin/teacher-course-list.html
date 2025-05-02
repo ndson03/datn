@@ -12,8 +12,184 @@
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/layout-2.css}">
+    <style>
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1rem 1.5rem;
+        }
+
+        .btn-courses {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-courses:hover {
+            background-color: #2982c8;
+            border-color: #2982c8;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #ff5252;
+            border-color: #ff5252;
+            color: white;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .teacher-avatar {
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-empty {
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            background-color: rgba(57, 160, 237, 0.1);
+            color: #2982c8;
+            border: none;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "•";
+        }
+
+        .badge {
+            padding: 0.5em 0.75em;
+            font-weight: 500;
+        }
+
+        .course-card {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            height: 100%;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(77, 97, 252, 0.15);
+        }
+
+        .course-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        /* Default gradient backgrounds for courses without images */
+        .course-image.default-1 {
+            background-image: linear-gradient(45deg, #4d61fc, #6c7aff);
+        }
+
+        .course-image.default-2 {
+            background-image: linear-gradient(45deg, #ff9f43, #ffbc7d);
+        }
+
+        .course-image.default-3 {
+            background-image: linear-gradient(45deg, #38c172, #74e39a);
+        }
+
+        .course-image.default-4 {
+            background-image: linear-gradient(45deg, #6f42c1, #a78edb);
+        }
+
+        .course-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .badge.bg-primary {
+            background-color: var(--primary-color) !important;
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
+        }
+
+        .course-code {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 10px 15px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .course-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-content h5 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            line-height: 1.4;
+        }
+
+        .course-footer {
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding-top: 70px;
+            padding-bottom: 2rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,11 +201,55 @@
             <span>Trường SICT - HaUI</span>
         </a>
 
-        <button class="navbar-toggler" type="button" id="mobileToggle">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Dashboard link -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/adminPanel}">
+                        <i class="fas fa-home"></i> Trang chủ
+                    </a>
+                </li>
+
+                <!-- Courses link -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/courses}">
+                        <i class="fas fa-book"></i> Khóa học
+                    </a>
+                </li>
+
+                <!-- Students link -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/students}">
+                        <i class="fas fa-user-graduate"></i> Sinh viên
+                    </a>
+                </li>
+
+                <!-- Teachers link -->
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/admin/teachers}">
+                        <i class="fas fa-chalkboard-teacher"></i> Giảng viên
+                    </a>
+                </li>
+
+                <!-- Info link -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/adminInfo}">
+                        <i class="fas fa-info-circle"></i> Thông tin
+                    </a>
+                </li>
+
+                <!-- Chatbot link -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/chatbot}">
+                        <i class="fas fa-robot"></i> Chatbot
+                    </a>
+                </li>
+            </ul>
+
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown user-dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
@@ -54,77 +274,43 @@
     </div>
 </nav>
 
-<!-- Sidebar Toggle Button -->
-<button class="sidebar-toggle" id="sidebarToggle">
-    <i class="fas fa-chevron-left"></i>
-</button>
-
-<!-- Side Navbar -->
-<nav class="side-navbar" id="sideNav">
-    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-        <a class="nav-link" th:href="@{/admin/adminPanel}" title="Trang chủ">
-            <i class="fas fa-home"></i>
-            <span>Trang chủ</span>
-        </a>
-        <a class="nav-link" th:href="@{/admin/courses}" title="Khóa học">
-            <i class="fas fa-book"></i>
-            <span>Khóa học</span>
-        </a>
-        <a class="nav-link" th:href="@{/admin/students}" title="Sinh viên">
-            <i class="fas fa-user-graduate"></i>
-            <span>Sinh viên</span>
-        </a>
-        <a class="nav-link active" th:href="@{/admin/teachers}" title="Giảng viên">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <span>Giảng viên</span>
-        </a>
-        <a class="nav-link" th:href="@{/admin/adminInfo}" title="Thông tin">
-            <i class="fas fa-info-circle"></i>
-            <span>Thông tin</span>
-        </a>
-        <a class="nav-link" th:href="@{/admin/chatbot}" title="Chatbot">
-            <i class="fas fa-robot"></i>
-            <span>Chatbot</span>
-        </a>
-    </div>
-</nav>
-
 <!-- Main Content -->
-<div class="main-content" id="mainContent">
-    <div class="container-fluid">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">Khóa học của giảng viên</h2>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a th:href="@{/admin/adminPanel}">Home</a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/admin/teachers}">Giảng viên</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Khóa học của giảng viên</li>
-                </ol>
-            </nav>
+<div class="main-content">
+    <div class="container-fluid px-4">
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2 mb-0">Khóa học của giảng viên</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/adminPanel}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/teachers}">Giảng viên</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Khóa học của giảng viên</li>
+                    </ol>
+                </nav>
+            </div>
         </div>
 
         <!-- Teacher Info Card -->
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-user-circle me-2"></i>
-                    Thông tin giảng viên
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-chalkboard-teacher me-2 text-primary"></i>Thông tin giảng viên
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3 mb-3 mb-md-0">
                         <div class="text-center">
-                            <div class="teacher-avatar mb-3">
-                                <i class="fas fa-user-tie fa-5x text-primary"></i>
+                            <div class="teacher-avatar mx-auto mb-3">
+                                <i class="fas fa-user-tie fa-3x text-primary"></i>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-9">
                         <div class="row mb-2">
                             <div class="col-md-3 fw-bold">Họ tên:</div>
-                            <div class="col-md-9" th:text="${teacher.firstName + ' ' +teacher.lastName}">Nguyễn Văn</div>
+                            <div class="col-md-9" th:text="${teacher.firstName + ' ' + teacher.lastName}">Nguyễn Văn</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-md-3 fw-bold">Email:</div>
@@ -145,44 +331,47 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-book me-2"></i>
-                    Danh sách khóa học đang dạy
+                    <i class="fas fa-book me-2 text-primary"></i>Danh sách khóa học đang dạy
                 </h5>
                 <a href="#" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus-circle me-1"></i> Thêm khóa học
                 </a>
             </div>
             <div class="card-body p-0">
-                <div class="alert alert-info m-3" th:if="${teacher.getCourses.size() == 0}">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Giảng viên này chưa được phân công khóa học nào.
+                <div class="alert alert-empty m-3" th:if="${teacher.getCourses.size() == 0}">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle me-3 fs-4"></i>
+                        <div>
+                            <strong>Thông báo!</strong> Giảng viên này chưa được phân công khóa học nào.
+                        </div>
+                    </div>
                 </div>
 
                 <div class="row p-3" th:if="${teacher.getCourses.size() != 0}">
-                    <div class="col-md-6 col-lg-4 mb-4" th:each="course : ${teacher.courses}">
-                        <div class="card h-100 course-card">
-                            <div class="card-header bg-light">
-                                <h5 class="card-title mb-0" th:text="${course.name}">Tên khóa học</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <span class="fw-bold"><Mã></Mã> Mã khóa học:</span>
-                                    <span th:text="${course.code}">CS101</span>
+                    <div class="col-md-6 col-lg-4 mb-4" th:each="course, iterStat : ${teacher.courses}">
+                        <div class="card course-card">
+                            <!-- Use imagePath if available, otherwise use default gradient -->
+                            <div th:if="${course.imagePath != null && !course.imagePath.isEmpty()}"
+                                 class="course-image"
+                                 th:style="'background-image: url(' + @{${course.imagePath}} + ');'">
+                                <div class="course-badge">
+                                    <span class="badge bg-primary">Active</span>
                                 </div>
-                                <div class="mb-2">
-                                    <span class="fw-bold">Số sinh viên:</span>
-                                    <span th:text="${course.students.size()}">20</span>
-                                </div>
+                                <div class="course-code" th:text="${course.code}">CS101</div>
                             </div>
-                            <div class="card-footer bg-light d-flex justify-content-between align-items-center">
-                                <a th:href="@{/admin/courses/{courseId}/students(courseId=${course.id})}" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye me-1"></i> Chi tiết
-                                </a>
-                                <a href="#"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="if (!(confirm('Bạn có chắc chắn muốn hủy phân công khóa học này?'))) return false">
-                                    <i class="fas fa-times-circle me-1"></i> Hủy phân công
-                                </a>
+                            <div th:if="${course.imagePath == null || course.imagePath.isEmpty()}"
+                                 th:class="'course-image default-' + ${iterStat.count % 4 + 1}">
+                                <div class="course-badge">
+                                    <span class="badge bg-primary">Active</span>
+                                </div>
+                                <div class="course-code" th:text="${course.code}">CS101</div>
+                            </div>
+                            <div class="course-content">
+                                <h5 class="mb-3" th:text="${course.name}">Tên khóa học</h5>
+                                <p class="text-muted mb-0">
+                                    <i class="fas fa-users me-2"></i>
+                                    <span th:text="${course.students.size()}">20</span> sinh viên
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -205,64 +394,14 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Sidebar toggle functionality
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const sideNav = document.getElementById('sideNav');
-        const mainContent = document.getElementById('mainContent');
+        // Add active class to current page nav link
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
 
-        // Desktop toggle
-        sidebarToggle.addEventListener('click', function() {
-            sideNav.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            sidebarToggle.classList.toggle('collapsed');
-
-            // Change icon direction
-            const icon = sidebarToggle.querySelector('i');
-            if (icon.classList.contains('fa-chevron-left')) {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
-            } else {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
+                link.classList.add('active');
             }
-        });
-
-        // Mobile toggle
-        mobileToggle.addEventListener('click', function() {
-            sideNav.classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
-            const isClickInsideSidebar = sideNav.contains(event.target);
-            const isClickOnToggle = mobileToggle.contains(event.target);
-
-            if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
-                sideNav.classList.remove('show');
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 992) {
-                sideNav.classList.remove('show');
-            }
-        });
-
-        // Add hover effect to course cards
-        const courseCards = document.querySelectorAll('.course-card');
-        courseCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px)';
-                this.style.transition = 'transform 0.3s ease';
-                this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '';
-            });
         });
     });
 </script>

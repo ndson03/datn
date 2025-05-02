@@ -12,8 +12,115 @@
 	<!-- Material Design Icons -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
 	<!-- Google Fonts -->
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" th:href="@{/css/layout.css}">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/layout-2.css}">
+	<style>
+		:root {
+			--primary-color: #4d61fc;
+			--primary-dark: #3a4cd1;
+			--primary-light: #e6e9ff;
+			--secondary-color: #6c7aff;
+			--accent-color: #ff9f43;
+			--light-color: #f0f3ff;
+			--dark-color: #2d3748;
+			--success-color: #38c172;
+			--danger-color: #e3342f;
+			--warning-color: #ffce54;
+			--info-color: #3498db;
+			--gray-100: #f8f9fc;
+			--gray-200: #edf2f7;
+			--gray-300: #e2e8f0;
+			--gray-600: #718096;
+			--gray-700: #4a5568;
+			--border-radius: 12px;
+			--card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+			--hover-shadow: 0 15px 30px rgba(77, 97, 252, 0.15);
+			--content-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
+			--box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+			--transition-speed: 0.3s;
+		}
+
+		.card {
+			border: none;
+			border-radius: 12px;
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+			overflow: hidden;
+		}
+
+		.card-header {
+			background: white;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+			padding: 1rem 1.5rem;
+		}
+
+		.form-control, .form-select {
+			border-radius: 8px;
+			padding: 0.6rem 1rem;
+			border: 1px solid var(--gray-300);
+			transition: all 0.3s ease;
+		}
+
+		.form-control:focus, .form-select:focus {
+			border-color: var(--primary-color);
+			box-shadow: 0 0 0 0.2rem rgba(77, 97, 252, 0.15);
+		}
+
+		.form-label {
+			font-weight: 500;
+			color: var(--gray-700);
+			margin-bottom: 0.5rem;
+		}
+
+		.btn-primary {
+			background-color: var(--primary-color);
+			border-color: var(--primary-color);
+		}
+
+		.btn-primary:hover {
+			background-color: var(--primary-dark);
+			border-color: var(--primary-dark);
+		}
+
+		.btn-secondary {
+			background-color: var(--gray-200);
+			border-color: var(--gray-300);
+			color: var(--gray-700);
+		}
+
+		.btn-secondary:hover {
+			background-color: var(--gray-300);
+			border-color: var(--gray-300);
+			color: var(--dark-color);
+		}
+
+		.breadcrumb-item + .breadcrumb-item::before {
+			content: "•";
+		}
+
+		.avatar {
+			width: 40px;
+			height: 40px;
+			background-color: var(--primary-light);
+			color: var(--primary-color);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+		}
+
+		#imagePreviewContainer {
+			background-color: var(--gray-100);
+			border-radius: 8px;
+			padding: 10px;
+		}
+
+		/* Add specific styles for this page */
+		.main-content {
+			padding-top: 80px;
+			padding-bottom: 20px;
+		}
+	</style>
 </head>
 
 <body>
@@ -25,11 +132,55 @@
 			<span>Trường SICT - HaUI</span>
 		</a>
 
-		<button class="navbar-toggler" type="button" id="mobileToggle">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				<!-- Dashboard link -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/admin/adminPanel}">
+						<i class="fas fa-home"></i> Trang chủ
+					</a>
+				</li>
+
+				<!-- Courses link -->
+				<li class="nav-item">
+					<a class="nav-link active" th:href="@{/admin/courses}">
+						<i class="fas fa-book"></i> Khóa học
+					</a>
+				</li>
+
+				<!-- Students link -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/admin/students}">
+						<i class="fas fa-user-graduate"></i> Sinh viên
+					</a>
+				</li>
+
+				<!-- Teachers link -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/admin/teachers}">
+						<i class="fas fa-chalkboard-teacher"></i> Giảng viên
+					</a>
+				</li>
+
+				<!-- Info link -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/admin/adminInfo}">
+						<i class="fas fa-info-circle"></i> Thông tin
+					</a>
+				</li>
+
+				<!-- Chatbot link -->
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/admin/chatbot}">
+						<i class="fas fa-robot"></i> Chatbot
+					</a>
+				</li>
+			</ul>
+
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item dropdown user-dropdown">
 					<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
@@ -54,73 +205,39 @@
 	</div>
 </nav>
 
-<!-- Sidebar Toggle Button -->
-<button class="sidebar-toggle" id="sidebarToggle">
-	<i class="fas fa-chevron-left"></i>
-</button>
-
-<!-- Side Navbar -->
-<nav class="side-navbar" id="sideNav">
-	<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-		<a class="nav-link" th:href="@{/admin/adminPanel}" title="Trang chủ">
-			<i class="fas fa-home"></i>
-			<span>Trang chủ</span>
-		</a>
-		<a class="nav-link active" th:href="@{/admin/courses}" title="Khóa học">
-			<i class="fas fa-book"></i>
-			<span>Khóa học</span>
-		</a>
-		<a class="nav-link" th:href="@{/admin/students}" title="Sinh viên">
-			<i class="fas fa-user-graduate"></i>
-			<span>Sinh viên</span>
-		</a>
-		<a class="nav-link" th:href="@{/admin/teachers}" title="Giảng viên">
-			<i class="fas fa-chalkboard-teacher"></i>
-			<span>Giảng viên</span>
-		</a>
-		<a class="nav-link" th:href="@{/admin/adminInfo}" title="Thông tin">
-			<i class="fas fa-info-circle"></i>
-			<span>Thông tin</span>
-		</a>
-		<a class="nav-link" th:href="@{/admin/chatbot}" title="Chatbot">
-			<i class="fas fa-robot"></i>
-			<span>Chatbot</span>
-		</a>
-	</div>
-</nav>
-
 <!-- Main Content -->
-<div class="main-content" id="mainContent">
-	<div class="container-fluid">
-		<!-- Header -->
-		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2 class="fw-bold">Thêm khóa học</h2>
-			<nav aria-label="breadcrumb">
-				<ol class="breadcrumb mb-0">
-					<li class="breadcrumb-item"><a th:href="@{/admin/adminPanel}">Trang chủ</a></li>
-					<li class="breadcrumb-item"><a th:href="@{/admin/courses}">Khóa học</a></li>
-					<li class="breadcrumb-item active" aria-current="page">Thêm khóa học</li>
-				</ol>
-			</nav>
+<div class="main-content">
+	<div class="container-fluid px-4">
+		<!-- Page Header -->
+		<div class="page-header mb-4">
+			<div class="d-flex justify-content-between align-items-center">
+				<h1 class="h2 mb-0">Thêm khóa học</h1>
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb mb-0">
+						<li class="breadcrumb-item"><a th:href="@{/admin/adminPanel}">Trang chủ</a></li>
+						<li class="breadcrumb-item"><a th:href="@{/admin/courses}">Khóa học</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Thêm khóa học</li>
+					</ol>
+				</nav>
+			</div>
 		</div>
 
 		<!-- Add Course Form -->
-		<div class="row">
-			<div class="col-md-8 mx-auto">
-				<div class="card">
-					<div class="card-header">
-						<h5 class="mb-0">
-							<i class="fas fa-plus-circle me-2"></i>
-							Thông tin khóa học mới
-						</h5>
-					</div>
-					<div class="card-body p-4">
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h5 class="mb-0 fw-bold">
+					<i class="fas fa-plus-circle me-2 text-primary"></i>Thông tin khóa học mới
+				</h5>
+			</div>
+			<div class="card-body p-4">
+				<div class="row">
+					<div class="col-md-8 mx-auto">
 						<form action="#" th:action="@{/admin/saveCourse}" th:object="${course}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
 							<input type="hidden" th:field="*{id}">
 
 							<div class="mb-3">
 								<label for="courseCode" class="form-label">Mã khóa học</label>
-								<input type="text" class="form-control" id="courseCode" th:field="*{code}" required>
+								<input type="text" class="form-control" id="courseCode" th:field="*{code}" required placeholder="Nhập mã khóa học...">
 								<div class="invalid-feedback">
 									Vui lòng nhập mã khóa học!
 								</div>
@@ -132,7 +249,7 @@
 
 							<div class="mb-3">
 								<label for="courseName" class="form-label">Tên khóa học</label>
-								<input type="text" class="form-control" id="courseName" th:field="*{name}" required>
+								<input type="text" class="form-control" id="courseName" th:field="*{name}" required placeholder="Nhập tên khóa học...">
 								<div class="invalid-feedback">
 									Vui lòng nhập tên khóa học!
 								</div>
@@ -175,7 +292,7 @@
 								</div>
 							</div>
 
-							<div class="text-end">
+							<div class="text-end mt-4">
 								<a th:href="@{/admin/courses}" class="btn btn-secondary me-2">
 									<i class="fas fa-arrow-left me-1"></i> Hủy
 								</a>
@@ -197,48 +314,13 @@
 
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
-		// Sidebar toggle functionality
-		const sidebarToggle = document.getElementById('sidebarToggle');
-		const mobileToggle = document.getElementById('mobileToggle');
-		const sideNav = document.getElementById('sideNav');
-		const mainContent = document.getElementById('mainContent');
+		// Add active class to current page nav link
+		const currentPath = window.location.pathname;
+		const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
 
-		// Desktop toggle
-		sidebarToggle.addEventListener('click', function() {
-			sideNav.classList.toggle('collapsed');
-			mainContent.classList.toggle('expanded');
-			sidebarToggle.classList.toggle('collapsed');
-
-			// Change icon direction
-			const icon = sidebarToggle.querySelector('i');
-			if (icon.classList.contains('fa-chevron-left')) {
-				icon.classList.remove('fa-chevron-left');
-				icon.classList.add('fa-chevron-right');
-			} else {
-				icon.classList.remove('fa-chevron-right');
-				icon.classList.add('fa-chevron-left');
-			}
-		});
-
-		// Mobile toggle
-		mobileToggle.addEventListener('click', function() {
-			sideNav.classList.toggle('show');
-		});
-
-		// Close sidebar when clicking outside on mobile
-		document.addEventListener('click', function(event) {
-			const isClickInsideSidebar = sideNav.contains(event.target);
-			const isClickOnToggle = mobileToggle.contains(event.target);
-
-			if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
-				sideNav.classList.remove('show');
-			}
-		});
-
-		// Handle window resize
-		window.addEventListener('resize', function() {
-			if (window.innerWidth >= 992) {
-				sideNav.classList.remove('show');
+		navLinks.forEach(link => {
+			if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
+				link.classList.add('active');
 			}
 		});
 

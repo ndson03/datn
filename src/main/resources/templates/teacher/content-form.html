@@ -12,10 +12,9 @@
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Summernote CSS -->
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-
     <link rel="stylesheet" th:href="@{/css/layout.css}">
 </head>
 
@@ -28,11 +27,42 @@
             <span>Trường SICT - HaUI</span>
         </a>
 
-        <button class="navbar-toggler" type="button" id="mobileToggle">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Dashboard link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- Chatbot link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}">
+                        <i class="fas fa-robot"></i> Chatbot
+                    </a>
+                </li>
+
+                <!-- Courses dropdown menu -->
+                <li class="nav-item dropdown courses-dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="coursesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i> Khóa học
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="coursesDropdown">
+                        <li th:each="course : ${courses}">
+                            <a class="dropdown-item" th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}" th:text="${course.name}"></a>
+                        </li>
+                        <li th:if="${courses.size() == 0}">
+                            <span class="dropdown-item text-muted">Không có khóa học nào</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown user-dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
@@ -58,65 +88,90 @@
     </div>
 </nav>
 
+<nav class="side-navbar" id="sideNav">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+        <div class="mt-4 px-3">
+            <a class="nav-link"
+               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
+               th:title="${course.name}">
+                <span th:text="${'Khóa học: ' + course.name}" style="font-weight: 700"></span>
+            </a>
+            <hr class="my-2">
+        </div>
+        <div th:each="lessonItem : ${lessons}">
+            <a class="nav-link"
+               th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonItem.id})}"
+               th:classappend="${lessonItem.id == lesson.id ? 'active' : ''}"
+               th:title="${lessonItem.orderNumber + '. ' + lessonItem.title}">
+                <span th:text="${lessonItem.orderNumber + '. ' + lessonItem.title}"></span>
+            </a>
+
+            <!-- Display contents and assignments for the current lesson -->
+            <div th:if="${lessonItem.id == lesson.id}"
+                 class="content-nav">
+                <!-- Content items -->
+                <div class="nav-section-title ps-3" th:if="${not #lists.isEmpty(contents)}">
+                    <small class="text-muted fw-bold">Nội dung</small>
+                </div>
+                <div th:each="contentItem : ${contents}">
+                    <a class="nav-link"
+                       th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonId}, contentId=${contentItem.id})}"
+                       th:title="${contentItem.orderNumber + '. ' + contentItem.title}">
+                        <i th:class="${
+            contentItem.contentType == 'VIDEO' ? 'fas fa-video content-icon' :
+            contentItem.contentType == 'TEXT' ? 'fas fa-file-alt content-icon' :
+            contentItem.contentType == 'PDF' ? 'fas fa-file-pdf content-icon' :
+            contentItem.contentType == 'IMAGE' ? 'fas fa-image content-icon' :
+            contentItem.contentType == 'CODE' ? 'fas fa-code content-icon' :
+            contentItem.contentType == 'QUIZ' ? 'fas fa-question-circle content-icon' :
+            'fas fa-file content-icon'}"></i>
+                        <span th:text="${contentItem.orderNumber + '. ' + contentItem.title}"></span>
+                    </a>
+                </div>
+
+                <!-- Assignment items -->
+                <div th:if="${not #lists.isEmpty(assignments)}" class="mt-2">
+                    <div class="nav-section-title ps-3">
+                        <small class="text-muted fw-bold">Bài tập</small>
+                    </div>
+                    <div th:each="assignment : ${assignments}">
+                        <a class="nav-link"
+                           th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}(teacherId=${teacher.id}, courseId=${courseId}, lessonId=${lessonId}, assignmentId=${assignment.id})}"
+                           th:title="${assignment.name}">
+                            <i th:class="${assignment.isQuiz() ? 'fas fa-question-circle content-icon' : 'fas fa-tasks content-icon'}"></i>
+                            <span th:text="${assignment.name}"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
 <!-- Sidebar Toggle Button -->
 <button class="sidebar-toggle" id="sidebarToggle">
     <i class="fas fa-chevron-left"></i>
 </button>
 
-<!-- Side Navbar -->
-<nav class="side-navbar" id="sideNav">
-    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-        <a class="nav-link" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}" title="Dashboard">
-            <i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-        </a>
-        <a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}" title="Chatbot">
-            <i class="fas fa-robot"></i>
-            <span>Chatbot</span>
-        </a>
-
-        <div class="mt-3 px-3">
-            <div class="small text-muted text-uppercase">Khóa học</div>
-            <hr class="my-2">
-        </div>
-
-        <div th:each="course : ${courses}">
-            <a class="nav-link"
-               th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}"
-               th:title="${course.name}"
-               th:classappend="${course.id == courseId ? 'active' : ''}">
-                <i class="fas fa-book"></i>
-                <span th:text="${course.name}"></span>
-            </a>
-        </div>
-    </div>
-</nav>
-
 <!-- Main Content -->
 <div class="main-content mt-5 pt-3">
     <div class="container-fluid">
         <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4" style="padding-top: 30px">
-            <h1 class="h2 mb-0" th:text="${content.id == 0 ? 'Thêm nội dung mới' : 'Cập nhật nội dung'}"></h1>
+        <div class="page-header">
+            <h1 class="h3 mb-2" th:text="${content.id == 0 ? 'Thêm nội dung mới' : 'Cập nhật nội dung'}"></h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item"><a href="#">Khóa học</a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/contents/lesson/{id}/{teacherId}(id=${lesson.id},teacherId=${teacher.id})}">Nội dung bài học</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">Home</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}" th:text="${course.name}"></a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}" th:text="${lesson.title}"></a></li>
                     <li class="breadcrumb-item active" aria-current="page" th:text="${content.id == 0 ? 'Thêm mới' : 'Cập nhật'}"></li>
                 </ol>
             </nav>
         </div>
 
-        <!-- Course and Lesson Info -->
-        <div class="mb-4">
-            <h4 class="mb-2">Khóa học: <span th:text="${course.name}"></span></h4>
-            <h5 class="mb-3">Bài học: <span th:text="${lesson.title}"></span></h5>
-        </div>
-
         <!-- Form thêm/sửa nội dung -->
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-edit me-2"></i>
                     <span th:text="${content.id == 0 ? 'Thêm nội dung mới' : 'Cập nhật nội dung'}"></span>
@@ -126,34 +181,34 @@
                 <form th:action="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}/content/save(lessonId=${lesson.id}, courseId=${course.id}, teacherId=${teacher.id})}"
                       th:object="${content}"
                       method="POST"
-                      enctype="multipart/form-data">
-                    <!-- Hidden field cho ID nội dung -->
-                    <input type="hidden" th:field="*{id}" />
+                      enctype="multipart/form-data"
+                      class="content-form">
 
-                    <!-- Hidden field cho lessonId -->
+                    <!-- Hidden fields -->
+                    <input type="hidden" th:field="*{id}" />
                     <input type="hidden" name="lessonId" th:value="${lesson.id}" />
 
-                    <!-- Thứ tự hiển thị của nội dung -->
-                    <div class="row mb-3">
-                        <label for="orderNumber" class="col-sm-2 col-form-label">Thứ tự hiển thị:</label>
-                        <div class="col-sm-10">
-                            <input type="number" th:field="*{orderNumber}" class="form-control" min="1" required />
+                    <!-- Thứ tự hiển thị -->
+                    <div class="mb-3 row">
+                        <label for="orderNumber" class="col-sm-3 col-md-2 col-form-label">Thứ tự hiển thị:</label>
+                        <div class="col-sm-9 col-md-10">
+                            <input type="number" th:field="*{orderNumber}" class="form-control" id="orderNumber" min="1" required />
                         </div>
                     </div>
 
-                    <!-- Tiêu đề nội dung -->
-                    <div class="row mb-3">
-                        <label for="title" class="col-sm-2 col-form-label">Tiêu đề:</label>
-                        <div class="col-sm-10">
-                            <input type="text" th:field="*{title}" class="form-control" placeholder="Nhập tiêu đề nội dung" required />
+                    <!-- Tiêu đề -->
+                    <div class="mb-3 row">
+                        <label for="title" class="col-sm-3 col-md-2 col-form-label">Tiêu đề:</label>
+                        <div class="col-sm-9 col-md-10">
+                            <input type="text" th:field="*{title}" class="form-control" id="title" placeholder="Nhập tiêu đề nội dung" required />
                             <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger"></span>
                         </div>
                     </div>
 
                     <!-- Loại nội dung -->
-                    <div class="row mb-3">
-                        <label for="contentType" class="col-sm-2 col-form-label">Loại nội dung:</label>
-                        <div class="col-sm-10">
+                    <div class="mb-3 row">
+                        <label for="contentType" class="col-sm-3 col-md-2 col-form-label">Loại nội dung:</label>
+                        <div class="col-sm-9 col-md-10">
                             <select th:field="*{contentType}" class="form-select" id="contentType" required>
                                 <option value="">-- Chọn loại nội dung --</option>
                                 <option value="TEXT">Văn bản</option>
@@ -165,14 +220,14 @@
                         </div>
                     </div>
 
-                    <!-- Phần upload file -->
-                    <div class="row mb-3" id="fileUploadSection" style="display: none;">
-                        <label for="fileUpload" class="col-sm-2 col-form-label">Tải lên tệp:</label>
-                        <div class="col-sm-10">
+                    <!-- Upload file -->
+                    <div class="mb-3 row" id="fileUploadSection" style="display: none;">
+                        <label for="fileUpload" class="col-sm-3 col-md-2 col-form-label">Tải lên tệp:</label>
+                        <div class="col-sm-9 col-md-10">
                             <input type="file" name="fileUpload" id="fileUpload" class="form-control" />
                             <small class="text-muted">Hỗ trợ các định dạng phổ biến (PDF, DOC, XLS, JPG, PNG, MP4...)</small>
 
-                            <!-- Hiển thị file hiện tại nếu đang chỉnh sửa -->
+                            <!-- File hiện tại nếu đang chỉnh sửa -->
                             <div th:if="${content.id != 0 && (content.contentType == 'FILE' || content.contentType == 'IMAGE' || content.contentType == 'VIDEO')}"
                                  class="mt-2 p-2 border rounded">
                                 <p class="mb-1"><strong>File hiện tại:</strong> <span th:text="${content.contentData}"></span></p>
@@ -187,20 +242,20 @@
                     </div>
 
                     <!-- Nội dung -->
-                    <div class="row mb-4" id="contentEditorSection">
-                        <label for="contentData" class="col-sm-2 col-form-label">Nội dung:</label>
-                        <div class="col-sm-10">
+                    <div class="mb-3 row" id="contentEditorSection">
+                        <label for="contentData" class="col-sm-3 col-md-2 col-form-label">Nội dung:</label>
+                        <div class="col-sm-9 col-md-10">
                             <textarea th:field="*{contentData}" id="contentEditor" class="form-control" rows="10"></textarea>
                         </div>
                     </div>
 
-                    <!-- Các nút hành động -->
+                    <!-- Nút hành động -->
                     <div class="row">
-                        <div class="col-sm-10 offset-sm-2">
+                        <div class="col-sm-9 col-md-10 offset-sm-3 offset-md-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-1"></i> Lưu
                             </button>
-                            <a th:href="@{/teacher/{teacherId}/courses/{courseId}/lessons/{lessonId}/contents/{contentId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id}, contentId=${content.id})}" class="btn btn-secondary ms-2">
+                            <a th:href="@{/teacher/{teacherId}/course/{courseId}/lesson/{lessonId}(teacherId=${teacher.id}, courseId=${course.id}, lessonId=${lesson.id})}" class="btn btn-secondary ms-2">
                                 <i class="fas fa-times me-1"></i> Hủy
                             </a>
                         </div>
@@ -219,16 +274,34 @@
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 
 <script>
-    // Modified for fixed sidebar
     document.addEventListener('DOMContentLoaded', function() {
         const sidebarToggle = document.getElementById('sidebarToggle');
-        const sideNavbar = document.querySelector('.side-navbar');
+        const sideNav = document.getElementById('sideNav') || document.querySelector('.side-navbar');
         const mainContent = document.querySelector('.main-content');
 
-        // Only for mobile view
-        sidebarToggle.addEventListener('click', function() {
-            sideNavbar.classList.toggle('show');
-        });
+        // Sidebar toggle for desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                if (sideNav) {
+                    sideNav.classList.toggle('collapsed');
+                    sideNav.classList.toggle('show');
+                }
+                if (mainContent) {
+                    mainContent.classList.toggle('expanded');
+                }
+                sidebarToggle.classList.toggle('collapsed');
+
+                // Change icon direction
+                const icon = sidebarToggle.querySelector('i');
+                if (icon.classList.contains('fa-chevron-left')) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-left');
+                }
+            });
+        }
     });
 
     $(document).ready(function() {
@@ -298,56 +371,6 @@
                 }
             }
         }
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Sidebar toggle functionality
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const sideNav = document.getElementById('sideNav');
-        const mainContent = document.querySelector('.main-content');
-
-        // Desktop toggle
-        sidebarToggle.addEventListener('click', function() {
-            sideNav.classList.toggle('collapsed');
-            if (mainContent) {
-                mainContent.classList.toggle('expanded');
-            }
-            sidebarToggle.classList.toggle('collapsed');
-
-            // Change icon direction
-            const icon = sidebarToggle.querySelector('i');
-            if (icon.classList.contains('fa-chevron-left')) {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
-            } else {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
-            }
-        });
-
-        // Mobile toggle
-        mobileToggle.addEventListener('click', function() {
-            sideNav.classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
-            const isClickInsideSidebar = sideNav.contains(event.target);
-            const isClickOnToggle = mobileToggle.contains(event.target);
-
-            if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 992 && sideNav.classList.contains('show')) {
-                sideNav.classList.remove('show');
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 992) {
-                sideNav.classList.remove('show');
-            }
-        });
     });
 </script>
 </body>

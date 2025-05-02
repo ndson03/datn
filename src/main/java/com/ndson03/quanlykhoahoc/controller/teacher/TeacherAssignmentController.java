@@ -84,6 +84,13 @@ public class TeacherAssignmentController {
         theModel.addAttribute("course", course);
         theModel.addAttribute("lesson", lesson);
         theModel.addAttribute("courses", courses);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        theModel.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        theModel.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        theModel.addAttribute("contents", contents);
+
 
         return "teacher/assignment-form";
     }
@@ -310,6 +317,14 @@ public class TeacherAssignmentController {
         model.addAttribute("teacher", teacher);
         model.addAttribute("course", course);
         model.addAttribute("lesson", lesson);
+        List<Course> courses = teacher.getCourses();
+        model.addAttribute("courses", courses);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
 
         return "teacher/quiz-create-form";
     }
@@ -394,6 +409,23 @@ public class TeacherAssignmentController {
         assignmentService.save(assignment);
 
         return "redirect:/teacher/" + teacherId + "/course/" + courseId + "/lesson/" + lessonId;
+    }
+
+    @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}")
+    public String viewAssignment(@PathVariable("teacherId") int studentId,
+                                 @PathVariable("courseId") int courseId,
+                                 @PathVariable("lessonId") int lessonId,
+                                 @PathVariable("assignmentId") int assignmentId) {
+
+        Assignment assignment = assignmentService.findById(assignmentId);
+
+        if (assignment.isQuiz()) {
+            return "redirect:/teacher/" + studentId + "/course/" + courseId +
+                    "/lesson/" + lessonId + "/assignment/" + assignmentId + "/quiz";
+        } else {
+            return "redirect:/teacher/" + studentId + "/course/" + courseId +
+                    "/lesson/" + lessonId + "/assignment/" + assignmentId + "/file";
+        }
     }
 
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}/quiz")

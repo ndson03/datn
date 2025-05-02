@@ -14,7 +14,7 @@ import com.ndson03.quanlykhoahoc.service.user.TeacherService;
 
 @Configuration
 @EnableWebSecurity
-public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
+public class 	DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private StudentService studentService;

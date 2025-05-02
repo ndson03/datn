@@ -76,4 +76,10 @@ public class GeminiController {
         theModel.addAttribute("courses", courses);
         return "teacher/teacher-chatbot";
     }
+
+    @GetMapping("/admin/chatbot")
+    public String qnaPage() {
+        return "admin/admin-chatbot";
+    }
+
 }

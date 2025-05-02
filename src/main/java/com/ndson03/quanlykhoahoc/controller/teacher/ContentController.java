@@ -75,6 +75,7 @@ public class ContentController {
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/showFormForAdd")
     public String showAddContentForm(@PathVariable("lessonId") int lessonId,
                                      @PathVariable("teacherId") int teacherId,
+                                     @PathVariable("courseId") int courseId,
                                      Model model) {
         // Lấy thông tin để hiển thị menu và breadcrumb
         Teacher teacher = teacherService.findByTeacherId(teacherId);
@@ -93,6 +94,12 @@ public class ContentController {
         model.addAttribute("courses", courses);
         model.addAttribute("content", content);
         model.addAttribute("courseId", course.getId());
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
 
         return "teacher/content-form";
     }
@@ -100,6 +107,8 @@ public class ContentController {
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/content/{contentId}/showFormForUpdate")
     public String showEditContentForm(@PathVariable("contentId") int contentId,
                                       @PathVariable("teacherId") int teacherId,
+                                      @PathVariable("lessonId") int lessonId,
+                                      @PathVariable("courseId") int courseId,
                                       Model model) {
         // Lấy thông tin để hiển thị menu và breadcrumb
         Content content = contentService.findById(contentId);
@@ -114,6 +123,13 @@ public class ContentController {
         model.addAttribute("courses", courses);
         model.addAttribute("content", content);
         model.addAttribute("courseId", course.getId());
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
+        List<Assignment> assignments = lesson.getAssignments();
+        model.addAttribute("assignments", assignments);
+        List<Content> contents = contentService.findByLessonId(lessonId);
+        model.addAttribute("contents", contents);
+
 
         return "teacher/content-form";
     }

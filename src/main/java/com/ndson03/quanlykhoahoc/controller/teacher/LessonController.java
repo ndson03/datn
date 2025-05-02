@@ -44,13 +44,17 @@ public class LessonController {
         model.addAttribute("course", course);
         model.addAttribute("teacher", teacher);
         model.addAttribute("courses", courses);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
 
         return "teacher/lesson-form";
     }
 
     // Hiển thị form cập nhật bài học
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}/updateLesson")
-    public String showFormForUpdate(@PathVariable("teacherId") int teacherId, @PathVariable("lessonId") int id, Model model) {
+    public String showFormForUpdate(@PathVariable("teacherId") int teacherId,
+                                    @PathVariable("courseId") int courseId,
+                                    @PathVariable("lessonId") int id, Model model) {
         Teacher teacher = teacherService.findByTeacherId(teacherId);
         List<Course> courses = teacher.getCourses();
         Lesson lesson = lessonService.findById(id);
@@ -58,6 +62,8 @@ public class LessonController {
         model.addAttribute("course", lesson.getCourse());
         model.addAttribute("teacher", teacher);
         model.addAttribute("courses", courses);
+        List<Lesson> lessons = lessonService.findByCourseId(courseId);
+        model.addAttribute("lessons", lessons);
 
         return "teacher/lesson-form";
     }
