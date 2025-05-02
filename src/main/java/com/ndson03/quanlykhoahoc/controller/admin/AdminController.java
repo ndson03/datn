@@ -223,13 +223,13 @@ public class AdminController {
 				String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
 
 				// Đường dẫn đầy đủ đến file
-				Path targetLocation = Paths.get(uploadDir + "/course_image/").resolve(uniqueFilename);
+				Path targetLocation = Paths.get(uploadDir).resolve(uniqueFilename);
 
 				// Lưu file
 				Files.copy(imageFile.getInputStream(), targetLocation);
 
 				// Lưu đường dẫn vào entity
-				theCourse.setImagePath("/uploads/course_image/" + uniqueFilename);
+				theCourse.setImagePath("/uploads/" + uniqueFilename);
 
 			} catch (IOException ex) {
 				// Xử lý ngoại lệ khi tải file lên

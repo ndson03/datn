@@ -16,6 +16,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
         // Đăng ký đường dẫn ảo "/uploads/**" đến thư mục vật lý chứa hình ảnh
         Path uploadPath = Paths.get(uploadDir);
         String uploadPathString = uploadPath.toFile().getAbsolutePath();

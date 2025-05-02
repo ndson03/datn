@@ -26,7 +26,7 @@ public class ContentFileController {
     private ContentService contentService;
 
     @Value("${file.upload.directory}")
-    private String uploadDirectory;
+    private String uploadDir;
 
     @GetMapping("/download-content-file/{filename:.+}")
     @ResponseBody
@@ -36,7 +36,7 @@ public class ContentFileController {
 
             // Tìm nội dung dựa trên tên file đã lưu trong hệ thống
             Content content = contentService.findByContentData(filename);
-            Path file = Paths.get(uploadDirectory).resolve(filename);
+            Path file = Paths.get(uploadDir).resolve(filename);
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {

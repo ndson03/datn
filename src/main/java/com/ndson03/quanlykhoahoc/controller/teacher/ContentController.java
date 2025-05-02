@@ -44,7 +44,7 @@ public class ContentController {
 
 
     @Value("${file.upload.directory}")
-    private String uploadDirectory;
+    private String uploadDir;
 
     @GetMapping("/{teacherId}/course/{courseId}/lesson/{lessonId}")
     public String viewLessonContents(@PathVariable("lessonId") int lessonId,
@@ -145,8 +145,6 @@ public class ContentController {
                               Model model,
                               RedirectAttributes redirectAttributes) {
 
-        final String uploadDirectory = "uploads/content_file" + "/content_" + content.getId();
-
         // Kiểm tra lỗi validation
         if (bindingResult.hasErrors()) {
             Teacher teacher = teacherService.findByTeacherId(teacherId);
@@ -191,7 +189,7 @@ public class ContentController {
                 if (file != null && !file.isEmpty()) {
                     try {
                         // Tạo thư mục nếu chưa tồn tại
-                        File directory = new File(uploadDirectory);
+                        File directory = new File(uploadDir);
                         if (!directory.exists()) {
                             directory.mkdirs();
                         }
@@ -199,7 +197,7 @@ public class ContentController {
                         // Xóa file cũ nếu đang cập nhật và có file cũ
                         if (content.getId() != 0 && originalFilePath != null && !originalFilePath.isEmpty()) {
                             try {
-                                Path oldFile = Paths.get(uploadDirectory, originalFilePath);
+                                Path oldFile = Paths.get(uploadDir, originalFilePath);
                                 Files.deleteIfExists(oldFile);
                             } catch (IOException e) {
                                 // Ghi log nếu không xóa được file cũ
@@ -213,7 +211,7 @@ public class ContentController {
                         String newFilename = UUID.randomUUID().toString() + extension;
 
                         // Lưu file vào thư mục đã cấu hình
-                        Path fileNameAndPath = Paths.get(uploadDirectory, newFilename);
+                        Path fileNameAndPath = Paths.get(uploadDir, newFilename);
                         Files.write(fileNameAndPath, file.getBytes());
 
                         // Lưu đường dẫn file và tên file gốc vào nội dung
@@ -229,7 +227,7 @@ public class ContentController {
                     // Nếu không có file mới và không giữ file cũ, xóa file cũ
                     try {
                         if (originalFilePath != null && !originalFilePath.isEmpty()) {
-                            Path oldFile = Paths.get(uploadDirectory, originalFilePath);
+                            Path oldFile = Paths.get(uploadDir, originalFilePath);
                             Files.deleteIfExists(oldFile);
                         }
 
@@ -272,7 +270,7 @@ public class ContentController {
                 content.getContentData() != null && !content.getContentData().isEmpty()) {
 
             try {
-                Path filePath = Paths.get(uploadDirectory, content.getContentData());
+                Path filePath = Paths.get(uploadDir, content.getContentData());
                 Files.deleteIfExists(filePath);
             } catch (IOException e) {
                 System.err.println("Không thể xóa file: " + e.getMessage());

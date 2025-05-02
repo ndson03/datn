@@ -40,6 +40,9 @@ import java.util.*;
 @RequestMapping("/teacher")
 public class TeacherAssignmentController {
 
+    @Value("${file.upload.directory}")
+    private String uploadDir;
+
     @Autowired
     private AssignmentService assignmentService;
 
@@ -132,7 +135,6 @@ public class TeacherAssignmentController {
         if (!assignment.isQuiz() && assignmentFile != null && !assignmentFile.isEmpty()) {
             try {
                 // Create directory structure if it doesn't exist
-                String uploadDir = "uploads/assignment_file" + "/assignment_" + assignment.getId();
                 Path uploadPath = Paths.get(uploadDir);
 
                 if (!Files.exists(uploadPath)) {
@@ -152,7 +154,7 @@ public class TeacherAssignmentController {
                 Files.copy(assignmentFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                 // Set file information in the assignment
-                assignment.setFilePath(uploadDir + "/" + uniqueFilename);
+                assignment.setFilePath(uploadDir + uniqueFilename);
                 assignment.setFileName(originalFilename);
 
             } catch (IOException e) {
