@@ -188,15 +188,16 @@
                     <div th:if="${content.contentData != null && content.contentData.contains('youtube')}" class="video-container" th:utext="${content.contentData}"></div>
 
                     <!-- Nếu là file video được tải lên -->
+                    <!-- For locally uploaded videos -->
                     <div th:if="${content.contentData != null && !content.contentData.contains('youtube')}" class="mb-3">
                         <div class="video-container">
                             <video controls>
-                                <source th:href="@{/download-content-file/{filename}(filename=${content.contentData})}" type="video/mp4">
+                                <source th:src="@{/download-content-file/{filename}(filename=${content.contentData})}" type="video/mp4">
                                 Trình duyệt của bạn không hỗ trợ video này.
                             </video>
                         </div>
                         <div class="text-center mt-3">
-                            <a th:src="@{/download-content-file/{filename}(filename=${content.contentData})}"
+                            <a th:href="@{/download-content-file/{filename}(filename=${content.contentData})}"
                                class="btn btn-primary download-btn"
                                download th:attr="download=${content.filename}">
                                 <i class="fas fa-download me-2"></i>Tải xuống video
