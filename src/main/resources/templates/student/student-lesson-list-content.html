@@ -34,7 +34,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <!-- Dashboard link moved to top navbar -->
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+                    <a class="nav-link active" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
                 </li>
@@ -72,8 +72,7 @@
                         <span th:text="${student.firstName + ' ' + student.lastName}"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
+                        <li><a class="dropdown-item" th:href="@{/student/{studentId}/profile(studentId=${student.id})}"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="#" th:action="@{/logout}" method="POST">

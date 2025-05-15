@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hồ sơ học viên</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.0.96/css/materialdesignicons.min.css">
+    <!-- Google Fonts - Thêm các phương thức hiển thị tiếng Việt -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap&subset=vietnamese" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4d61fc;
+            --primary-dark: #3a4cd1;
+            --secondary-color: #6c7aff;
+            --accent-color: #ff9f43;
+            --light-color: #f0f3ff;
+            --dark-color: #2d3748;
+            --success-color: #38c172;
+            --danger-color: #e3342f;
+            --warning-color: #ffce54;
+            --info-color: #3498db;
+            --gray-100: #f8f9fc;
+            --gray-200: #edf2f7;
+            --gray-300: #e2e8f0;
+            --gray-600: #718096;
+            --gray-700: #4a5568;
+            --border-radius: 12px;
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --hover-shadow: 0 15px 30px rgba(77, 97, 252, 0.15);
+            --content-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
+            --box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Poppins', 'Be Vietnam Pro', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 400;
+            background-color: var(--gray-100);
+            color: var(--dark-color);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Top navbar styling */
+        .top-navbar {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            box-shadow: var(--box-shadow);
+            padding: 0.8rem 1.5rem;
+            border-bottom: none;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            padding-left: 20px;
+            font-size: 1.2rem;
+        }
+
+        .navbar-brand i {
+            font-size: 1.2rem;
+        }
+
+        .user-dropdown .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown:hover .avatar {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Nav links in top bar */
+        .top-navbar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .top-navbar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .top-navbar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        .top-navbar .nav-link i {
+            margin-right: 8px;
+        }
+
+        /* Courses dropdown in navbar */
+        .courses-dropdown .dropdown-menu {
+            width: 280px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .courses-dropdown .dropdown-item {
+            white-space: normal;
+            padding: 10px 15px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 80px 30px 30px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        /* Profile Card Redesign */
+        .profile-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            border: none;
+        }
+
+        .profile-card .card-header {
+            border-bottom: 1px solid var(--gray-200);
+            padding: 18px 25px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .profile-card .card-header h5 {
+            margin-bottom: 0;
+            color: var(--dark-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-card .card-body {
+            padding: 30px 100px;
+        }
+
+        /* Profile Header Redesign - Avatar left, info right */
+        .profile-header {
+            display: flex;
+            position: relative;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .profile-left {
+            flex: 0 0 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-image {
+            width: 230px;
+            height: 230px;
+            border-radius: 50%; /* Thay đổi thành hình tròn */
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3.5rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(77, 97, 252, 0.2);
+            margin-bottom: 15px;
+            border: 5px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .update-avatar-btn {
+            width: 100%;
+            border-radius: 8px;
+            background-color: var(--gray-200);
+            color: var(--dark-color);
+            border: none;
+            padding: 8px 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .update-avatar-btn:hover {
+            background-color: var(--gray-300);
+        }
+
+        .update-avatar-btn i {
+            margin-right: 5px;
+        }
+
+        .profile-info {
+            padding-left: 80px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .profile-name {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1.6rem;
+        }
+
+        .profile-username {
+            color: var(--gray-600);
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+        }
+
+        /* Profile Information Items */
+        .profile-info-section {
+            margin-bottom: 25px;
+        }
+
+        .profile-info-item {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .profile-info-label {
+            width: 200px;
+            font-weight: 500;
+            color: var(--gray-700);
+            flex-shrink: 0;
+        }
+
+        .profile-info-value {
+            color: var(--dark-color);
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        /* Edit Button Positioned Below Info */
+        .profile-actions {
+            text-align: left;
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(77, 97, 252, 0.15);
+            font-size: 0.9rem;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(77, 97, 252, 0.25);
+        }
+
+        /* New password change button - lighter style */
+        .change-password-btn {
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            font-size: 0.9rem;
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .change-password-btn:hover {
+            transform: translateY(-2px);
+            background-color: var(--gray-300);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Enrolled Courses Redesign */
+        .alert-custom {
+            background-color: rgba(77, 97, 252, 0.1);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        /* Custom Table for Courses */
+        .custom-table {
+            margin-bottom: 0;
+        }
+
+        .custom-table thead th {
+            background-color: var(--light-color);
+            color: var(--gray-700);
+            font-weight: 600;
+            border-bottom: none;
+            padding: 15px 20px;
+        }
+
+        .custom-table tbody tr {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .custom-table tbody tr:hover {
+            background-color: rgba(77, 97, 252, 0.05);
+        }
+
+        .custom-table td {
+            padding: 15px 25px;
+            vertical-align: middle;
+            border-color: var(--gray-200);
+        }
+
+        /* Course Info in Table - OPTIMIZED LAYOUT */
+        .course-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .course-thumb {
+            width: 150px; /* Slightly wider for better visual balance */
+            height: 90px; /* Adjusted for better proportion */
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            margin-right: 25px;
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Default backgrounds for course thumbnails */
+        .course-thumb.default-1 {
+            background: linear-gradient(45deg, #4d61fc, #6c7aff);
+        }
+
+        .course-thumb.default-2 {
+            background: linear-gradient(45deg, #ff9f43, #ffbc7d);
+        }
+
+        .course-thumb.default-3 {
+            background: linear-gradient(45deg, #38c172, #74e39a);
+        }
+
+        .course-thumb.default-4 {
+            background: linear-gradient(45deg, #6f42c1, #a78edb);
+        }
+
+        .course-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 6px;
+            display: block;
+            font-size: 1.25rem; /* Increased course name size */
+            line-height: 1.3;
+        }
+
+        .course-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .course-code {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        /* Teacher info styling - now integrated under course name */
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .teacher-info i {
+            color: var(--primary-color);
+            margin-right: 8px;
+            font-size: 0.95rem;
+        }
+
+        .teacher-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--gray-700);
+        }
+
+        /* Courses Grid Layout */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(77, 97, 252, 0.15);
+        }
+
+        .course-card-thumb {
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .course-card-body {
+            padding: 20px;
+        }
+
+        .course-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+
+        .course-card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Dropdown menu styling */
+        .dropdown-menu {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+
+        .dropdown-item {
+            padding: 8px 20px;
+            color: var(--gray-700);
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .dropdown-divider {
+            margin: 8px 0;
+            border-top-color: var(--gray-200);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .profile-header {
+                gap: 30px;
+            }
+
+            .profile-left {
+                flex: 0 0 150px;
+            }
+
+            .profile-image {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+
+            .courses-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .profile-left {
+                margin-bottom: 10px;
+            }
+
+            .profile-info {
+                padding-left: 0;
+            }
+
+            .profile-info-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .profile-info-label {
+                margin-bottom: 5px;
+                width: auto;
+            }
+
+            .profile-actions {
+                text-align: center;
+                margin-top: 20px;
+                justify-content: center;
+            }
+
+            .course-info {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .course-thumb {
+                width: 100%;
+                max-width: 260px;
+                height: 130px;
+                margin-bottom: 15px;
+                margin-right: 0;
+            }
+
+            .course-details {
+                text-align: center;
+            }
+
+            .teacher-info {
+                justify-content: center;
+            }
+
+            .custom-table td {
+                padding: 20px 15px;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card .card-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Top Navbar - Kept exactly as original -->
+<nav class="navbar navbar-expand-lg top-navbar navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span>Trường SICT - HaUI</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Dashboard link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/teacher/{teacherId}/courses(teacherId=${teacher.id})}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- Chatbot link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/teacher/{teacherId}/chatbot(teacherId=${teacher.id})}">
+                        <i class="fas fa-robot"></i> Chatbot
+                    </a>
+                </li>
+
+                <!-- Courses dropdown menu -->
+                <li class="nav-item dropdown courses-dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="coursesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i> Khóa học
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="coursesDropdown">
+                        <li th:each="course : ${courses}">
+                            <a class="dropdown-item" th:href="@{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})}" th:text="${course.name}"></a>
+                        </li>
+                        <li th:if="${courses.size() == 0}">
+                            <span class="dropdown-item text-muted">Không có khóa học nào</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown user-dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown">
+                        <div class="avatar me-2">
+                            <span th:text="${#strings.substring(teacher.firstName, 0, 1) + #strings.substring(teacher.lastName, 0, 1)}"></span>
+                        </div>
+                        <span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" th:href="@{/teacher/{teacherId}/profile(teacherId=${teacher.id})}"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="#" th:action="@{/logout}" method="POST">
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div style="height: 30px"></div>
+    <div class="container">
+
+        <!-- Profile Section -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h5><i class="fas fa-user-circle me-2"></i> Thông tin cá nhân</h5>
+            </div>
+            <div class="card-body">
+                <!-- Combined Profile Header - Avatar Left, Info Right -->
+                <div class="profile-header">
+                    <div class="profile-left">
+                        <div class="profile-image">
+                            <span th:text="${#strings.substring(teacher.firstName, 0, 1) + #strings.substring(teacher.lastName, 0, 1)}"></span>
+                        </div>
+                        <button class="update-avatar-btn">
+                            <i class="fas fa-camera"></i> Cập nhật ảnh
+                        </button>
+                    </div>
+                    <div class="profile-info">
+                        <h4 class="profile-name" th:text="${teacher.firstName + ' ' + teacher.lastName}"></h4>
+                        <p class="profile-username" th:text="${teacher.userName}"></p>
+
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Tên đăng nhập:</div>
+                            <div class="profile-info-value" th:text="${teacher.userName}"></div>
+                        </div>
+
+                        <!-- Profile Information Items -->
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Họ tên:</div>
+                            <div class="profile-info-value" th:text="${teacher.firstName + ' ' + teacher.lastName}"></div>
+                        </div>
+
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Email:</div>
+                            <div class="profile-info-value" th:text="${teacher.email}"></div>
+                        </div>
+
+                        <!-- Edit Button + Change Password Button Under Information -->
+                        <div class="profile-actions">
+                            <a th:href="@{/teacher/{teacherId}/profile/edit(teacherId=${teacher.id})}" class="btn btn-primary edit-btn">
+                                <i class="fas fa-edit me-1"></i> Chỉnh sửa
+                            </a>
+                            <a th:href="@{/teacher/{teacherId}/change-password(teacherId=${teacher.id})}" class="btn change-password-btn">
+                                <i class="fas fa-key me-1"></i> Đổi mật khẩu
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enrolled Courses Section - OPTIMIZED LAYOUT -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h5><i class="fas fa-book me-2"></i> Khóa học đã đăng ký</h5>
+            </div>
+            <div class="card-body">
+                <!-- No Courses Message -->
+                <div class="alert alert-custom" th:if="${courses.empty}">
+                    <i class="fas fa-info-circle me-2"></i> Bạn chưa đăng ký khóa học nào. Hãy liên hệ với giáo viên để đăng ký!
+                </div>
+
+                <!-- Option 1: Optimized Table Layout (Teacher info moved under course name) -->
+                <div class="table-responsive" th:unless="${courses.empty}">
+                    <table class="table table-hover custom-table">
+                        <tbody>
+                        <tr th:each="course, iterStat : ${courses}" th:onclick="'window.location.href=\'' + @{/teacher/{teacherId}/courses/{courseId}(teacherId=${teacher.id}, courseId=${course.id})} + '\''">
+                            <td>
+                                <div class="course-info">
+                                    <!-- Course Thumbnail -->
+                                    <div th:if="${course.imagePath != null && !course.imagePath.isEmpty()}"
+                                         class="course-thumb"
+                                         th:style="'background-image: url(' + @{${course.imagePath}} + ');'">
+                                    </div>
+                                    <div th:if="${course.imagePath == null || course.imagePath.isEmpty()}"
+                                         th:class="'course-thumb default-' + ${iterStat.count % 4 + 1}">
+                                    </div>
+
+                                    <!-- Course Name, Code and Teacher -->
+                                    <div class="course-details">
+                                        <span class="course-name" th:text="${course.name}"></span>
+                                        <div class="course-meta">
+                                            <span class="course-code" th:text="${course.code}"></span>
+                                            <!-- Teacher info now integrated below course name -->
+                                            <div class="teacher-info">
+                                                <i class="fas fa-chalkboard-teacher"></i>
+                                                <span class="teacher-name" th:text="${course.teacher != null ? course.teacher.firstName + ' ' + course.teacher.lastName : 'Chưa có giáo viên'}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hiệu ứng hover khi di chuột qua hàng trong bảng
+        const tableRows = document.querySelectorAll('.custom-table tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.cursor = 'pointer';
+            });
+        });
+    });
+</script>
+</body>
+</html>
+

@@ -4,6 +4,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 import com.ndson03.quanlykhoahoc.domain.validation.FieldMatch;
 import com.ndson03.quanlykhoahoc.domain.entity.Role;
@@ -42,6 +47,16 @@ public class UserDTO {
 	@Email(message = "Email không hợp lệ")
 	@Size(max = 100, message = "Email không được vượt quá {max} ký tự")
 	private String email;
+
+	@NotBlank(message = "Số điện thoại không được để trống")
+	@Pattern(regexp = "^(0|\\+84)(\\s|\\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\\d)(\\s|\\.)?(\\d{3})(\\s|\\.)?(\\d{3})$",
+			message = "Số điện thoại không hợp lệ")
+	private String phoneNumber;
+
+	@NotNull(message = "Ngày sinh không được để trống")
+	@Past(message = "Ngày sinh phải là ngày trong quá khứ")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date birthDate;
 
 	private Role role;
 
@@ -95,6 +110,22 @@ public class UserDTO {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	public Role getRole() {

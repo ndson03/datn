@@ -132,33 +132,6 @@
 			<i class="fas fa-exclamation-circle me-2"></i>
 			Chưa có sinh viên trong khóa học này. Cần ít nhất 1 sinh viên để xem chi tiết khóa học.
 		</div>
-
-		<div th:if="${students.size() != 0}">
-			<!-- Dashboard Cards -->
-			<div class="row mb-4">
-				<div class="col-md-3">
-					<div class="card counter-card">
-						<i class="fas fa-users"></i>
-						<div class="counter" th:text="${students.size()}"></div>
-						<div class="counter-title">Sinh viên</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card counter-card">
-						<i class="fas fa-book-open"></i>
-						<div class="counter" th:text="${lessons != null ? lessons.size() : 0}"></div>
-						<div class="counter-title">Bài học</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card counter-card">
-						<i class="fas fa-chart-line"></i>
-						<div class="counter">--</div>
-						<div class="counter-title">Điểm trung bình</div>
-					</div>
-				</div>
-			</div>
-
 			<!-- Lessons List -->
 			<div class="card">
 				<div class="card-header d-flex justify-content-between align-items-center">

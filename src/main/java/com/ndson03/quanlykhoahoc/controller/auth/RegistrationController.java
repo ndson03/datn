@@ -21,6 +21,11 @@ import com.ndson03.quanlykhoahoc.service.user.StudentService;
 import com.ndson03.quanlykhoahoc.service.user.TeacherService;
 import com.ndson03.quanlykhoahoc.domain.dto.UserDTO;
 
+import java.beans.PropertyEditorSupport;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Controller
 @RequestMapping("/register")
 public class RegistrationController {
@@ -36,8 +41,29 @@ public class RegistrationController {
 
 	@InitBinder
 	public void initBinder(WebDataBinder dataBinder) {
+		// String trimmer để xử lý khoảng trắng
 		StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(true);
 		dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
+
+		// Custom editor cho Date để xử lý ngày sinh
+		dataBinder.registerCustomEditor(Date.class, new PropertyEditorSupport() {
+			private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+			@Override
+			public void setAsText(String text) throws IllegalArgumentException {
+				try {
+					setValue(dateFormat.parse(text));
+				} catch (ParseException e) {
+					setValue(null);
+				}
+			}
+
+			@Override
+			public String getAsText() {
+				Date value = (Date) getValue();
+				return (value != null ? dateFormat.format(value) : "");
+			}
+		});
 	}
 
 	@GetMapping("/showRegistrationForm")

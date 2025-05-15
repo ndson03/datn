@@ -19,6 +19,7 @@
 			--primary-color: #4d61fc;
 			--primary-dark: #3a4cd1;
 			--secondary-color: #6c7aff;
+			--secondary-color: #6c7aff;
 			--accent-color: #ff9f43;
 			--light-color: #f0f3ff;
 			--dark-color: #2d3748;
@@ -466,8 +467,7 @@
 						<span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span>
 					</a>
 					<ul class="dropdown-menu dropdown-menu-end">
-						<li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
-						<li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
+						<li><a class="dropdown-item" th:href="@{/teacher/{teacherId}/profile(teacherId=${teacher.id})}"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
 						<li><hr class="dropdown-divider"></li>
 						<li>
 							<form action="#" th:action="@{/logout}" method="POST">
@@ -534,10 +534,7 @@
 		<div class="empty-state" th:if="${courses.size() == 0}">
 			<i class="fas fa-book-open"></i>
 			<h4>Không có khóa học nào</h4>
-			<p class="text-muted">Bạn chưa có khóa học nào. Hãy tạo khóa học đầu tiên!</p>
-			<button class="btn btn-primary mt-3">
-				<i class="fas fa-plus me-2"></i> Tạo khóa học mới
-			</button>
+			<p class="text-muted">Bạn chưa có khóa học nào.</p>
 		</div>
 	</div>
 </div>
