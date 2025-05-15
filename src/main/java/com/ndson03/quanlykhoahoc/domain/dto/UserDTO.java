@@ -2,36 +2,51 @@ package com.ndson03.quanlykhoahoc.domain.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 
+import com.ndson03.quanlykhoahoc.domain.validation.FieldMatch;
 import com.ndson03.quanlykhoahoc.domain.entity.Role;
 
-
+@FieldMatch.List({
+		@FieldMatch(first = "password", second = "confirmPassword",
+				message = "Mật khẩu và xác nhận mật khẩu phải trùng khớp")
+})
 public class UserDTO {
-	
-	@NotBlank(message = "is required")
-	@Size(min = 1, message = "is required")
+
+	@NotBlank(message = "Tên người dùng không được để trống")
+	@Size(min = 3, max = 50, message = "Tên người dùng phải từ {min} đến {max} ký tự")
+	@Pattern(regexp = "^[a-zA-Z0-9._-]{3,}$", message = "Tên người dùng chỉ được chứa chữ cái, số và các ký tự đặc biệt ._-")
 	private String userName;
-	
-	@NotBlank(message = "is required")
-	@Size(min = 1, message = "is required")
+
+	@NotBlank(message = "Mật khẩu không được để trống")
+	@Size(min = 8, max = 100, message = "Mật khẩu phải từ {min} đến {max} ký tự")
+	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+			message = "Mật khẩu phải chứa ít nhất 1 chữ số, 1 chữ thường, 1 chữ hoa, 1 ký tự đặc biệt và không có khoảng trắng")
 	private String password;
-	
-	@NotBlank(message = "is required")
-	@Size(min = 1, message = "is required")
+
+	@NotBlank(message = "Xác nhận mật khẩu không được để trống")
+	private String confirmPassword;
+
+	@NotBlank(message = "Họ đệm không được để trống")
+	@Size(min = 1, max = 50, message = "Họ đệm phải từ {min} đến {max} ký tự")
+	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "Họ đệm chỉ được chứa chữ cái và các ký tự .'- ")
 	private String firstName;
-	
-	@NotBlank(message = "is required")
-	@Size(min = 1, message = "is required")
+
+	@NotBlank(message = "Tên không được để trống")
+	@Size(min = 1, max = 50, message = "Tên phải từ {min} đến {max} ký tự")
+	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "Tên chỉ được chứa chữ cái và các ký tự .'- ")
 	private String lastName;
-	
-	@NotBlank(message = "is required")
-	@Size(min = 1, message = "is required")
+
+	@NotBlank(message = "Email không được để trống")
+	@Email(message = "Email không hợp lệ")
+	@Size(max = 100, message = "Email không được vượt quá {max} ký tự")
 	private String email;
-	
+
 	private Role role;
-	
+
 	public UserDTO() {
-		
+		// Constructor mặc định
 	}
 
 	public String getUserName() {
@@ -48,6 +63,14 @@ public class UserDTO {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 
 	public String getFirstName() {
@@ -81,8 +104,4 @@ public class UserDTO {
 	public void setRole(Role role) {
 		this.role = role;
 	}
-
-	
-	
-	
 }

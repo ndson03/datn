@@ -111,7 +111,6 @@
 
 		.input-with-icon {
 			padding-left: 2.5rem;
-
 		}
 
 		.btn-register {
@@ -135,6 +134,40 @@
 			border-radius: 8px;
 		}
 
+		.registration-success {
+			font-size: 0.9rem;
+			padding: 0.75rem;
+			margin-bottom: 1.5rem;
+			border-radius: 8px;
+		}
+
+		.password-requirements {
+			font-size: 0.8rem;
+			color: var(--secondary-color);
+			margin-top: 0.3rem;
+		}
+
+		.password-strength {
+			height: 5px;
+			margin-top: 0.5rem;
+			border-radius: 5px;
+			background-color: #e9ecef;
+		}
+
+		.password-strength-bar {
+			height: 100%;
+			border-radius: 5px;
+			width: 0%;
+			transition: width 0.3s, background-color 0.3s;
+		}
+
+		.is-valid {
+			color: #28a745;
+		}
+
+		.is-invalid {
+			color: #dc3545;
+		}
 
 		@media (max-width: 576px) {
 			.register-container {
@@ -167,8 +200,12 @@
 					</div>
 					<div class="brand-name">Trường SICT - HaUI</div>
 				</div>
+
 				<!-- Registration Error -->
 				<div class="alert alert-danger registration-error" th:if="${registrationError}" th:text="${registrationError}"></div>
+
+				<!-- Registration Success -->
+				<div class="alert alert-success registration-success" th:if="${registrationSuccess}" th:text="${registrationSuccess}"></div>
 
 				<!-- Registration Form -->
 				<form th:action="@{/register/processRegistrationForm}" th:object="${userDto}" method="POST">
@@ -177,7 +214,8 @@
 						<label for="userName">Tên người dùng</label>
 						<i class="fas fa-user form-icon"></i>
 						<input type="text" class="form-control input-with-icon" id="userName" th:field="*{userName}" placeholder="Nhập tên người dùng" autofocus>
-						<div class="error-feedback" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}">Invalid user name!</div>
+						<div class="error-feedback" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></div>
+						<small class="form-text text-muted">Tên người dùng phải từ 3 đến 50 ký tự và chỉ chứa chữ cái, số và các ký tự ._-</small>
 					</div>
 
 					<!-- Password and Confirm Password - in a row -->
@@ -187,14 +225,25 @@
 								<label for="password">Mật khẩu</label>
 								<i class="fas fa-lock form-icon"></i>
 								<input type="password" class="form-control input-with-icon" id="password" th:field="*{password}" placeholder="Nhập mật khẩu">
-								<div class="error-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Invalid password!</div>
+								<div class="error-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+								<div class="password-strength">
+									<div class="password-strength-bar" id="passwordStrengthBar"></div>
+								</div>
+								<div class="password-requirements">
+									<div id="length-check"><i class="fas fa-circle"></i> Ít nhất 8 ký tự</div>
+									<div id="lowercase-check"><i class="fas fa-circle"></i> Ít nhất 1 chữ cái thường</div>
+									<div id="uppercase-check"><i class="fas fa-circle"></i> Ít nhất 1 chữ cái hoa</div>
+									<div id="number-check"><i class="fas fa-circle"></i> Ít nhất 1 chữ số</div>
+									<div id="special-check"><i class="fas fa-circle"></i> Ít nhất 1 ký tự đặc biệt</div>
+								</div>
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="form-group">
 								<label for="confirmPassword">Xác nhận mật khẩu</label>
 								<i class="fas fa-lock form-icon"></i>
-								<input type="password" class="form-control input-with-icon" id="confirmPassword" name="confirmPassword" placeholder="Nhập lại mật khẩu">
+								<input type="password" class="form-control input-with-icon" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Nhập lại mật khẩu">
+								<div class="error-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
 								<div class="error-feedback" id="password-mismatch" style="display: none;">Mật khẩu không khớp!</div>
 							</div>
 						</div>
@@ -207,7 +256,7 @@
 								<label for="firstName">Họ đệm</label>
 								<i class="fas fa-id-card form-icon"></i>
 								<input type="text" class="form-control input-with-icon" id="firstName" th:field="*{firstName}" placeholder="Họ đệm">
-								<div class="error-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Invalid first name!</div>
+								<div class="error-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -215,7 +264,7 @@
 								<label for="lastName">Tên</label>
 								<i class="fas fa-id-card form-icon"></i>
 								<input type="text" class="form-control input-with-icon" id="lastName" th:field="*{lastName}" placeholder="Tên">
-								<div class="error-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Invalid last name!</div>
+								<div class="error-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
 							</div>
 						</div>
 					</div>
@@ -225,7 +274,8 @@
 						<label for="email">Email</label>
 						<i class="fas fa-envelope form-icon"></i>
 						<input type="email" class="form-control input-with-icon" id="email" th:field="*{email}" placeholder="Nhập email">
-						<div class="error-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Invalid email!</div>
+						<div class="error-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+						<small class="form-text text-muted">Vui lòng nhập một địa chỉ email hợp lệ</small>
 					</div>
 
 					<!-- Role -->
@@ -265,11 +315,114 @@
 		const confirmPasswordInput = document.getElementById('confirmPassword');
 		const passwordMismatch = document.getElementById('password-mismatch');
 		const registerBtn = document.getElementById('registerBtn');
+		const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+
+		// Password requirement checkers
+		const lengthCheck = document.getElementById('length-check');
+		const lowercaseCheck = document.getElementById('lowercase-check');
+		const uppercaseCheck = document.getElementById('uppercase-check');
+		const numberCheck = document.getElementById('number-check');
+		const specialCheck = document.getElementById('special-check');
+
+		// Function to check password requirements
+		function checkPasswordRequirements() {
+			const password = passwordInput.value;
+			let strength = 0;
+
+			// Check length
+			if (password.length >= 8) {
+				lengthCheck.classList.add('is-valid');
+				lengthCheck.classList.remove('is-invalid');
+				lengthCheck.querySelector('i').className = 'fas fa-check-circle';
+				strength += 20;
+			} else {
+				lengthCheck.classList.remove('is-valid');
+				lengthCheck.classList.add('is-invalid');
+				lengthCheck.querySelector('i').className = 'fas fa-times-circle';
+			}
+
+			// Check lowercase
+			if (/[a-z]/.test(password)) {
+				lowercaseCheck.classList.add('is-valid');
+				lowercaseCheck.classList.remove('is-invalid');
+				lowercaseCheck.querySelector('i').className = 'fas fa-check-circle';
+				strength += 20;
+			} else {
+				lowercaseCheck.classList.remove('is-valid');
+				lowercaseCheck.classList.add('is-invalid');
+				lowercaseCheck.querySelector('i').className = 'fas fa-times-circle';
+			}
+
+			// Check uppercase
+			if (/[A-Z]/.test(password)) {
+				uppercaseCheck.classList.add('is-valid');
+				uppercaseCheck.classList.remove('is-invalid');
+				uppercaseCheck.querySelector('i').className = 'fas fa-check-circle';
+				strength += 20;
+			} else {
+				uppercaseCheck.classList.remove('is-valid');
+				uppercaseCheck.classList.add('is-invalid');
+				uppercaseCheck.querySelector('i').className = 'fas fa-times-circle';
+			}
+
+			// Check number
+			if (/[0-9]/.test(password)) {
+				numberCheck.classList.add('is-valid');
+				numberCheck.classList.remove('is-invalid');
+				numberCheck.querySelector('i').className = 'fas fa-check-circle';
+				strength += 20;
+			} else {
+				numberCheck.classList.remove('is-valid');
+				numberCheck.classList.add('is-invalid');
+				numberCheck.querySelector('i').className = 'fas fa-times-circle';
+			}
+
+			// Check special character
+			if (/[^A-Za-z0-9]/.test(password)) {
+				specialCheck.classList.add('is-valid');
+				specialCheck.classList.remove('is-invalid');
+				specialCheck.querySelector('i').className = 'fas fa-check-circle';
+				strength += 20;
+			} else {
+				specialCheck.classList.remove('is-valid');
+				specialCheck.classList.add('is-invalid');
+				specialCheck.querySelector('i').className = 'fas fa-times-circle';
+			}
+
+			// Update strength bar
+			passwordStrengthBar.style.width = strength + '%';
+
+			// Change color based on strength
+			if (strength <= 20) {
+				passwordStrengthBar.style.backgroundColor = '#dc3545'; // Red
+			} else if (strength <= 40) {
+				passwordStrengthBar.style.backgroundColor = '#ffc107'; // Yellow
+			} else if (strength <= 60) {
+				passwordStrengthBar.style.backgroundColor = '#fd7e14'; // Orange
+			} else if (strength <= 80) {
+				passwordStrengthBar.style.backgroundColor = '#20c997'; // Teal
+			} else {
+				passwordStrengthBar.style.backgroundColor = '#28a745'; // Green
+			}
+
+			// Enable/disable register button based on password strength
+			if (strength < 80) {
+				registerBtn.disabled = true;
+			} else {
+				// Check if passwords match before enabling
+				if (confirmPasswordInput.value === '') {
+					registerBtn.disabled = true;
+				} else {
+					registerBtn.disabled = (passwordInput.value !== confirmPasswordInput.value);
+				}
+			}
+		}
 
 		// Function to check password match
 		function checkPasswordMatch() {
 			if (confirmPasswordInput.value === '') {
 				passwordMismatch.style.display = 'none';
+				registerBtn.disabled = true;
 				return;
 			}
 
@@ -278,11 +431,61 @@
 				registerBtn.disabled = true;
 			} else {
 				passwordMismatch.style.display = 'none';
-				registerBtn.disabled = false;
+				// Check password strength before enabling button
+				const strength = passwordStrengthBar.style.width.replace('%', '');
+				registerBtn.disabled = (parseInt(strength) < 80);
 			}
 		}
 
+		// Toggle password visibility
+		const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+		togglePasswordButtons.forEach(button => {
+			button.addEventListener('click', function() {
+				const input = this.previousElementSibling;
+				const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+				input.setAttribute('type', type);
+				this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+			});
+		});
+
+		// Real-time username validation
+		const userNameInput = document.getElementById('userName');
+		userNameInput.addEventListener('input', function() {
+			const userName = this.value;
+			const usernamePattern = /^[a-zA-Z0-9._-]{3,}$/;
+
+			if (userName.length < 3) {
+				this.classList.add('is-invalid');
+				this.classList.remove('is-valid');
+			} else if (!usernamePattern.test(userName)) {
+				this.classList.add('is-invalid');
+				this.classList.remove('is-valid');
+			} else {
+				this.classList.remove('is-invalid');
+				this.classList.add('is-valid');
+			}
+		});
+
+		// Real-time email validation
+		const emailInput = document.getElementById('email');
+		emailInput.addEventListener('input', function() {
+			const email = this.value;
+			const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+			if (email === '') {
+				this.classList.remove('is-valid');
+				this.classList.remove('is-invalid');
+			} else if (!emailPattern.test(email)) {
+				this.classList.add('is-invalid');
+				this.classList.remove('is-valid');
+			} else {
+				this.classList.remove('is-invalid');
+				this.classList.add('is-valid');
+			}
+		});
+
 		// Add event listeners
+		passwordInput.addEventListener('input', checkPasswordRequirements);
 		passwordInput.addEventListener('input', checkPasswordMatch);
 		confirmPasswordInput.addEventListener('input', checkPasswordMatch);
 
@@ -293,7 +496,17 @@
 				passwordMismatch.style.display = 'block';
 				confirmPasswordInput.focus();
 			}
+
+			// Check password strength
+			const strength = passwordStrengthBar.style.width.replace('%', '');
+			if (parseInt(strength) < 80) {
+				e.preventDefault();
+				alert('Mật khẩu không đủ mạnh! Vui lòng đáp ứng tất cả các yêu cầu.');
+			}
 		});
+
+		// Initialize password strength checker
+		checkPasswordRequirements();
 	});
 </script>
 </body>

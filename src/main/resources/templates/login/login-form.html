@@ -115,6 +115,15 @@
 			font-size: 0.9rem;
 		}
 
+		.success-message {
+			background-color: #d1e7dd;
+			color: #0f5132;
+			padding: 0.75rem;
+			border-radius: 8px;
+			margin-bottom: 1rem;
+			font-size: 0.9rem;
+		}
+
 		.footer {
 			margin-top: auto;
 			padding: 1.5rem 0;
@@ -150,6 +159,12 @@
 					<div class="error-message" th:if="${param.error}">
 						<i class="fas fa-exclamation-circle me-2"></i>
 						Tài khoản hoặc mật khẩu không hợp lệ
+					</div>
+
+					<!-- Success Message -->
+					<div class="success-message" th:if="${param.registrationSuccess}">
+						<i class="fas fa-check-circle me-2"></i>
+						Đăng ký thành công! Vui lòng đăng nhập.
 					</div>
 
 					<!-- Username -->

@@ -24,70 +24,65 @@ import com.ndson03.quanlykhoahoc.domain.dto.UserDTO;
 @Controller
 @RequestMapping("/register")
 public class RegistrationController {
-	
+
 	@Autowired
 	private StudentService studentService;
-	
+
 	@Autowired
 	private TeacherService teacherService;
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
-	
+
 	@InitBinder
 	public void initBinder(WebDataBinder dataBinder) {
-		
 		StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(true);
-		
 		dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
-	}	
-	
-	
-	
+	}
+
 	@GetMapping("/showRegistrationForm")
 	public String showRegistrationForm(Model theModel) {
 		theModel.addAttribute("userDto", new UserDTO());
 		return "registration/registration-form";
 	}
-	
-	
+
 	@PostMapping("/processRegistrationForm")
 	public String processRegistrationForm(@Valid @ModelAttribute("userDto") UserDTO user,
 										  BindingResult theBindingResult, @RequestParam(value="role") String roleName, Model theModel) {
+
+		// Kiểm tra lỗi validation
 		if (theBindingResult.hasErrors()) {
 			return "registration/registration-form";
 		}
-		
-		if(roleName.equals("ROLE_STUDENT")) {
-			String userName = user.getUserName();
-			
-			//if username already exists in db
-			if(studentService.findByStudentName(userName) != null) {
-				theModel.addAttribute("userDto", new UserDTO());
-				theModel.addAttribute("registrationError", "User name already exists!");
-				return "registration/registration-form";
+
+		try {
+			if (roleName.equals("ROLE_STUDENT")) {
+				// Kiểm tra username đã tồn tại chưa
+				if (studentService.findByStudentName(user.getUserName()) != null) {
+					theModel.addAttribute("registrationError", "Tên người dùng đã tồn tại!");
+					return "registration/registration-form";
+				}
+
+				Role role = roleRepository.findRoleByName(roleName);
+				user.setRole(role);
+				studentService.save(user);
+			} else { // ROLE_TEACHER
+				// Kiểm tra username đã tồn tại chưa
+				if (teacherService.findByTeacherName(user.getUserName()) != null) {
+					theModel.addAttribute("registrationError", "Tên người dùng đã tồn tại!");
+					return "registration/registration-form";
+				}
+
+				Role role = roleRepository.findRoleByName(roleName);
+				user.setRole(role);
+				teacherService.save(user);
 			}
-					
-			Role role = roleRepository.findRoleByName(roleName);
-			user.setRole(role);
-			studentService.save(user); //save() method converts UserDto to Student and saves it in db
-		} else { //teacher role
-			
-			String userName = user.getUserName();
-			
-			//if username already exists in db
-			if(teacherService.findByTeacherName(userName) != null) {
-				theModel.addAttribute("userDto", new UserDTO());
-				theModel.addAttribute("registrationError", "User name already exists!");
-				return "registration/registration-form";
-			}
-					
-			Role role = roleRepository.findRoleByName(roleName);
-			user.setRole(role);
-			teacherService.save(user);
+		} catch (Exception e) {
+			theModel.addAttribute("registrationError", "Đăng ký thất bại! Vui lòng thử lại.");
+			return "registration/registration-form";
 		}
-		
-		
-		return "login/login-form";
+
+		// Redirect to login page with a success parameter
+		return "redirect:/showLoginPage?registrationSuccess";
 	}
 }
