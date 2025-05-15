@@ -5,7 +5,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class LoginController {
-	
+
+	@GetMapping("/")
+	public String homeRedirect() {
+		return "redirect:/showLoginPage/";
+	}
+
 	@GetMapping("/showLoginPage")
 	public String showLoginPage() {
 		return "login/login-form";
