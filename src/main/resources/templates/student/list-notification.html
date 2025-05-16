@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>Trang chủ</title>
+    <head th:replace="fragments/head :: common-head"></head>
+
+    <style>
+        :root {
+            --primary-color: #4d61fc;
+            --primary-dark: #3a4cd1;
+            --secondary-color: #6c7aff;
+            --accent-color: #ff9f43;
+            --light-color: #f0f3ff;
+            --dark-color: #2d3748;
+            --success-color: #38c172;
+            --danger-color: #e3342f;
+            --warning-color: #ffce54;
+            --info-color: #3498db;
+            --gray-100: #f8f9fc;
+            --gray-200: #edf2f7;
+            --gray-300: #e2e8f0;
+            --gray-600: #718096;
+            --gray-700: #4a5568;
+            --border-radius: 12px;
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --hover-shadow: 0 15px 30px rgba(77, 97, 252, 0.15);
+            --content-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
+            --box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Poppins', 'Be Vietnam Pro', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 400;
+            background-color: var(--gray-100);
+            color: var(--dark-color);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Top navbar styling - WHITE BACKGROUND VERSION */
+        .top-navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 0.8rem 1.5rem;
+            border-bottom: none;
+        }
+
+        /* Updated text colors for navbar links */
+        .top-navbar .nav-link {
+            color: var(--gray-700);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .top-navbar .nav-link:hover {
+            color: var(--primary-color);
+            background-color: var(--light-color);
+        }
+
+        .top-navbar .nav-link.active {
+            color: var(--primary-color);
+            background-color: var(--light-color);
+            font-weight: 500;
+        }
+
+        /* Courses dropdown specific styling */
+        .courses-dropdown .dropdown-toggle {
+            color: var(--gray-700) !important;
+        }
+
+        .courses-dropdown .dropdown-toggle:hover,
+        .courses-dropdown .dropdown-toggle:focus {
+            color: var(--primary-color) !important;
+        }
+
+        .courses-dropdown .dropdown-menu .dropdown-item {
+            color: var(--gray-700);
+        }
+
+        .courses-dropdown .dropdown-menu .dropdown-item:hover {
+            color: var(--primary-color);
+            background-color: var(--light-color);
+        }
+
+        .user-dropdown .dropdown-toggle {
+            color: var(--gray-700) !important;
+        }
+
+        /* Khi hover vào dropdown toggle, giữ màu chữ tím */
+        .user-dropdown .dropdown-toggle:hover,
+        .user-dropdown .dropdown-toggle:focus {
+            color: var(--primary-color) !important; /* Màu tím chính của bạn */
+        }
+
+        /* Đảm bảo các mục trong dropdown menu có màu tím khi hover */
+        .dropdown-menu .dropdown-item:hover,
+        .dropdown-menu .dropdown-item:focus {
+            color: var(--primary-color) !important;
+            background-color: var(--light-color);
+        }
+
+        /* Đặc biệt cho nút logout */
+        .dropdown-menu button.dropdown-item:hover,
+        .dropdown-menu button.dropdown-item:focus {
+            color: var(--primary-color) !important;
+            background-color: var(--light-color);
+        }
+
+        /* Đảm bảo icon trong các mục dropdown cũng có màu tím khi hover */
+        .dropdown-menu .dropdown-item:hover i,
+        .dropdown-menu .dropdown-item:focus i {
+            color: var(--primary-color);
+        }
+
+        /* Updated brand/logo text color */
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+            padding-left: 20px;
+            font-size: 1.2rem;
+        }
+
+        /* Update user dropdown style */
+        .user-dropdown .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--light-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Fix navbar-toggler for mobile view */
+        .navbar-toggler {
+            border-color: var(--gray-300);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2874, 85, 104, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        /* Main Content */
+        .main-content {
+            padding: 80px 30px 30px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        /* Dashboard Cards */
+        .counter-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            padding: 30px 20px;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .counter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .counter-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: rgba(67, 97, 238, 0.1);
+            z-index: -1;
+            transform: translate(30%, 30%);
+        }
+
+        .counter-card:nth-child(2)::after {
+            background-color: rgba(72, 149, 239, 0.1);
+        }
+
+        .counter-card:nth-child(3)::after {
+            background-color: rgba(76, 201, 240, 0.1);
+        }
+
+        .counter-card i {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .counter {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .counter-title {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--gray-600);
+        }
+
+        /* Course Card Styling */
+        .course-card {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: none;
+            background: white;
+        }
+
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .course-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        /* Default gradient backgrounds for courses without images */
+        .course-image.default-1 {
+            background-image: linear-gradient(45deg, #4d61fc, #6c7aff);
+        }
+
+        .course-image.default-2 {
+            background-image: linear-gradient(45deg, #ff9f43, #ffbc7d);
+        }
+
+        .course-image.default-3 {
+            background-image: linear-gradient(45deg, #38c172, #74e39a);
+        }
+
+        .course-image.default-4 {
+            background-image: linear-gradient(45deg, #6f42c1, #a78edb);
+        }
+
+        .course-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .badge.bg-primary {
+            background-color: var(--primary-color) !important;
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
+        }
+
+        .course-code {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 10px 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .course-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-content h5 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            line-height: 1.4;
+        }
+
+        .course-footer {
+            padding: 10px 25px;
+            background-color: var(--light-color);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .course-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .stat-item i {
+            color: var(--primary-color);
+            opacity: 0.8;
+        }
+
+        /* Page header styling */
+        .page-header {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--content-shadow);
+        }
+
+        .page-header h1 {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--content-shadow);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state h4 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(77, 97, 252, 0.15);
+        }
+
+        .btn-primary:hover, .btn-primary:active {
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(77, 97, 252, 0.25);
+        }
+
+        /* Dropdown menu styling */
+        .dropdown-menu {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+
+        .dropdown-item {
+            padding: 8px 20px;
+            color: var(--gray-700);
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .dropdown-divider {
+            margin: 8px 0;
+            border-top-color: var(--gray-200);
+        }
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .main-content {
+                padding: 75px 15px 20px;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .courses-dropdown .dropdown-menu {
+                width: 100%;
+            }
+        }
+
+        .notification-dropdown .nav-link.active,
+        .notification-dropdown .nav-link.show {
+            color: var(--primary-color) !important;
+        }
+
+        /* Main content adjustments */
+        .main-content {
+            padding: 80px 0 30px;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+
+        .content {
+            margin-bottom: 30px;
+        }
+
+        /* Notification List Styling */
+        .notification-list-item {
+            border-left: 0;
+            border-right: 0;
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .notification-list-item:hover {
+            background-color: var(--gray-100);
+        }
+
+        .notification-list-item.unread {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light-color);
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+
+        .notification-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            line-height: 1.4;
+            max-width: 70%;
+        }
+
+        .notification-list-item.unread .notification-title {
+            font-weight: 700;
+        }
+
+        .notification-text {
+            color: var(--gray-700);
+            font-size: 0.95rem;
+            margin-top: 5px;
+            line-height: 1.5;
+            max-width: 95%;
+        }
+
+        .unread-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .notification-actions .btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .notification-actions .btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state h4 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 991.98px) {
+            .notification-title {
+                max-width: 100%;
+            }
+
+            .notification-content {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .notification-list-item {
+                padding: 12px 15px;
+            }
+
+            .notification-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Top Navbar -->
+<nav class="navbar navbar-expand-lg top-navbar navbar-light fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span>Trường SICT - HaUI</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Dashboard link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+                        <i class="fas fa-tachometer-alt"></i> Trang chủ
+                    </a>
+                </li>
+
+                <!-- Chatbot link moved to top navbar -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/student/{studentId}/chatbot(studentId=${student.id})}">
+                        <i class="fas fa-robot"></i> Chatbot
+                    </a>
+                </li>
+
+                <!-- Courses dropdown menu -->
+                <li class="nav-item dropdown courses-dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="coursesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i> Khóa học
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="coursesDropdown">
+                        <li th:each="course : ${courses}">
+                            <a class="dropdown-item" th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}" th:text="${course.name}"></a>
+                        </li>
+                        <li th:if="${courses.size() == 0}">
+                            <span class="dropdown-item text-muted">Không có khóa học nào</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+                <!-- Thêm notification bell fragment tại đây -->
+                <th:block th:replace="fragments/notifications :: notification-bell"></th:block>
+
+                <li class="nav-item dropdown user-dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown">
+                        <div class="avatar me-2">
+                            <span th:text="${#strings.substring(student.firstName, 0, 1) + #strings.substring(student.lastName, 0, 1)}"></span>
+                        </div>
+                        <span th:text="${student.firstName + ' ' + student.lastName}"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" th:href="@{/student/{studentId}/profile(studentId=${student.id})}"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="#" th:action="@{/logout}" method="POST">
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">
+                        <i class="fas fa-bell me-2"></i> Thông báo
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses(studentId=${student.id})}">Trang chủ</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Thông báo</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-auto">
+                    <button id="markAllReadBtn" class="btn btn-primary" th:if="${unreadNotificationsCount > 0}">
+                        <i class="fas fa-check-double me-2"></i>Đánh dấu tất cả đã đọc
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Notifications List -->
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="notification-list">
+                        <!-- No Notifications Message -->
+                        <div th:if="${notifications == null || notifications.empty}" class="empty-state p-5 text-center">
+                            <i class="fas fa-bell-slash mb-3"></i>
+                            <h4>Không có thông báo nào</h4>
+                            <p class="text-muted">Hiện tại bạn chưa có thông báo nào.</p>
+                        </div>
+
+                        <!-- Notifications -->
+                        <div th:if="${notifications != null && !notifications.empty}" class="list-group list-group-flush">
+                            <a th:each="notification : ${notifications}"
+                               th:href="${notification.url != null ? notification.url : '#'}"
+                               class="list-group-item list-group-item-action notification-list-item"
+                               th:classappend="${notification['isRead'] == false ? 'unread' : ''}"
+                               th:data-notification-id="${notification.id}"
+                               th:data-notification-type="${notification.type.name()}"
+                               th:data-notification-status="${notification['isRead'] == false ? 'unread' : 'read'}"
+                               th:style="${notification['isRead'] == false ? 'background-color: var(--light-color);' : ''}">
+
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon me-3">
+                                        <i class="fas fa-bell" th:classappend="${
+                                                notification.type.name() == 'COURSE_ANNOUNCEMENT' ? 'text-info' :
+                                                notification.type.name() == 'ASSIGNMENT' ? 'text-warning' :
+                                                notification.type.name() == 'GRADE' ? 'text-success' : 'text-primary'
+                                            }" th:style="${notification['isRead'] == true ? 'color: var(--primary-color) !important;' : ''}"></i>
+                                    </div>
+                                    <div class="notification-content flex-grow-1">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <h5 class="notification-title mb-0" th:text="${notification.title}">Tiêu đề thông báo</h5>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge me-2" th:classappend="${
+                                                        notification.type.name() == 'COURSE_ANNOUNCEMENT' ? 'bg-primary' :
+                                                        notification.type.name() == 'ASSIGNMENT' ? 'bg-info' :
+                                                        notification.type.name() == 'GRADE' ? 'bg-success' : 'bg-warn'
+                                                    }"
+                                                      th:text="${
+                                                        notification.type.name() == 'COURSE_ANNOUNCEMENT' ? 'Thông báo' :
+                                                        notification.type.name() == 'ASSIGNMENT' ? 'Bài tập' :
+                                                        notification.type.name() == 'GRADE' ? 'Điểm số' : 'Hệ thống'
+                                                    }">
+                                                </span>
+                                                <span class="unread-indicator me-2" th:if="${notification['isRead'] == false}"></span>
+                                                <small class="text-muted notification-time">
+                                                    <span th:text="${#dates.format(notification.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2025 12:30</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <p class="notification-text mb-0" th:text="${notification.content}">Nội dung thông báo sẽ hiển thị ở đây.</p>
+                                    </div>
+                                    <div class="notification-actions ms-3">
+                                        <button class="btn btn-sm btn-light mark-read-btn"
+                                                th:if="${notification['isRead'] == false}"
+                                                th:data-notification-id="${notification.id}">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add active class to current page nav link
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Variables
+        const filterType = document.getElementById('filterType');
+        const filterStatus = document.getElementById('filterStatus');
+        const searchInput = document.getElementById('searchNotifications');
+        const notificationItems = document.querySelectorAll('.notification-list-item');
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        const markReadBtns = document.querySelectorAll('.mark-read-btn');
+
+        // Disable notification bell in topbar since we're on the notifications page
+        const notificationBell = document.querySelector('.notification-dropdown .nav-link');
+        if (notificationBell) {
+            notificationBell.classList.add('disabled');
+            notificationBell.style.pointerEvents = 'none';
+            notificationBell.style.opacity = '0.6';
+        }
+
+        // Function to filter notifications
+        function filterNotifications() {
+            const typeValue = filterType.value;
+            const statusValue = filterStatus.value;
+            const searchValue = searchInput.value.toLowerCase();
+
+            notificationItems.forEach(item => {
+                const type = item.getAttribute('data-notification-type');
+                const status = item.getAttribute('data-notification-status');
+                const title = item.querySelector('.notification-title').textContent.toLowerCase();
+                const content = item.querySelector('.notification-text').textContent.toLowerCase();
+
+                const typeMatch = typeValue === 'all' || type === typeValue;
+                const statusMatch = statusValue === 'all' || status === statusValue;
+                const searchMatch = title.includes(searchValue) || content.includes(searchValue);
+
+                if (typeMatch && statusMatch && searchMatch) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Event listeners for filters
+        filterType.addEventListener('change', filterNotifications);
+        filterStatus.addEventListener('change', filterNotifications);
+        searchInput.addEventListener('input', filterNotifications);
+
+        // Mark single notification as read
+        markReadBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const notificationId = this.getAttribute('data-notification-id');
+                const listItem = document.querySelector(`.notification-list-item[data-notification-id="${notificationId}"]`);
+
+                // Make AJAX call to mark notification as read
+                fetch(`/api/notifications/${notificationId}/mark-read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // Update UI
+                            listItem.classList.remove('unread');
+                            listItem.style.backgroundColor = '';
+                            listItem.setAttribute('data-notification-status', 'read');
+
+                            // Change bell icon color to blue
+                            const bellIcon = listItem.querySelector('.notification-icon i');
+                            if (bellIcon) {
+                                bellIcon.style.color = 'var(--primary-color)';
+                            }
+
+                            // Remove unread indicator and mark read button
+                            const unreadIndicator = listItem.querySelector('.unread-indicator');
+                            if (unreadIndicator) unreadIndicator.remove();
+                            this.remove();
+
+                            // Update unread count
+                            updateUnreadCount(-1);
+                        }
+                    })
+                    .catch(error => console.error('Error marking notification as read:', error));
+            });
+        });
+
+        // Mark all notifications as read
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function() {
+                // Make AJAX call to mark all notifications as read
+                fetch(`/api/notifications/mark-all-read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // Update UI for all unread notifications
+                            document.querySelectorAll('.notification-list-item.unread').forEach(item => {
+                                item.classList.remove('unread');
+                                item.style.backgroundColor = '';
+                                item.setAttribute('data-notification-status', 'read');
+
+                                // Change bell icon color to blue
+                                const bellIcon = item.querySelector('.notification-icon i');
+                                if (bellIcon) {
+                                    bellIcon.style.color = 'var(--primary-color)';
+                                }
+
+                                // Remove unread indicator and mark read button
+                                const unreadIndicator = item.querySelector('.unread-indicator');
+                                if (unreadIndicator) unreadIndicator.remove();
+
+                                const markReadBtn = item.querySelector('.mark-read-btn');
+                                if (markReadBtn) markReadBtn.remove();
+                            });
+
+                            // Hide the mark all read button
+                            this.style.display = 'none';
+
+                            // Reset the notification badge in the navbar
+                            const navBadge = document.querySelector('.notification-badge');
+                            if (navBadge) navBadge.style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error marking all notifications as read:', error));
+            });
+        }
+
+        // Function to get CSRF token
+        function getCsrfToken() {
+            const metaTag = document.querySelector('meta[name="_csrf"]');
+            return metaTag ? metaTag.getAttribute('content') : '';
+        }
+
+        // Function to update unread count
+        function updateUnreadCount(change) {
+            const navBadge = document.querySelector('.notification-badge');
+            if (navBadge) {
+                let count = parseInt(navBadge.textContent);
+                if (!isNaN(count)) {
+                    count += change;
+                    if (count <= 0) {
+                        navBadge.style.display = 'none';
+                        if (markAllReadBtn) markAllReadBtn.style.display = 'none';
+                    } else {
+                        navBadge.textContent = count > 99 ? '99+' : count;
+                    }
+                }
+            }
+        }
+
+        // Mark notification as read when clicked
+        notificationItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const notificationId = this.getAttribute('data-notification-id');
+                const isUnread = this.classList.contains('unread');
+
+                if (isUnread) {
+                    // Make AJAX call to mark notification as read
+                    fetch(`/api/notifications/${notificationId}/mark-read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': getCsrfToken()
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                updateUnreadCount(-1);
+                            }
+                        })
+                        .catch(error => console.error('Error marking notification as read:', error));
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -23,36 +23,33 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 	
 	@Autowired
 	private TeacherService teacherService;
-	
-	
+
+
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication auth) throws IOException, ServletException {
-		
-		
+										Authentication auth) throws IOException, ServletException {
+
 		String role = auth.getAuthorities().iterator().next().toString();
-		
-		//redirecting the user to proper url depending on the authority
+		String userName = auth.getName();
+
+		// Sau khi xác thực thành công, Spring đã migrate session => gọi lại để lấy session mới
+		HttpSession session = request.getSession(); // session mới
+
 		if(role.equals("ROLE_STUDENT")) {
-			String userName = auth.getName();
 			Student theStudent = studentService.findByStudentName(userName);
-			int userId = theStudent.getId(); //student id is a part of the url to get the current student in the controller class 
-			HttpSession session = request.getSession();
 			session.setAttribute("user", theStudent);
-			response.sendRedirect(request.getContextPath() + "/student/" + userId + "/courses");
-			
+			response.sendRedirect(request.getContextPath() + "/student/" + theStudent.getId() + "/courses");
+
 		} else if(role.equals("ROLE_TEACHER")) {
-			String userName = auth.getName();
 			Teacher theTeacher = teacherService.findByTeacherName(userName);
-			int userId = theTeacher.getId();
-			HttpSession session = request.getSession();
 			session.setAttribute("user", theTeacher);
-			response.sendRedirect(request.getContextPath() + "/teacher/" + userId + "/courses");
-		} else { //if the role is admin
+			response.sendRedirect(request.getContextPath() + "/teacher/" + theTeacher.getId() + "/courses");
+
+		} else { // ROLE_ADMIN
 			response.sendRedirect(request.getContextPath() + "/admin/adminPanel");
 		}
-
 	}
+
 
 }
 

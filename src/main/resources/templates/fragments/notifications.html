@@ -1,55 +1,335 @@
-<!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Notification Fragment</title>
-    <head th:replace="fragments/head :: common-head"></head>
-</head>
-<body>
-
-<!-- Notification Fragment definition -->
-<div th:fragment="notifications">
-    <!-- Notification Icon with Badge -->
-    <div class="notification-icon dropdown" id="notificationDropdown">
-        <a class="nav-link text-light position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge" th:if="${unreadNotificationsCount > 0}" th:text="${unreadNotificationsCount}"></span>
+<!-- Fragment notification-bell -->
+<th:block th:fragment="notification-bell">
+    <li class="nav-item dropdown notification-dropdown d-flex align-items-center">
+        <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button"
+           data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-bell notification-bell-icon"
+               th:classappend="${unreadNotificationsCount > 0 ? '' : 'text-primary'}"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
+                  th:if="${unreadNotificationsCount > 0}" th:text="${unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}">
+            </span>
         </a>
-
-        <!-- Notification Dropdown Menu -->
-        <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0" aria-labelledby="notificationDropdown">
-            <div class="notification-header">
-                <h6 class="mb-0">Thông báo</h6>
-                <a href="#" class="small text-decoration-none" th:if="${notifications != null && !notifications.empty}"
-                   th:onclick="'markAllNotificationsAsRead(' + ${student.id} + '); return false;'">Đánh dấu đã đọc tất cả</a>
-            </div>
-
-            <div class="notification-body">
-                <!-- If there are notifications -->
-                <div th:if="${notifications != null && !notifications.empty}">
-                    <div class="notification-item" th:each="notification : ${notifications}"
-                         th:classappend="${notification.read ? '' : 'unread'}"
-                         th:onclick="'viewNotification(' + ${notification.id} + ', ' + ${student.id} + '); return false;'">
-                        <div class="d-flex justify-content-between align-items-start mb-1">
-                            <h6 class="mb-0" th:classappend="${notification.read ? '' : 'fw-bold'}" th:text="${notification.title}"></h6>
-                            <span class="notification-time" th:text="${notification.timeAgo}"></span>
+        <ul class="dropdown-menu dropdown-menu-end notification-dropdown-menu p-0" aria-labelledby="notificationDropdown">
+            <li>
+                <div class="notification-header d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                    <h6 class="m-0">Thông báo</h6>
+                    <a th:href="@{/student/{studentId}/notifications(studentId=${student.id})}" class="text-primary small view-all-link">Xem tất cả</a>
+                </div>
+            </li>
+            <!-- Sửa lại cấu trúc không sử dụng container riêng -->
+            <div class="notification-body" style="max-height: 300px; overflow-y: auto;">
+                <li th:if="${notifications != null && !notifications.empty}" th:each="notification : ${notifications}">
+                    <a class="dropdown-item notification-item d-flex align-items-center py-2"
+                       th:href="${notification.url != null ? notification.url : '#'}"
+                       th:classappend="${notification['isRead'] == false ? 'unread' : ''}"
+                       th:data-notification-id="${notification.id}"
+                       th:attr="data-debug-class=${notification['isRead'] == false ? 'unread' : 'read'}"
+                       th:style="${notification['isRead'] == false ? 'background-color: #f0f7ff; font-weight: bold;' : ''}">
+                        <div class="notification-icon me-3">
+                            <!-- Đã sửa: Thêm điều kiện để biểu tượng chuông có màu xanh khi đã đọc -->
+                            <i class="fas fa-bell" th:classappend="${
+                                    notification['isRead'] == true ? 'text-primary' :
+                                    notification.type.name() == 'COURSE_ANNOUNCEMENT' ? 'text-info' :
+                                    notification.type.name() == 'ASSIGNMENT' ? 'text-warning' :
+                                    notification.type.name() == 'GRADE' ? 'text-success' : 'text-primary'
+                                }"></i>
                         </div>
-                        <p class="mb-0 small" th:text="${notification.message}"></p>
+                        <div class="notification-content flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="notification-title mb-0" th:text="${notification.title}">Tiêu đề thông báo</h6>
+                                <div class="d-flex align-items-center">
+                                    <!-- Indicator for unread notifications -->
+                                    <span class="unread-indicator me-2" th:if="${notification['isRead'] == false}"></span>
+                                    <small class="text-muted notification-time">
+                                        <span th:text="${#dates.format(notification.createdAt, 'dd/MM/yyyy')}">01/01/2025</span>
+                                        <span th:text="${#dates.format(notification.createdAt, 'HH:mm')}">12:30</span>
+                                    </small>
+                                </div>
+                            </div>
+                            <p class="notification-text small text-truncate mb-0">
+                                <span th:text="${notification.content}">Nội dung thông báo</span>
+                            </p>
+                        </div>
+                    </a>
+                </li>
+                <li th:if="${notifications == null || notifications.empty}">
+                    <div class="dropdown-item text-center text-muted py-3 m-0">
+                        <p class="mb-0">Không có thông báo nào</p>
                     </div>
-                </div>
-
-                <!-- If there are no notifications -->
-                <div th:if="${notifications == null || notifications.empty}" class="empty-notifications">
-                    <i class="fas fa-bell-slash"></i>
-                    <p class="mb-0">Bạn không có thông báo nào</p>
-                </div>
+                </li>
             </div>
+        </ul>
+    </li>
 
-            <div class="notification-footer">
-                <a th:href="@{/student/{studentId}/notifications(studentId=${student.id})}" class="text-decoration-none">Xem tất cả thông báo</a>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- Add JavaScript to handle marking notifications as read -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all notification items
+            const notificationItems = document.querySelectorAll('.notification-item[data-notification-id]');
 
-</body>
-</html>
+            // Add click event listener to each notification
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function(event) {
+                    // Get the notification ID from the data attribute
+                    const notificationId = this.getAttribute('data-notification-id');
+
+                    // Only proceed if we have a valid notification ID
+                    if (notificationId) {
+                        // Make AJAX call to mark notification as read
+                        fetch(`/api/notifications/${notificationId}/mark-read`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': getCsrfToken() // Function to get CSRF token (defined below)
+                            }
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    // If successful, update the UI to reflect the read status
+                                    this.classList.remove('unread');
+                                    this.style.backgroundColor = '';
+                                    this.style.fontWeight = '';
+
+                                    // Remove the unread indicator if it exists
+                                    const unreadIndicator = this.querySelector('.unread-indicator');
+                                    if (unreadIndicator) {
+                                        unreadIndicator.remove();
+                                    }
+
+                                    // Cập nhật màu của biểu tượng chuông thành màu xanh (text-primary)
+                                    const bellIcon = this.querySelector('.notification-icon i');
+                                    if (bellIcon) {
+                                        // Xóa tất cả các class màu hiện tại
+                                        bellIcon.classList.remove('text-info', 'text-warning', 'text-success');
+                                        // Thêm class màu xanh
+                                        bellIcon.classList.add('text-primary');
+                                    }
+
+                                    // Update the notification count in the badge
+                                    updateNotificationCount();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error marking notification as read:', error);
+                            });
+                    }
+
+                    // Don't prevent default here to allow navigation to the notification URL
+                });
+            });
+
+            // Function to get CSRF token from meta tag
+            function getCsrfToken() {
+                const metaTag = document.querySelector('meta[name="_csrf"]');
+                return metaTag ? metaTag.getAttribute('content') : '';
+            }
+
+            // Function to update the notification count in the badge
+            function updateNotificationCount() {
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    let count = parseInt(badge.textContent.trim());
+                    if (!isNaN(count) && count > 0) {
+                        count--;
+                        if (count <= 0) {
+                            // If no more unread notifications, hide the badge
+                            badge.style.display = 'none';
+
+                            // Change the bell icon color to blue when there are no unread notifications
+                            const bellIcon = document.querySelector('.notification-bell-icon');
+                            if (bellIcon) {
+                                bellIcon.classList.add('text-primary');
+                            }
+                        } else {
+                            // Update the count
+                            badge.textContent = count > 99 ? '99+' : count;
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</th:block>
+
+<style>
+    .notification-dropdown-menu {
+        width: 400px;
+        padding: 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 0;
+    }
+
+    .notification-header {
+        background-color: #f8f9fa;
+        padding: 12px 15px;
+    }
+
+    /* Add hover effect for "Xem tất cả" link */
+    .view-all-link {
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .view-all-link:hover {
+        color: var(--primary-color) !important;
+        opacity: 0.8;
+        text-decoration: underline;
+    }
+
+    .notification-body {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .notification-body-container {
+        padding: 0;
+    }
+
+    .notification-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #f1f1f1;
+        transition: all 0.2s ease;
+    }
+
+    /* Added specific styles for dropdown menu and items */
+    .dropdown-menu .dropdown-item.notification-item:hover,
+    .dropdown-menu .dropdown-item.notification-item:focus {
+        color: var(--primary-color) !important;
+        background-color: var(--light-color);
+    }
+
+    /* Special override for unread notifications when hovered */
+    .dropdown-menu .dropdown-item.notification-item.unread:hover,
+    .dropdown-menu .dropdown-item.notification-item.unread:focus {
+        background-color: #e3f0ff !important;
+        color: var(--primary-color) !important;
+    }
+
+    /* Styling cho thông báo chưa đọc */
+    .dropdown-menu .notification-item.unread {
+        background-color: #f0f7ff;
+        font-weight: bold;
+    }
+
+    .notification-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e9ecef;
+        border-radius: 50%;
+        position: relative;
+    }
+
+    .notification-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 3px;
+        color: #333;
+    }
+
+    .notification-item.unread .notification-title {
+        font-weight: 700;
+        color: #000;
+    }
+
+    .notification-text {
+        max-width: 230px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .notification-time {
+        font-size: 0.75rem;
+    }
+
+    /* Unread indicator dot */
+    .unread-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: var(--primary-color);
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Notification bell styling to match other dropdowns */
+    .notification-dropdown {
+        height: 100%;
+    }
+
+    /* Styling tương tự như các dropdown khác */
+    .notification-dropdown .nav-link {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        color: var(--gray-700) !important;
+    }
+
+    /* Sửa lỗi khi thông báo dropdown mở ra thì nút chuông biến mất */
+    .notification-dropdown .nav-link:hover,
+    .notification-dropdown .nav-link:focus,
+    .notification-dropdown .nav-link[aria-expanded="true"] {
+        color: var(--primary-color) !important;
+        background-color: transparent !important;
+    }
+
+    /* Larger bell icon and make sure it's always visible */
+    .notification-bell-icon {
+        font-size: 1.75rem;
+        color: inherit;
+        opacity: 1 !important;
+        transition: color 0.3s ease;
+    }
+
+    /* Blue color for notification bell when there are no unread notifications */
+    .notification-bell-icon.text-primary {
+        color: var(--primary-color) !important;
+    }
+
+    /* Smaller notification badge */
+    .notification-badge {
+        font-size: 0.65rem;
+        padding: 0.25em 0.45em;
+        transform: translate(25%, -25%) !important;
+    }
+
+    /* Animation for new notifications */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .notification-body li:first-child.unread .notification-icon {
+        animation: pulse 2s infinite;
+    }
+
+    /* Bo góc cho phần tử thông báo cuối cùng */
+    .notification-body li:last-child .dropdown-item,
+    .notification-body li:last-child .notification-item {
+        border-bottom: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    /* Đảm bảo văn bản và icon trong thông báo cũng thay đổi màu khi hover */
+    .notification-item:hover i,
+    .notification-item:hover .notification-title,
+    .notification-item:hover .notification-text {
+        color: var(--primary-color) !important;
+    }
+
+    /* Updated inline style fallback for unread notifications */
+    [data-debug-class="unread"] {
+        background-color: #f0f7ff; /* Lighter blue background */
+    }
+
+    /* Định nghĩa text-primary để biểu tượng chuông chắc chắn có màu xanh */
+    .notification-icon i.text-primary {
+        color: var(--primary-color) !important;
+    }
+</style>

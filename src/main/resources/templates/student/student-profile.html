@@ -595,6 +595,14 @@
                 padding: 20px;
             }
         }
+
+        .notification-dropdown .nav-link.active,
+        .notification-dropdown .nav-link.show {
+            color: var(--primary-color) !important;
+        }
+
+        .text-primary { color: var(--primary-color) !important; }
+
     </style>
 </head>
 
@@ -644,6 +652,9 @@
             </ul>
 
             <ul class="navbar-nav ms-auto">
+                <!-- Thêm notification bell fragment tại đây -->
+                <th:block th:replace="fragments/notifications :: notification-bell"></th:block>
+
                 <li class="nav-item dropdown user-dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown">

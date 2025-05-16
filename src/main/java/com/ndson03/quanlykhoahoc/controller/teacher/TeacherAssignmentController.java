@@ -15,6 +15,7 @@ import com.ndson03.quanlykhoahoc.service.quiz.QuizSubmissionService;
 import com.ndson03.quanlykhoahoc.service.course.StudentCourseDetailsService;
 import com.ndson03.quanlykhoahoc.service.user.StudentService;
 import com.ndson03.quanlykhoahoc.service.user.TeacherService;
+import com.ndson03.quanlykhoahoc.service.utils.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -78,6 +79,9 @@ public class TeacherAssignmentController {
 
     @Autowired
     private ContentService contentService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Value("${file.upload.directory}")
     private String uploadDirectory;
@@ -178,6 +182,16 @@ public class TeacherAssignmentController {
             assignmentDetail.setStudentCourseDetails(studentCourseDetails);
             assignmentDetail.setIsDone(0);
             assignmentDetailsService.save(assignmentDetail);
+
+            Notification notification = new Notification();
+            notification.setTitle("Bài tập mới: " + assignment.getName());
+            notification.setContent("Bài học: " + lesson.getTitle());
+            notification.setStudent(student);
+            notification.setType(Notification.NotificationType.ASSIGNMENT);
+            notification.setUrl("/student/" + student.getId() + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignment.getId());
+            notification.setCreatedAt(new Date());
+            notification.setRead(false);
+            notificationService.save(notification);
         }
 
         if (assignment.isQuiz()) {
