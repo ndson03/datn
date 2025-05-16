@@ -13,8 +13,7 @@ import com.ndson03.quanlykhoahoc.domain.entity.Student;
 import com.ndson03.quanlykhoahoc.service.utils.NotificationService;
 
 @ControllerAdvice(
-        basePackages = {"com.ndson03.quanlykhoahoc.controller.student"},
-        assignableTypes = {com.ndson03.quanlykhoahoc.controller.gemini.GeminiController.class}
+        basePackages = {"com.ndson03.quanlykhoahoc.controller.student"}
 )
 
 public class NotificationControllerAdvice {

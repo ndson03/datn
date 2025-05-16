@@ -321,6 +321,9 @@
 				<h5 class="mb-0 fw-bold">
 					<i class="fas fa-tasks me-2"></i>
 					Trạng thái nộp bài
+					<span class="ms-2 badge bg-info">
+    <span th:text="${completedCount}"></span>/<span th:text="${totalStudents}"></span> hoàn thành
+</span>
 				</h5>
 				<div>
 					<button class="btn btn-outline-success btn-sm me-2">
@@ -485,6 +488,8 @@
 				row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
 			});
 		}
+
+
 	});
 </script>
 </body>

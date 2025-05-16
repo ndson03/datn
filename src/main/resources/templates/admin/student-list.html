@@ -216,11 +216,6 @@
 				</nav>
 			</div>
 		</div>
-		<!-- Search Bar -->
-		<div class="search-bar">
-			<i class="fas fa-search"></i>
-			<input type="text" class="form-control" placeholder="Tìm kiếm sinh viên theo tên, email...">
-		</div>
 
 		<!-- Student List -->
 		<div class="card mb-4">
@@ -255,11 +250,12 @@
 					<table class="table table-hover align-middle mb-0">
 						<thead>
 						<tr>
-							<th style="width: 10%;">ID</th>
-							<th style="width: 20%;">Họ đệm</th>
-							<th style="width: 10%;">Tên</th>
-							<th style="width: 20%;">Email</th>
-							<th class="text-center" style="width: 40%;">Thao tác</th>
+							<th style="width: 8%;">ID</th>
+							<th style="width: 15%;">Họ đệm</th>
+							<th style="width: 8%;">Tên</th>
+							<th style="width: 15%;">Username</th>
+							<th style="width: 15%;">Email</th>
+							<th class="text-center" style="width: 39%;">Thao tác</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -267,6 +263,7 @@
 							<td th:text="${student.id}"></td>
 							<td th:text="${student.firstName}"></td>
 							<td th:text="${student.lastName}"></td>
+							<td th:text="${student.userName}"></td>
 							<td th:text="${student.email}"></td>
 							<td class="text-center">
 								<a class="btn btn-sm btn-courses me-2" th:href="@{/admin/students/{studentId}/courses(studentId=${student.id})}">

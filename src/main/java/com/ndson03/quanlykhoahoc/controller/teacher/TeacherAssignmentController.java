@@ -505,6 +505,7 @@ public class TeacherAssignmentController {
         // Create student - status map
         Map<StudentAssignmentResultDTO, String> list = new HashMap<>();
 
+        int completedCount = 0;
         for (Student student : students) {
             StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
             AssignmentDetails ad = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
@@ -521,6 +522,7 @@ public class TeacherAssignmentController {
                 studentDTO.setScore(ad.getScore());
                 studentDTO.setSubmissionTime(formatTime(quizSubmission.getSubmissionDate()));
                 studentDTO.setSubmissionDate(formatDate(quizSubmission.getSubmissionDate()));
+                completedCount++;
             }
 
             // Set status
@@ -560,6 +562,8 @@ public class TeacherAssignmentController {
         List<Content> contents = contentService.findByLessonId(lessonId);
         theModel.addAttribute("contents", contents);
 
+        theModel.addAttribute("completedCount", completedCount);
+        theModel.addAttribute("totalStudents", students.size());
         return "teacher/quiz-assignment-status";
     }
 
@@ -577,7 +581,7 @@ public class TeacherAssignmentController {
 
         // Create student - status map
         Map<StudentAssignmentResultDTO, String> list = new HashMap<>();
-
+        int completedCount = 0;
         for (Student student : students) {
             StudentCourseDetails scd = studentCourseDetailsService.findByStudentAndCourseId(student.getId(), courseId);
             AssignmentDetails ad = assignmentDetailsService.findByAssignmentAndStudentCourseDetailsId(assignmentId, scd.getId());
@@ -593,6 +597,7 @@ public class TeacherAssignmentController {
                 studentDTO.setScore(ad.getScore());
                 studentDTO.setSubmissionTime(formatTime(ad.getSubmitTime()));
                 studentDTO.setSubmissionDate(formatDate(ad.getSubmitTime()));
+                completedCount++;
             }
 
             // Set status
@@ -619,6 +624,8 @@ public class TeacherAssignmentController {
         List<Content> contents = contentService.findByLessonId(lessonId);
         theModel.addAttribute("contents", contents);
 
+        theModel.addAttribute("completedCount", completedCount);
+        theModel.addAttribute("totalStudents", students.size());
         return "teacher/file-assignment-status";
     }
 

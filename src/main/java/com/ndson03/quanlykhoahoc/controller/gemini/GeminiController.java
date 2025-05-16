@@ -4,11 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ndson03.quanlykhoahoc.domain.entity.Course;
+import com.ndson03.quanlykhoahoc.domain.entity.Notification;
 import com.ndson03.quanlykhoahoc.domain.entity.Student;
 import com.ndson03.quanlykhoahoc.domain.entity.Teacher;
 import com.ndson03.quanlykhoahoc.service.gemini.GeminiService;
 import com.ndson03.quanlykhoahoc.service.user.StudentService;
 import com.ndson03.quanlykhoahoc.service.user.TeacherService;
+import com.ndson03.quanlykhoahoc.service.utils.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,9 @@ public class GeminiController {
 
     @Autowired
     private TeacherService teacherService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public GeminiController(GeminiService geminiService) {
         this.geminiService = geminiService;
@@ -64,6 +69,10 @@ public class GeminiController {
 
         theModel.addAttribute("student", student);
         theModel.addAttribute("courses", courses);
+        List<Notification> notifications = notificationService.findAllByStudent(student).stream().limit(5).toList();
+        theModel.addAttribute("notifications", notifications);
+        int unreadNotificationsCount = notificationService.countUnreadByStudent(student);
+        theModel.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
         return "student/student-chatbot";
     }
 
