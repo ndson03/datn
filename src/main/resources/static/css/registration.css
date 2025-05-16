@@ -1,0 +1,176 @@
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+}
+
+body {
+    font-family: 'Poppins', 'Be Vietnam Pro', 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f7fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.register-container {
+    max-width: 550px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.brand-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.brand-logo {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0.25rem;
+}
+
+.brand-tagline {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.form-subtitle {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.form-control, .form-select {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.input-group-text {
+    background-color: white;
+    border-right: none;
+}
+
+.input-group .form-control {
+    border-left: none;
+}
+
+.form-icon {
+    position: absolute;
+    left: 15px;
+    top: 46px;
+    color: var(--secondary-color);
+    z-index: 10;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.input-with-icon {
+    padding-left: 2.5rem;
+}
+
+.btn-register {
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 500;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.error-feedback {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.registration-error {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+}
+
+.registration-success {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+}
+
+.password-requirements {
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    margin-top: 0.3rem;
+}
+
+.password-strength {
+    height: 5px;
+    margin-top: 0.5rem;
+    border-radius: 5px;
+    background-color: #e9ecef;
+}
+
+.password-strength-bar {
+    height: 100%;
+    border-radius: 5px;
+    width: 0%;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.is-valid {
+    color: #28a745;
+}
+
+.is-invalid {
+    color: #dc3545;
+}
+
+@media (max-width: 576px) {
+    .register-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .row {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    .col-md-6 {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}

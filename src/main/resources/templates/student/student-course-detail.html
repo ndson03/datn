@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-	<title>Course Details</title>
+	<title>Chi tiet khoa hoc</title>
 	<head th:replace="fragments/head :: common-head"></head>
 	<link rel="stylesheet" th:href="@{/css/layout.css}">
 
@@ -49,8 +49,8 @@
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 				<!-- Dashboard link moved to top navbar -->
 				<li class="nav-item">
-					<a class="nav-link active" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
-						<i class="fas fa-tachometer-alt"></i> Dashboard
+					<a class="nav-link" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+						<i class="fas fa-tachometer-alt"></i> Trang chủ
 					</a>
 				</li>
 

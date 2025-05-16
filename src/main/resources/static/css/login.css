@@ -1,33 +1,79 @@
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+}
+
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f8f9fa;
-    height: 100vh;
+    font-family: 'Poppins', 'Be Vietnam Pro', 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f7fa;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 .login-container {
     max-width: 450px;
-    margin: auto;
-    padding: 30px;
+    margin: 0 auto;
+    padding: 2rem;
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
-.login-header {
-    margin-bottom: 30px;
+.brand-header {
     text-align: center;
+    margin-bottom: 2rem;
 }
 
-.form-label {
+.brand-logo {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0.25rem;
+}
+
+.brand-tagline {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
     font-weight: 500;
+    color: var(--dark-color);
+}
+
+.form-control {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.input-group-text {
+    background-color: white;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
 }
 
 .btn-login {
-    background-color: #0d6efd;
-    border: none;
-    padding: 10px;
+    padding: 0.75rem;
+    border-radius: 8px;
     font-weight: 500;
     width: 100%;
 }
@@ -35,31 +81,48 @@ body {
 .divider {
     display: flex;
     align-items: center;
-    margin: 25px 0;
+    margin: 1.5rem 0;
 }
 
 .divider hr {
     flex: 1;
+    border-color: #dee2e6;
 }
 
 .divider span {
-    padding: 0 15px;
-    color: #6c757d;
+    padding: 0 1rem;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
 }
 
 .error-message {
     background-color: #f8d7da;
     color: #842029;
-    padding: 12px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    border: 1px solid #f5c2c7;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.success-message {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
 }
 
 .footer {
     margin-top: auto;
-    background-color: #f8f9fa;
-    padding: 15px 0;
+    padding: 1.5rem 0;
     text-align: center;
-    border-top: 1px solid #e9ecef;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 576px) {
+    .login-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
 }

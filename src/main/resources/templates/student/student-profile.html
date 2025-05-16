@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Hồ sơ học viên</title>
+    <title>Hồ sơ</title>
     <head th:replace="fragments/head :: common-head"></head>
     <style>
         :root {
@@ -39,47 +39,17 @@
             text-rendering: optimizeLegibility;
         }
 
-        /* Top navbar styling */
+        /* Top navbar styling - WHITE BACKGROUND VERSION */
         .top-navbar {
-            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
-            box-shadow: var(--box-shadow);
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             padding: 0.8rem 1.5rem;
             border-bottom: none;
         }
 
-        .navbar-brand {
-            font-weight: 600;
-            padding-left: 20px;
-            font-size: 1.2rem;
-        }
-
-        .navbar-brand i {
-            font-size: 1.2rem;
-        }
-
-        .user-dropdown .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        .user-dropdown:hover .avatar {
-            transform: scale(1.05);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
-        }
-
-        /* Nav links in top bar */
+        /* Updated text colors for navbar links */
         .top-navbar .nav-link {
-            color: rgba(255, 255, 255, 0.85);
+            color: var(--gray-700);
             padding: 0.5rem 1rem;
             border-radius: 8px;
             transition: all 0.3s ease;
@@ -87,30 +57,95 @@
         }
 
         .top-navbar .nav-link:hover {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+            background-color: var(--light-color);
         }
 
         .top-navbar .nav-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.2);
+            color: var(--primary-color);
+            background-color: var(--light-color);
             font-weight: 500;
         }
 
-        .top-navbar .nav-link i {
-            margin-right: 8px;
+        /* Courses dropdown specific styling */
+        .courses-dropdown .dropdown-toggle {
+            color: var(--gray-700) !important;
         }
 
-        /* Courses dropdown in navbar */
-        .courses-dropdown .dropdown-menu {
-            width: 280px;
-            max-height: 400px;
-            overflow-y: auto;
+        .courses-dropdown .dropdown-toggle:hover,
+        .courses-dropdown .dropdown-toggle:focus {
+            color: var(--primary-color) !important;
         }
 
-        .courses-dropdown .dropdown-item {
-            white-space: normal;
-            padding: 10px 15px;
+        .courses-dropdown .dropdown-menu .dropdown-item {
+            color: var(--gray-700);
+        }
+
+        .courses-dropdown .dropdown-menu .dropdown-item:hover {
+            color: var(--primary-color);
+            background-color: var(--light-color);
+        }
+
+        .user-dropdown .dropdown-toggle {
+            color: var(--gray-700) !important;
+        }
+
+        /* Khi hover vào dropdown toggle, giữ màu chữ tím */
+        .user-dropdown .dropdown-toggle:hover,
+        .user-dropdown .dropdown-toggle:focus {
+            color: var(--primary-color) !important; /* Màu tím chính của bạn */
+        }
+
+        /* Đảm bảo các mục trong dropdown menu có màu tím khi hover */
+        .dropdown-menu .dropdown-item:hover,
+        .dropdown-menu .dropdown-item:focus {
+            color: var(--primary-color) !important;
+            background-color: var(--light-color);
+        }
+
+        /* Đặc biệt cho nút logout */
+        .dropdown-menu button.dropdown-item:hover,
+        .dropdown-menu button.dropdown-item:focus {
+            color: var(--primary-color) !important;
+            background-color: var(--light-color);
+        }
+
+        /* Đảm bảo icon trong các mục dropdown cũng có màu tím khi hover */
+        .dropdown-menu .dropdown-item:hover i,
+        .dropdown-menu .dropdown-item:focus i {
+            color: var(--primary-color);
+        }
+
+        /* Updated brand/logo text color */
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+            padding-left: 20px;
+            font-size: 1.2rem;
+        }
+
+        /* Update user dropdown style */
+        .user-dropdown .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--light-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Fix navbar-toggler for mobile view */
+        .navbar-toggler {
+            border-color: var(--gray-300);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2874, 85, 104, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
         /* Main Content */
@@ -580,8 +615,8 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <!-- Dashboard link moved to top navbar -->
                 <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <a class="nav-link " th:href="@{/student/{studentId}/courses(studentId=${student.id})}">
+                        <i class="fas fa-tachometer-alt"></i> Trang chủ
                     </a>
                 </li>
 
