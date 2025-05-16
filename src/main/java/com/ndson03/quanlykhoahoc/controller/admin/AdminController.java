@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+import com.ndson03.quanlykhoahoc.service.utils.ToastService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,7 @@ import com.ndson03.quanlykhoahoc.service.course.StudentCourseDetailsService;
 import com.ndson03.quanlykhoahoc.service.user.StudentService;
 import com.ndson03.quanlykhoahoc.service.user.TeacherService;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 @Controller
@@ -58,6 +60,9 @@ public class AdminController {
 
 	@Value("${file.upload.directory}")
 	private String uploadDir;
+
+	@Autowired
+	private ToastService toastService;
 	
 	private int teacherDeleteErrorValue; //used for deleting teacher, 0 means the teacher has not any assigned courses, 1 means it has
 	
@@ -174,16 +179,16 @@ public class AdminController {
 		
 		return "redirect:/admin/teachers";
 	}
-	
-	
+
+
 	@GetMapping("/addCourse")
 	public String addCourse(Model theModel) {
-		//add course form has a select teacher field where all teachers registered are showed as drop-down list
-		List<Teacher> teachers = teacherService.findAllTeachers(); 
-		
+		List<Teacher> teachers = teacherService.findAllTeachers();
+
 		theModel.addAttribute("course", new Course());
 		theModel.addAttribute("teachers", teachers);
-		
+		theModel.addAttribute("toastService", toastService);
+
 		return "admin/course-form";
 	}
 
@@ -196,9 +201,9 @@ public class AdminController {
 			Model theModel) {
 
 		if (theBindingResult.hasErrors()) {
-			// course form has data validation rules. If fields are not properly filled out, form is showed again
 			List<Teacher> teachers = teacherService.findAllTeachers();
 			theModel.addAttribute("teachers", teachers);
+			toastService.addErrorToast("Vui lòng kiểm tra lại thông tin khóa học!");
 			return "admin/course-form";
 		}
 
@@ -237,16 +242,16 @@ public class AdminController {
 			}
 		}
 
-		// Lưu khóa học
 		courseService.save(theCourse);
+		toastService.addSuccessToast("Lưu khóa học thành công!");
 
-		return "redirect:/admin/adminPanel";
+		return "redirect:/admin/courses";
 	}
-	
+
 	@GetMapping("/courses")
 	public String showCourses(Model theModel) {
-		theModel.addAttribute("courses", courseService.findAllCourses());	
-		
+		theModel.addAttribute("courses", courseService.findAllCourses());
+		theModel.addAttribute("toastService", toastService);
 		return "admin/course-list";
 	}
 
@@ -277,6 +282,7 @@ public class AdminController {
 
 		// Xóa khóa học
 		courseService.deleteCourseById(courseId);
+		toastService.addSuccessToast("Xóa khoá học thành công!");
 
 		return "redirect:/admin/courses";
 	}
