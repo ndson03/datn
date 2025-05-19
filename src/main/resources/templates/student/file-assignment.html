@@ -308,7 +308,6 @@
                         <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/courses/{courseId}(studentId=${student.id}, courseId=${course.id})}" th:text="${course.name}"></a></li>
                         <li class="breadcrumb-item"><a th:href="@{/student/{studentId}/course/{courseId}/lesson/{lessonId}(studentId=${student.id}, courseId=${course.id}, lessonId=${lesson.id})}" th:text="${lesson.title}"></a></li>
                         <li class="breadcrumb-item active" aria-current="page" th:text="${assignment.name}"></li>
-                        <li class="breadcrumb-item active" aria-current="page" th:text="${assignment.name}"></li>
                     </ol>
                 </nav>
             </div>
@@ -550,5 +549,6 @@
         });
     });
 </script>
+<div th:replace="~{fragments/toast-fragments :: toast-script}"></div>
 </body>
 </html>

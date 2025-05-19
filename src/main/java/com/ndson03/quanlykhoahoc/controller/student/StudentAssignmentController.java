@@ -12,6 +12,7 @@ import com.ndson03.quanlykhoahoc.service.course.StudentCourseDetailsService;
 import com.ndson03.quanlykhoahoc.service.quiz.*;
 import com.ndson03.quanlykhoahoc.service.user.StudentService;
 import com.ndson03.quanlykhoahoc.service.utils.NotificationService;
+import com.ndson03.quanlykhoahoc.service.utils.ToastService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -79,6 +80,8 @@ public class StudentAssignmentController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private ToastService toastService;
 
     @GetMapping("/{studentId}/course/{courseId}/lesson/{lessonId}/assignment/{assignmentId}")
     public String viewAssignment(@PathVariable("studentId") int studentId,
@@ -183,7 +186,7 @@ public class StudentAssignmentController {
             List<AssignmentFileSubmission> assignmentFileSubmissions = fileSubmissionService.findByAssignmentDetailsId(assignmentDetails.getId());
             model.addAttribute("assignmentFileSubmissions", assignmentFileSubmissions);
         }
-
+        model.addAttribute("toastService", toastService);
         return "student/file-assignment";
     }
 
@@ -401,7 +404,8 @@ public class StudentAssignmentController {
                              @PathVariable("assignmentId") int assignmentId,
                              @RequestParam("file") MultipartFile file,
                              @RequestParam(value = "comment", required = false) String comment,
-                             RedirectAttributes redirectAttributes) {
+                             RedirectAttributes redirectAttributes,
+                             Model theModel) {
 
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("message", "Vui lòng chọn file để tải lên");
@@ -473,6 +477,9 @@ public class StudentAssignmentController {
         notification.setCreatedAt(new Date());
         notification.setRead(false);
         notificationService.save(notification);
+        theModel.addAttribute("toastService", toastService);
+        toastService.addSuccessToast("Tải file lên thành công!");
+
         return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId;
     }
 
@@ -519,6 +526,8 @@ public class StudentAssignmentController {
             redirectAttributes.addFlashAttribute("message", "Không tìm thấy file!");
             redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
         }
+
+        toastService.addSuccessToast("Xóa file thành công!");
 
         return "redirect:/student/" + studentId + "/course/" + courseId + "/lesson/" + lessonId + "/assignment/" + assignmentId;
     }

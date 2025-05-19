@@ -27,6 +27,10 @@
 						Tài khoản hoặc mật khẩu không hợp lệ
 					</div>
 
+					<div class="error-message" th:if="${param.expired}">
+						<i class="fas fa-exclamation-circle me-2"></i>
+						Phiên đăng nhập đã hết hiệu lực!
+					</div>
 					<!-- Success Message -->
 					<div class="success-message" th:if="${param.registrationSuccess}">
 						<i class="fas fa-check-circle me-2"></i>
