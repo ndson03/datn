@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ndson03.quanlykhoahoc.repository.user.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ndson03.quanlykhoahoc.repository.user.RoleRepository;
-import com.ndson03.quanlykhoahoc.repository.user.StudentRepository;
 import com.ndson03.quanlykhoahoc.domain.entity.Role;
 import com.ndson03.quanlykhoahoc.domain.entity.Student;
 import com.ndson03.quanlykhoahoc.domain.dto.UserDTO;
@@ -35,13 +35,13 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	@Transactional
 	public Student findByStudentName(String studentName) {
-		return studentRepository.findByStudentName(studentName);
+		return studentRepository.findByUserName(studentName);
 	}
 	
 	@Override
 	@Transactional
 	public Student findByStudentId(int id) {
-		return studentRepository.findByStudentId(id);
+		return studentRepository.findById(id).orElse(null);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Student student = studentRepository.findByStudentName(username);
+		Student student = studentRepository.findByUserName(username);
 		if (student == null) {
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
@@ -79,7 +79,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	@Transactional
 	public List<Student> findAllStudents() {
-		return studentRepository.findAllStudents();
+		return studentRepository.findAll();
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ndson03.quanlykhoahoc.repository.user.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ndson03.quanlykhoahoc.repository.user.RoleRepository;
-import com.ndson03.quanlykhoahoc.repository.user.TeacherRepository;
 import com.ndson03.quanlykhoahoc.domain.entity.Role;
 import com.ndson03.quanlykhoahoc.domain.entity.Teacher;
 import com.ndson03.quanlykhoahoc.domain.dto.UserDTO;
@@ -33,7 +33,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	@Transactional
 	public Teacher findByTeacherName(String teacherName) {
-		return teacherRepository.findByTeacherName(teacherName);
+		return teacherRepository.findByUserName(teacherName);
 	}
 
 	@Override
@@ -60,14 +60,14 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	@Transactional
 	public List<Teacher> findAllTeachers() {
-		return teacherRepository.findAllTeachers();
+		return teacherRepository.findAll();
 	}
 	
 	
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Teacher teacher = teacherRepository.findByTeacherName(username);
+		Teacher teacher = teacherRepository.findByUserName(username);
 		if (teacher == null) {
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
@@ -84,13 +84,13 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	@Transactional
 	public Teacher findByTeacherId(int id) {
-		return teacherRepository.findByTeacherId(id);
+		return teacherRepository.findById(id).orElse(null);
 	}
 
 	@Override
 	@Transactional
 	public void deleteTeacherById(int id) {
-		teacherRepository.deleteTeacherById(id);
+		teacherRepository.deleteById(id);
 	}
 
 	

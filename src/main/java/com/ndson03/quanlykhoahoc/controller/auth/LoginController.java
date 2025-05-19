@@ -8,10 +8,10 @@ public class LoginController {
 
 	@GetMapping("/")
 	public String homeRedirect() {
-		return "redirect:/showLoginPage/";
+		return "redirect:/login/";
 	}
 
-	@GetMapping("/showLoginPage")
+	@GetMapping("/login")
 	public String showLoginPage() {
 		return "login/login-form";
 	}

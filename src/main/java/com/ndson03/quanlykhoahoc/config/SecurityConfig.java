@@ -32,7 +32,7 @@ import com.ndson03.quanlykhoahoc.service.user.TeacherService;
 
 @Configuration
 @EnableWebSecurity
-public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private StudentService studentService;
@@ -65,6 +65,7 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable()
 				.authorizeRequests()
 				.antMatchers("/api/qna/**").permitAll()
+				.antMatchers("/forgot-password", "/reset-password/**").permitAll()
 				.antMatchers("/").authenticated()
 				.antMatchers("/admin/**").hasRole("ADMIN")
 				.antMatchers("/student/**").hasRole("STUDENT")
@@ -81,17 +82,17 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 				.deleteCookies("JSESSIONID")
 				.invalidateHttpSession(true)
 				.clearAuthentication(true)
-				.logoutSuccessUrl("/showLoginPage?logout")
+				.logoutSuccessUrl("/login?logout")
 				.permitAll()
 				.and()
 				.sessionManagement()
 				.sessionFixation().migrateSession()  // Bảo vệ phiên khỏi fixation attacks
 				.maximumSessions(1)                  // Mỗi người dùng chỉ được phép đăng nhập 1 phiên
 				.maxSessionsPreventsLogin(false)     // False: phiên cũ sẽ bị đăng xuất nếu đăng nhập ở nơi khác
-				.expiredUrl("/showLoginPage?expired") // Chuyển hướng khi phiên hết hạn
+				.expiredUrl("/login?expired") // Chuyển hướng khi phiên hết hạn
 				.and()
 				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-				.invalidSessionUrl("/showLoginPage?invalid") // Chuyển hướng khi phiên không hợp lệ
+				.invalidSessionUrl("/login?invalid") // Chuyển hướng khi phiên không hợp lệ
 				.and()
 				.exceptionHandling().accessDeniedPage("/access-denied");
 

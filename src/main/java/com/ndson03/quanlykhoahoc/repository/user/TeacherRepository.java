@@ -1,19 +1,15 @@
 package com.ndson03.quanlykhoahoc.repository.user;
 
-import java.util.List;
-
 import com.ndson03.quanlykhoahoc.domain.entity.Teacher;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface TeacherRepository {
-	
-	public Teacher findByTeacherName(String theTeacherName);
-	
-	public Teacher findByTeacherId(int id);
-	
-	public void save(Teacher teacher);
-	
-	public List<Teacher> findAllTeachers();
-	
-	public void deleteTeacherById(int id);
-	
+@Repository
+public interface TeacherRepository extends JpaRepository<Teacher, Integer> {
+
+	Teacher findByUserName(String userName);
+
+	Teacher findByEmail(String email);
+
+	// Các method như save(), deleteById(), findAll()... đã có sẵn từ JpaRepository
 }
