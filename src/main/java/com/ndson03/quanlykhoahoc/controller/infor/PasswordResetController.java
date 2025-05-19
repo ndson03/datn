@@ -1,6 +1,6 @@
-package com.ndson03.quanlykhoahoc.controller;
+package com.ndson03.quanlykhoahoc.controller.infor;
 
-import com.ndson03.quanlykhoahoc.service.PasswordResetService;
+import com.ndson03.quanlykhoahoc.service.infor.PasswordResetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

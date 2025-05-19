@@ -1,4 +1,4 @@
-package com.ndson03.quanlykhoahoc.service;
+package com.ndson03.quanlykhoahoc.service.infor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;

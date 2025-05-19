@@ -1,9 +1,9 @@
-package com.ndson03.quanlykhoahoc.service;
+package com.ndson03.quanlykhoahoc.service.infor;
 
 import com.ndson03.quanlykhoahoc.domain.entity.PasswordResetToken;
 import com.ndson03.quanlykhoahoc.domain.entity.Student;
 import com.ndson03.quanlykhoahoc.domain.entity.Teacher;
-import com.ndson03.quanlykhoahoc.repository.PasswordResetTokenRepository;
+import com.ndson03.quanlykhoahoc.repository.infor.PasswordResetTokenRepository;
 import com.ndson03.quanlykhoahoc.repository.user.StudentRepository;
 import com.ndson03.quanlykhoahoc.repository.user.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;

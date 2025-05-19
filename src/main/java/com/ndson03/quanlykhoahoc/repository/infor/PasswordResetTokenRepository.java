@@ -1,4 +1,4 @@
-package com.ndson03.quanlykhoahoc.repository;
+package com.ndson03.quanlykhoahoc.repository.infor;
 
 import com.ndson03.quanlykhoahoc.domain.entity.PasswordResetToken;
 import org.springframework.data.jpa.repository.JpaRepository;

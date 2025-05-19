@@ -72,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/teacher/**").hasRole("TEACHER")
 				.and()
 				.formLogin()
-				.loginPage("/showLoginPage")
+				.loginPage("/login")
 				.loginProcessingUrl("/authenticateTheUser")
 				.successHandler(customAuthenticationSuccessHandler)
 				.permitAll()
@@ -136,7 +136,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 										FilterChain filterChain) throws ServletException, IOException {
 			// Kiểm tra nếu request đến trang đăng nhập và người dùng đã xác thực
-			if (request.getRequestURI().equals(request.getContextPath() + "/showLoginPage") &&
+			if (request.getRequestURI().equals(request.getContextPath() + "/login") &&
 					SecurityContextHolder.getContext().getAuthentication() != null &&
 					SecurityContextHolder.getContext().getAuthentication().isAuthenticated() &&
 					!(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
