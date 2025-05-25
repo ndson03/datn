@@ -3,7 +3,6 @@
 <head>
     <title>Chatbot</title>
     <head th:replace="fragments/head :: common-head"></head>
-    <link rel="stylesheet" th:href="@{/css/layout-2.css}">
     <link rel="stylesheet" th:href="@{/css/chatbot.css}">
     <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
@@ -95,13 +94,11 @@
     </div>
 </nav>
 
-<!-- Main Content -->
+!-- Main Content -->
 <div class="main-content">
     <div class="container-fluid">
-        <!-- Chatbot Container -->
         <div class="chat-container">
             <div class="chat-box" id="chatBox">
-                <!-- Bot welcome message -->
                 <div class="bot-message">
                     <div class="message-content">
                         <p>Xin chào! Tôi là trợ lý AI của Trường SICT. Tôi có thể giúp gì cho bạn hôm nay?</p>
@@ -109,12 +106,20 @@
                 </div>
             </div>
 
+            <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+            <div id="imagePreview" style="display: none; padding: 0 15px;"></div>
+
             <div class="chat-input-container">
+                <div id="attachBtn" onclick="document.getElementById('imageInput').click()"
+                     style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+                color: var(--primary-color); cursor: pointer; margin-right: 10px;"
+                     title="Đính kèm ảnh">
+                    <i class="fas fa-paperclip"></i>
+                </div>
                 <textarea id="questionInput" placeholder="Nhập câu hỏi của bạn..." oninput="autoResize(this)" onkeydown="checkEnter(event)" autofocus></textarea>
                 <div id="sendIcon" onclick="askQuestion()">
                     <i class="fas fa-paper-plane"></i>
                 </div>
-                <!-- Thêm nút xóa lịch sử cạnh nút gửi -->
                 <div id="clearHistoryBtn" onclick="clearChatHistory()" title="Xóa lịch sử chat">
                     <i class="fas fa-trash-alt"></i>
                 </div>
