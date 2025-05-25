@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,11 +45,27 @@ public class GeminiController {
     public ResponseEntity<String> askQuestion(@RequestBody Map<String, Object> payload) {
         String question = (String) payload.get("question");
         List<Map<String, Object>> chatHistory = (List<Map<String, Object>>) payload.get("chatHistory");
+        Map<String, Object> imageData = (Map<String, Object>) payload.get("image");
 
-        // Thêm câu hỏi mới vào lịch sử
+        // Tạo parts cho message
+        List<Object> parts = new ArrayList<>();
+        if (question != null && !question.isEmpty()) {
+            parts.add(Map.of("text", question));
+        }
+
+        // Thêm image nếu có
+        if (imageData != null) {
+            parts.add(Map.of(
+                    "inline_data", Map.of(
+                            "mime_type", imageData.get("mimeType"),
+                            "data", imageData.get("data")
+                    )
+            ));
+        }
+
         Map<String, Object> userMessage = Map.of(
                 "role", "user",
-                "parts", new Object[]{Map.of("text", question)}
+                "parts", parts.toArray()
         );
         chatHistory.add(userMessage);
 
