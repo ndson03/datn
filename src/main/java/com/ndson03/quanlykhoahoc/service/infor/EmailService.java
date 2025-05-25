@@ -30,7 +30,7 @@ public class EmailService {
         Context context = new Context();
         context.setVariable("token", token);
         context.setVariable("fullName", fullName);
-        context.setVariable("resetUrl", "http://localhost:8080/reset-password?token=" + token);
+        context.setVariable("resetUrl", "https://ndson.online/reset-password?token=" + token);
 
         String emailContent = templateEngine.process("reset-password-email", context);
         helper.setText(emailContent, true);

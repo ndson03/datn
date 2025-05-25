@@ -41,25 +41,30 @@ public class GeminiController {
     }
 
     @PostMapping("/gemini/ask")
-    public ResponseEntity<String> askQuestion(@RequestBody Map<String, String> payload) {
-        // Lấy câu hỏi từ payload
-        String question = payload.get("question");
+    public ResponseEntity<String> askQuestion(@RequestBody Map<String, Object> payload) {
+        String question = (String) payload.get("question");
+        List<Map<String, Object>> chatHistory = (List<Map<String, Object>>) payload.get("chatHistory");
 
-        // Giả sử bạn đã nhận được câu trả lời từ API (dạng JSON string)
-        String answer = geminiService.getAnswer(question);
+        // Thêm câu hỏi mới vào lịch sử
+        Map<String, Object> userMessage = Map.of(
+                "role", "user",
+                "parts", new Object[]{Map.of("text", question)}
+        );
+        chatHistory.add(userMessage);
+
+        String answer = geminiService.getAnswer(chatHistory);
 
         // Parse JSON để lấy phần text
         JsonObject jsonObject = JsonParser.parseString(answer).getAsJsonObject();
         JsonArray candidates = jsonObject.getAsJsonArray("candidates");
 
-        // Lấy phần text từ câu trả lời
         String text = candidates.get(0).getAsJsonObject()
                 .getAsJsonObject("content")
                 .getAsJsonArray("parts")
                 .get(0).getAsJsonObject()
                 .get("text").getAsString();
 
-        return ResponseEntity.ok(text); // Trả về phần text
+        return ResponseEntity.ok(text);
     }
 
     @GetMapping("/student/{studentId}/chatbot")

@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class QuanLyKhoaHocApplication {
+public class LMSApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(QuanLyKhoaHocApplication.class, args);
+		SpringApplication.run(LMSApplication.class, args);
 	}
 
 }

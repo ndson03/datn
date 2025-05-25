@@ -109,6 +109,6 @@ public class RegistrationController {
 		}
 
 		// Redirect to login page with a success parameter
-		return "redirect:/showLoginPage?registrationSuccess";
+		return "redirect:/login?registrationSuccess";
 	}
 }

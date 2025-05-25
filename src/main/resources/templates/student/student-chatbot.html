@@ -584,7 +584,29 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Sửa lại hàm askQuestion để lưu câu trả lời của bot
+    // Tạo chat history theo định dạng API Gemini
+    function buildChatHistoryForAPI() {
+        const chatHistory = JSON.parse(localStorage.getItem('sictChatHistory') || '[]');
+        const apiHistory = [];
+
+        chatHistory.forEach(message => {
+            if (message.isUser) {
+                apiHistory.push({
+                    role: "user",
+                    parts: [{ text: message.content }]
+                });
+            } else {
+                apiHistory.push({
+                    role: "model",
+                    parts: [{ text: message.content }]
+                });
+            }
+        });
+
+        return apiHistory;
+    }
+
+    // Sửa lại hàm askQuestion để hỗ trợ ngữ cảnh
     function askQuestion() {
         const input = document.getElementById('questionInput');
         const question = input.value.trim();
@@ -616,11 +638,17 @@
         autoResize(input);
         document.getElementById('sendIcon').style.pointerEvents = 'none';
 
-        // Gửi request
+        // Tạo chat history cho API (không bao gồm câu hỏi hiện tại)
+        const chatHistory = buildChatHistoryForAPI();
+
+        // Gửi request với ngữ cảnh
         fetch('/gemini/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question })
+            body: JSON.stringify({
+                question: question,
+                chatHistory: chatHistory
+            })
         })
             .then(res => res.text())
             .then(data => {
@@ -651,6 +679,7 @@
                 }, 100);
             })
             .catch(err => {
+                console.error('Error:', err);
                 loadingDiv.className = 'bot-message';
 
                 const messageContent = document.createElement('div');
@@ -670,9 +699,11 @@
 
     // Thêm hàm để xóa lịch sử chat
     function clearChatHistory() {
-        localStorage.removeItem('sictChatHistory');
-        // Tải lại trang để hiển thị tin nhắn chào mừng mặc định
-        window.location.reload();
+        if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử chat không?')) {
+            localStorage.removeItem('sictChatHistory');
+            // Tải lại trang để hiển thị tin nhắn chào mừng mặc định
+            window.location.reload();
+        }
     }
 
     function appendMessage(el) {
