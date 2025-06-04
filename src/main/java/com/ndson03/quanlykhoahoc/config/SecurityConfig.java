@@ -66,6 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()
 				.antMatchers("/api/qna/**").permitAll()
 				.antMatchers("/forgot-password", "/reset-password/**").permitAll()
+				.antMatchers("/change-password").authenticated() // Cho phép tất cả user đã đăng nhập đổi mật khẩu
 				.antMatchers("/").authenticated()
 				.antMatchers("/admin/**").hasRole("ADMIN")
 				.antMatchers("/student/**").hasRole("STUDENT")

@@ -28,4 +28,5 @@ public class StudentProfileController {
         theModel.addAttribute("courses", courses);
         return "student/student-profile";
     }
+
 }

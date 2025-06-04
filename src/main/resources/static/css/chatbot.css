@@ -406,3 +406,87 @@ p {
     border-bottom-right-radius: 5px;
     word-wrap: break-word;
 }
+
+/* Đảm bảo main-content có thể cuộn và chiếm toàn bộ chiều cao màn hình */
+.main-content {
+    padding: 80px 30px 30px;
+    transition: all var(--transition-speed) ease;
+    overflow-y: auto; /* Thanh cuộn ngoài cùng bên phải */
+    height: calc(100vh - 80px); /* Chiều cao trừ đi navbar */
+    position: relative;
+}
+
+/* Giữ chat-container cố định trong khung */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Chiếm toàn bộ chiều cao của main-content */
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden; /* Ngăn thanh cuộn thừa */
+    position: relative; /* Cung cấp ngữ cảnh cho vị trí fixed */
+}
+
+/* Loại bỏ thanh cuộn trong chat-box */
+.chat-box {
+    flex: 1;
+    overflow-y: visible; /* Bỏ thanh cuộn trong chat-box */
+    padding: 20px;
+    max-height: none; /* Xóa giới hạn chiều cao */
+}
+
+/* Cố định chat-input-container ở dưới cùng */
+.chat-input-container {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding: 15px;
+    background-color: #f9f9f9;
+    position: fixed; /* Cố định tương đối với viewport */
+    bottom: 0;
+    left: 30px; /* Căn lề trái khớp với main-content */
+    right: 30px; /* Căn lề phải khớp với main-content */
+    z-index: 10; /* Đảm bảo nằm trên các phần tử khác */
+    border-radius: 0 0 12px 12px; /* Giữ góc bo tròn ở dưới */
+}
+
+/* Đảm bảo các tin nhắn hiển thị đúng */
+.user-message, .bot-message {
+    max-width: 75%;
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+    display: flex;
+    align-items: center;
+}
+
+.user-message {
+    align-self: flex-end;
+    background-color: var(--primary-color);
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+.bot-message {
+    align-self: flex-start;
+    background-color: #f0f2f5;
+    color: #333;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+/* Điều chỉnh cho màn hình nhỏ */
+@media (max-width: 991.98px) {
+    .main-content {
+        padding: 75px 15px 20px;
+    }
+
+    .chat-input-container {
+        left: 15px; /* Căn lề trái cho màn hình nhỏ */
+        right: 15px; /* Căn lề phải cho màn hình nhỏ */
+    }
+}

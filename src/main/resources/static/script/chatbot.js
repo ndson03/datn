@@ -109,58 +109,58 @@
 };
 }
 
-    function displayChatHistory(messages) {
+function displayChatHistory(messages) {
     const chatBox = document.getElementById('chatBox');
 
     if (messages.length > 0) {
-    chatBox.innerHTML = '';
-}
+        chatBox.innerHTML = '';
+    }
 
     messages.forEach(message => {
-    if (message.isUser) {
-    const container = document.createElement('div');
-    container.className = 'user-message-container';
+        if (message.isUser) {
+            const container = document.createElement('div');
+            container.className = 'user-message-container';
 
-    if (message.imageData) {
-    const img = document.createElement('img');
-    img.src = `data:${message.imageData.mimeType};base64,${message.imageData.data}`;
-    img.className = 'user-message-image';
+            if (message.imageData) {
+                const img = document.createElement('img');
+                img.src = `data:${message.imageData.mimeType};base64,${message.imageData.data}`;
+                img.className = 'user-message-image';
 
-    img.onclick = function() {
-    showImageModal(img.src);
-};
+                img.onclick = function() {
+                    showImageModal(img.src);
+                };
 
-    container.appendChild(img);
-}
+                container.appendChild(img);
+            }
 
-    if (message.content && message.content.trim()) {
-    const textDiv = document.createElement('div');
-    textDiv.className = 'user-message-text';
-    textDiv.textContent = message.content;
-    container.appendChild(textDiv);
-}
+            if (message.content && message.content.trim()) {
+                const textDiv = document.createElement('div');
+                textDiv.className = 'user-message-text';
+                textDiv.textContent = message.content;
+                container.appendChild(textDiv);
+            }
 
-    chatBox.appendChild(container);
-} else {
-    const el = document.createElement('div');
-    el.className = 'bot-message';
+            chatBox.appendChild(container);
+        } else {
+            const el = document.createElement('div');
+            el.className = 'bot-message';
 
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
 
-    const sanitized = DOMPurify.sanitize(md.render(message.content));
-    messageContent.innerHTML = sanitized;
+            const sanitized = DOMPurify.sanitize(md.render(message.content));
+            messageContent.innerHTML = sanitized;
 
-    el.appendChild(messageContent);
-    chatBox.appendChild(el);
+            el.appendChild(messageContent);
+            chatBox.appendChild(el);
 
-    el.querySelectorAll('pre code').forEach(block => {
-    hljs.highlightElement(block);
-});
-}
-});
+            el.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
+    });
 
-    chatBox.scrollTop = chatBox.scrollHeight;
+    scrollToBottom(); // Cuộn xuống cuối sau khi tải lịch sử
 }
 
     function buildChatHistoryForAPI() {
@@ -243,94 +243,91 @@
 }
 
     async function askQuestion() {
-    const input = document.getElementById('questionInput');
-    const question = input.value.trim();
+        const input = document.getElementById('questionInput');
+        const question = input.value.trim();
 
-    if (!question && !selectedImage) return;
+        if (!question && !selectedImage) return;
 
-    displayUserMessage(question, selectedImage);
+        displayUserMessage(question, selectedImage);
 
-    const chatBox = document.getElementById('chatBox');
-    const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'bot-message loading-message';
+        const chatBox = document.getElementById('chatBox');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'bot-message loading-message';
 
-    const loadingContent = document.createElement('div');
-    loadingContent.className = 'message-content';
+        const loadingContent = document.createElement('div');
+        loadingContent.className = 'message-content';
 
-    const typingIndicator = document.createElement('div');
-    typingIndicator.className = 'typing-indicator';
-    typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing-indicator';
+        typingIndicator.innerHTML = '<span></span><span></span><span></span>';
 
-    loadingContent.appendChild(typingIndicator);
-    loadingDiv.appendChild(loadingContent);
+        loadingContent.appendChild(typingIndicator);
+        loadingDiv.appendChild(loadingContent);
 
-    chatBox.appendChild(loadingDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
+        chatBox.appendChild(loadingDiv);
+        scrollToBottom(); // Cuộn xuống khi thêm tin nhắn loading
 
-    const payload = {
-    question: question || "",
-    chatHistory: await buildChatHistoryForAPI()
-};
+        const payload = {
+            question: question || "",
+            chatHistory: await buildChatHistoryForAPI()
+        };
 
-    if (selectedImage) {
-    payload.image = selectedImage;
-}
+        if (selectedImage) {
+            payload.image = selectedImage;
+        }
 
-    input.value = '';
-    autoResize(input);
-    removeSelectedImage();
-    document.getElementById('sendIcon').style.pointerEvents = 'none';
+        input.value = '';
+        autoResize(input);
+        removeSelectedImage();
+        document.getElementById('sendIcon').style.pointerEvents = 'none';
 
-    fetch('/gemini/ask', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-})
-    .then(res => {
-    if (!res.ok) {
-    throw new Error(`HTTP error! status: ${res.status}`);
-}
-    return res.text();
-})
-    .then(data => {
-    const sanitized = DOMPurify.sanitize(md.render(data));
-    loadingDiv.className = 'bot-message';
+        fetch('/gemini/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.text();
+            })
+            .then(data => {
+                const sanitized = DOMPurify.sanitize(md.render(data));
+                loadingDiv.className = 'bot-message';
 
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
-    messageContent.innerHTML = sanitized;
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.innerHTML = sanitized;
 
-    loadingDiv.innerHTML = '';
-    loadingDiv.appendChild(messageContent);
+                loadingDiv.innerHTML = '';
+                loadingDiv.appendChild(messageContent);
 
-    loadingDiv.querySelectorAll('pre code').forEach(block => {
-    hljs.highlightElement(block);
-});
+                loadingDiv.querySelectorAll('pre code').forEach(block => {
+                    hljs.highlightElement(block);
+                });
 
-    saveMessageToHistory(false, data);
+                saveMessageToHistory(false, data);
+                scrollToBottom(); // Cuộn xuống khi nhận được phản hồi
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                loadingDiv.className = 'bot-message';
 
-    setTimeout(() => {
-    chatBox.scrollTop = chatBox.scrollHeight;
-}, 100);
-})
-    .catch(err => {
-    console.error('Error:', err);
-    loadingDiv.className = 'bot-message';
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: #e74c3c; margin-right: 8px;"></i>Có lỗi xảy ra. Vui lòng thử lại!';
 
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
-    messageContent.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: #e74c3c; margin-right: 8px;"></i>Có lỗi xảy ra. Vui lòng thử lại!';
+                loadingDiv.innerHTML = '';
+                loadingDiv.appendChild(messageContent);
 
-    loadingDiv.innerHTML = '';
-    loadingDiv.appendChild(messageContent);
-
-    saveMessageToHistory(false, 'Có lỗi xảy ra. Vui lòng thử lại!');
-})
-    .finally(() => {
-    document.getElementById('sendIcon').style.pointerEvents = 'auto';
-});
-}
-
+                saveMessageToHistory(false, 'Có lỗi xảy ra. Vui lòng thử lại!');
+                scrollToBottom(); // Cuộn xuống khi có lỗi
+            })
+            .finally(() => {
+                document.getElementById('sendIcon').style.pointerEvents = 'auto';
+            });
+    }
     document.addEventListener('DOMContentLoaded', async function() {
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
@@ -463,10 +460,25 @@
 }
 }
 
-    function appendMessage(el) {
+function appendMessage(el) {
     const box = document.getElementById('chatBox');
     box.appendChild(el);
-    box.scrollTop = box.scrollHeight;
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const mainContent = document.querySelector('.main-content');
+    const chatBox = document.getElementById('chatBox');
+    // Tính toán vị trí của phần tử cuối cùng trong chat-box
+    const lastMessage = chatBox.lastElementChild;
+    if (lastMessage) {
+        const rect = lastMessage.getBoundingClientRect();
+        const mainContentRect = mainContent.getBoundingClientRect();
+        // Cuộn main-content để đưa tin nhắn cuối vào tầm nhìn
+        mainContent.scrollTop = chatBox.offsetHeight - mainContent.clientHeight + rect.height + 100; // Thêm 20px để có khoảng cách
+    } else {
+        mainContent.scrollTop = mainContent.scrollHeight;
+    }
 }
 
     function checkEnter(e) {
